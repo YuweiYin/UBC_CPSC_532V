@@ -287,13 +287,41 @@ def stat() -> None:
         json.dump(stat_result, fp_out)
 
 
+def plot() -> None:
+    from matplotlib import pyplot as plt
+
+    res_dir = os.path.join("./output/")
+    assert os.path.isdir(res_dir)
+    stat_fp = os.path.join(res_dir, "stat_results.json")
+
+    with open(stat_fp, "r", encoding="utf-8") as fp_in:
+        data = json.load(fp_in)
+    data = data["top_10_relation"]
+
+    x_rel_names = [item[0] for item in data]
+    y_rel_count = [item[1] for item in data]
+
+    plt.rcParams["font.family"] = "Times New Roman"
+
+    plt.figure()
+    plt.bar(x_rel_names, y_rel_count)
+
+    plt.title("Top 10 relations from search results", fontsize=16)
+    plt.xlabel("Relation Type", fontsize=14)
+    plt.ylabel("Count", fontsize=14)
+    plt.xticks(rotation=70)
+
+    res_fp = os.path.join(res_dir, "stat_figure.pdf")
+    plt.savefig(res_fp, format="pdf", dpi=600, bbox_inches="tight")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true", default=False)
     parser.add_argument("-e", "--example_id", type=int, default=-1, help="-1: all; 0: examples[0]")
     parser.add_argument("-c", "--choice_id", type=int, default=-1, help="-1: all; 0: choices[0]")
     parser.add_argument("-d", "--max_depth", type=int, default=6, help="Max BFS depth")
-    parser.add_argument("-t", "--use_gpt", action="store_true", default=False, help='Use LLM/GPT')
+    parser.add_argument("-t", "--use_gpt", action="store_true", default=False, help="Use LLM/GPT")
     args = parser.parse_args()
     print(args)
 
@@ -303,6 +331,7 @@ if __name__ == "__main__":
 
     run()
     # stat()
+    # plot()
 
     timer_end = time.perf_counter()
     print("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
