@@ -1,0 +1,132 @@
+# Example 1 (CommonSenseQA)
+
+Question: The only baggage the woman checked was a drawstring bag, where was she heading with it?
+
+Choices:
+(a) garbage can
+(b) military
+(c) jewelry store
+(d) safe
+(e) airport
+
+Correct Answer: e
+
+
+
+# Example 2 (COPA)
+
+Context: The host cancelled the party.
+Question: What was the cause?
+
+Choices:
+(a) She was certain she had the flu.
+(b) She worried she would catch the flu.
+
+Correct Answer: a
+
+
+
+# Example 3 (COPA)
+
+Context: The man uncovered incriminating evidence against his enemy.
+Question: What happened as a result?
+
+Choices:
+(a) The man avoided his enemy.
+(b) The man blackmailed his enemy.
+
+Correct Answer: b
+
+
+
+# Example 4 (Social IQa)
+
+Context: Alex had a party at his house while his parents were out of town even though they told him not to.
+Question: What will happen to Alex's parents?
+
+Choices:
+(a) punish Alex for having a party.
+(b) get in trouble.
+(c) have to clean up the mess.
+
+Correct Answer: a
+
+
+
+# Example 5 (Social IQa)
+
+Context: Skylar got a letter in the mail, it was from harvard, he was excited.
+Question: What will Skylar want to do next?
+
+(a) read the letter.
+(b) apply for entry into Harvard. 
+(c) throw the letter away.
+
+Correct Answer: a
+
+
+
+# Example 6 (WinoGrande)
+
+Context: They eased the pipe onto the giant pile so it wouldn't burst as it was rather rigid.	
+Question: What was rather rigid?
+
+Choices:
+(a) pipe
+(b) pile
+
+Correct Answer: a
+
+
+
+# Example 7 (WinoGrande)
+
+Context: Visiting New York City interested Kevin but not Lawrence because he hates being around crowds of people.
+Question: What hates being around crowds of people?
+
+Choices:
+(a) Kevin
+(b) Lawrence
+
+Correct Answer: b
+
+
+
+# Example 8 (RocStories)
+
+Context: Jim got his first credit card in college. He didn’t have a job so he bought everything on his card. After he graduated he amounted a $10,000 debt. Jim realized that he was foolish to spend so much money.
+Question: What is the next sentence?
+
+Choices:
+(a) Jim decided to open another credit card.
+(b) Jim decided to devise a plan for repayment.
+
+Correct Answer: b
+
+
+
+# Example 9 (MCTaco)
+
+Context: Growing up on a farm near St. Paul, L. Mark Bailey didn't dream of becoming a judge.
+Question: What did Mark do right after he found out that he became a judge?
+
+Choices:
+(a) had a nice dinner
+(b) he buy a 45-acre horse farm
+(c) he celebrated
+(d) mark retired
+(e) he dream of participating himself
+
+Correct Answer: a, c
+
+
+
+# Example 10 (PIQA)
+
+Question: What should you do to separate egg whites from the yolk using a water bottle?
+
+Choices:
+(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk.
+(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk.
+
+Correct Answer: a
