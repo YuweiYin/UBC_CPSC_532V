@@ -1,0 +1,8 @@
+// The path the concepts from "card" to "credit".Path Length: 2; Weight Sum: 5.791660527270807; Average Weight: 2.8958302636354034
+digraph "8_a---card-credit---PLen2_WSum5.792_WAvg2.896" {
+	0 [label=card]
+	1 [label=charge]
+	2 [label=credit]
+	0 -> 1 [label="RelatedTo; 2.316" dir=back weight=2.316]
+	1 -> 2 [label="RelatedTo; 3.476" dir=forward weight=3.476]
+}

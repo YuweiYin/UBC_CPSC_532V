@@ -1,0 +1,22 @@
+// The path the concepts from "entry" to "harvard".Path Length: 9; Weight Sum: 137.2619829968301; Average Weight: 15.251331444092235
+digraph "5_b---entry-harvard---PLen9_WSum137.262_WAvg15.251" {
+	0 [label=entry]
+	1 [label=door]
+	2 [label=house]
+	3 [label=room]
+	4 [label=class]
+	5 [label=school]
+	6 [label=place]
+	7 [label=city]
+	8 [label=college]
+	9 [label=harvard]
+	0 -> 1 [label="RelatedTo; 5.134" dir=back weight=5.134]
+	1 -> 2 [label="RelatedTo; 12.170" dir=forward weight=12.170]
+	2 -> 3 [label="RelatedTo; 21.152" dir=back weight=21.152]
+	3 -> 4 [label="RelatedTo; 26.729" dir=back weight=26.729]
+	4 -> 5 [label="RelatedTo; 28.786" dir=forward weight=28.786]
+	5 -> 6 [label="RelatedTo; 20.390" dir=forward weight=20.390]
+	6 -> 7 [label="IsA; 14.266" dir=back weight=14.266]
+	7 -> 8 [label="AtLocation; 7.633" dir=back weight=7.633]
+	8 -> 9 [label="IsA; 1.000" dir=back weight=1.000]
+}

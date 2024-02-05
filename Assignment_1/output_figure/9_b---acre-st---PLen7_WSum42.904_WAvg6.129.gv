@@ -1,0 +1,18 @@
+// The path the concepts from "acre" to "st".Path Length: 7; Weight Sum: 42.90382402080628; Average Weight: 6.12911771725804
+digraph "9_b---acre-st---PLen7_WSum42.904_WAvg6.129" {
+	0 [label=acre]
+	1 [label="acre foot"]
+	2 [label=foot]
+	3 [label=leg]
+	4 [label=walking]
+	5 [label=street]
+	6 [label=st]
+	7 [label=st]
+	0 -> 1 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 3.000" dir=forward weight=3.000]
+	2 -> 3 [label="RelatedTo; 10.159" dir=back weight=10.159]
+	3 -> 4 [label="RelatedTo; 11.796" dir=forward weight=11.796]
+	4 -> 5 [label="UsedFor; 8.293" dir=back weight=8.293]
+	5 -> 6 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	6 -> 7 [label="FormOf; 2.828" dir=back weight=2.828]
+}

@@ -1,0 +1,489 @@
+Namespace(verbose=False, example_id=5, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 5; Choice: "(a) read the letter."; From "letter" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "skylar" (Similarity: 0.349)
+>>> >>> Depth [1] Time 5.6 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 7); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 16.6 sec (0.3 min): [src->tgt] BFS source 10; Visited neighbors 50 (ignored 109); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 66.8 sec (1.1 min): [src->tgt] BFS source 50; Visited neighbors 219 (ignored 417); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between letter and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(a) read the letter."; From "letter" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "mail" (Similarity: 0.571)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 5)
+>>> Found 1 path(s) between "letter" and "mail".
+
+letter is like post
+post is like mail
+
+
+Example: 5; Choice: "(a) read the letter."; From "letter" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "harvard" (Similarity: 0.241)
+>>> >>> Depth [1] Time 1.6 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 3)
+>>> >>> Depth [2] Time 26.0 sec (0.4 min): [src->tgt] BFS source 11; Visited neighbors 67 (ignored 83); [tgt->src] BFS source 7; Visited neighbors 42 (ignored 6)
+>>> >>> Depth [3] Time 161.7 sec (2.7 min): [src->tgt] BFS source 67; Visited neighbors 368 (ignored 314); [tgt->src] BFS source 42; Visited neighbors 263 (ignored 101)
+>>> Found 25 path(s) between "letter" and "harvard".
+
+letter is like note
+note is like writing
+paper is like writing
+paper is like sheet
+page is like sheet
+page is like book
+reading is like book
+Sometimes reading causes learning
+school is used for learning
+school is like place
+city is a type of place
+You are likely to find college in city
+harvard is a type of college
+
+
+Example: 5; Choice: "(a) read the letter."; From "letter" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "excited" (Similarity: 0.293)
+>>> >>> Depth [1] Time 2.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 24.2 sec (0.4 min): [src->tgt] BFS source 13; Visited neighbors 112 (ignored 39); [tgt->src] BFS source 7; Visited neighbors 25 (ignored 13)
+>>> >>> Depth [3] Time 133.0 sec (2.2 min): [src->tgt] BFS source 112; Visited neighbors 588 (ignored 283); [tgt->src] BFS source 25; Visited neighbors 145 (ignored 42)
+>>> Found 20 path(s) between "letter" and "excited".
+
+letter is like note
+note is used for communication
+writing is like communication
+paper is like writing
+paper is like wood
+wood is like material
+bone is like material
+bone is like body
+body is like human
+person is like human
+person wants excited
+
+
+Example: 5; Choice: "(a) read the letter."; From "read" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "read" To "letter" (Similarity: 0.355)
+>>> >>> Depth [1] Time 3.2 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 22.0 sec (0.4 min): [src->tgt] BFS source 13; Visited neighbors 122 (ignored 51); [tgt->src] BFS source 15; Visited neighbors 151 (ignored 10)
+>>> Found 10 path(s) between "read" and "letter".
+
+books can be read
+You are likely to find books in table
+napkin is like table
+napkin is like paper
+paper is like writing
+writing is like communication
+note is used for communication
+letter is like note
+
+
+Example: 5; Choice: "(a) read the letter."; From "read" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "read" To "skylar" (Similarity: 0.209)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 12.0 sec (0.2 min): [src->tgt] BFS source 15; Visited neighbors 158 (ignored 48); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 185.2 sec (3.1 min): [src->tgt] BFS source 158; Visited neighbors 980 (ignored 344); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between read and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(a) read the letter."; From "read" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "read" To "mail" (Similarity: 0.283)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> Found 1 path(s) between "read" and "mail".
+
+table is used for read
+You are likely to find mail in table
+
+
+Example: 5; Choice: "(a) read the letter."; From "read" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "read" To "harvard" (Similarity: 0.205)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 3)
+>>> >>> Depth [2] Time 8.2 sec (0.1 min): [src->tgt] BFS source 12; Visited neighbors 112 (ignored 41); [tgt->src] BFS source 7; Visited neighbors 45 (ignored 3)
+>>> Found 2 path(s) between "read" and "harvard".
+
+books can be read
+literature is like books
+literature is used for learning
+college is used for learning
+harvard is a type of college
+
+
+Example: 5; Choice: "(a) read the letter."; From "read" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "read" To "excited" (Similarity: 0.357)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 6.7 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 55 (ignored 79); [tgt->src] BFS source 7; Visited neighbors 20 (ignored 18)
+>>> Found 1 path(s) between "read" and "excited".
+
+Something you do when you see exciting story is read
+Something you do when you see exciting story is get excited
+In order for jump up and down to happen, get excited needs to happen
+You would jump up and down because you want to excited
+
+*** Example: 5; Choice: a; SCORE: 12.166 (total_w_sum = 703.877; total_path_len = 45; match_pair_n = 7; total_pair_n = 9)
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "harvard" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "harvard" To "letter" (Similarity: 0.241)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 18.0 sec (0.3 min): [src->tgt] BFS source 10; Visited neighbors 71 (ignored 1); [tgt->src] BFS source 15; Visited neighbors 155 (ignored 6)
+>>> Found 1 path(s) between "harvard" and "letter".
+
+harvard is a type of college
+You are likely to find college in city
+city is like town
+You are likely to find post office in town
+You are likely to find letter in post office
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "harvard" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "harvard" To "skylar" (Similarity: 0.324)
+>>> >>> Depth [1] Time 0.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 3.3 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 37 (ignored 31); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 22.7 sec (0.4 min): [src->tgt] BFS source 37; Visited neighbors 184 (ignored 153); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between harvard and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "harvard" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "harvard" To "mail" (Similarity: 0.209)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 11.2 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 71 (ignored 1); [tgt->src] BFS source 14; Visited neighbors 110 (ignored 1)
+>>> Found 1 path(s) between "harvard" and "mail".
+
+harvard is a type of college
+You are likely to find college in city
+You are likely to find billboard in city
+billboard is used for advertisement
+You are likely to find advertisement in mail
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "harvard" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "harvard" To "excited" (Similarity: 0.147)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 0)
+>>> >>> Depth [2] Time 7.3 sec (0.1 min): [src->tgt] BFS source 10; Visited neighbors 69 (ignored 3); [tgt->src] BFS source 8; Visited neighbors 55 (ignored 1)
+>>> >>> Depth [3] Time 71.4 sec (1.2 min): [src->tgt] BFS source 69; Visited neighbors 478 (ignored 23); [tgt->src] BFS source 55; Visited neighbors 319 (ignored 19)
+>>> Found 8 path(s) between "harvard" and "excited".
+
+harvard is a type of college
+You are likely to find college in city
+city is a type of place
+school is like place
+school is used for learning
+book is used for learning
+character is like book
+character is like person
+person wants excited
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "entry" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "entry" To "letter" (Similarity: 0.426)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 9.7 sec (0.2 min): [src->tgt] BFS source 6; Visited neighbors 40 (ignored 4); [tgt->src] BFS source 15; Visited neighbors 116 (ignored 67)
+>>> Found 1 path(s) between "entry" and "letter".
+
+door is like entry
+door is like house
+You are likely to find mail in house
+letter is like mail
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "entry" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "entry" To "skylar" (Similarity: 0.242)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 2.3 sec (0.0 min): [src->tgt] BFS source 6; Visited neighbors 43 (ignored 1); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 28.2 sec (0.5 min): [src->tgt] BFS source 43; Visited neighbors 130 (ignored 86); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between entry and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "entry" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "entry" To "mail" (Similarity: 0.407)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 2)
+>>> >>> Depth [2] Time 7.1 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 37 (ignored 8); [tgt->src] BFS source 12; Visited neighbors 66 (ignored 33)
+>>> Found 1 path(s) between "entry" and "mail".
+
+door is like entry
+door is like room
+room is like house
+You are likely to find mail in house
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "entry" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "entry" To "harvard" (Similarity: 0.291)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 5)
+>>> >>> Depth [2] Time 3.3 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 21 (ignored 8); [tgt->src] BFS source 5; Visited neighbors 34 (ignored 12)
+>>> >>> Depth [3] Time 22.9 sec (0.4 min): [src->tgt] BFS source 21; Visited neighbors 55 (ignored 73); [tgt->src] BFS source 34; Visited neighbors 199 (ignored 167)
+>>> Found 8 path(s) between "entry" and "harvard".
+
+door is like entry
+door is like house
+room is like house
+class is like room
+class is like school
+school is like place
+city is a type of place
+You are likely to find college in city
+harvard is a type of college
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "entry" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "entry" To "excited" (Similarity: 0.299)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 5.1 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 40 (ignored 5); [tgt->src] BFS source 7; Visited neighbors 25 (ignored 13)
+>>> >>> Depth [3] Time 26.0 sec (0.4 min): [src->tgt] BFS source 40; Visited neighbors 112 (ignored 85); [tgt->src] BFS source 25; Visited neighbors 143 (ignored 44)
+>>> Found 1 path(s) between "entry" and "excited".
+
+door is like entry
+door is like house
+house is like building
+school is like building
+You are likely to find human in school
+person is like human
+person wants excited
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "apply" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "apply" To "letter" (Similarity: 0.349)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 11.1 sec (0.2 min): [src->tgt] BFS source 6; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 15; Visited neighbors 151 (ignored 10)
+>>> >>> Depth [3] Time 115.6 sec (1.9 min): [src->tgt] BFS source 8; Visited neighbors 10 (ignored 1); [tgt->src] BFS source 151; Visited neighbors 904 (ignored 197)
+>>> Path between apply and letter does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "apply" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "apply" To "skylar" (Similarity: 0.138)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 2.1 sec (0.0 min): [src->tgt] BFS source 6; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 2.9 sec (0.0 min): [src->tgt] BFS source 8; Visited neighbors 10 (ignored 1); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between apply and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "apply" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "apply" To "mail" (Similarity: 0.302)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 7.2 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 14; Visited neighbors 107 (ignored 4)
+>>> >>> Depth [3] Time 67.2 sec (1.1 min): [src->tgt] BFS source 4; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 107; Visited neighbors 645 (ignored 153)
+>>> Path between apply and mail does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "apply" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "apply" To "harvard" (Similarity: 0.226)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 3)
+>>> >>> Depth [2] Time 5.0 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 7; Visited neighbors 43 (ignored 5)
+>>> >>> Depth [3] Time 20.9 sec (0.3 min): [src->tgt] BFS source 8; Visited neighbors 10 (ignored 1); [tgt->src] BFS source 43; Visited neighbors 279 (ignored 102)
+>>> Path between apply and harvard does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(b) apply for entry into Harvard."; From "apply" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "apply" To "excited" (Similarity: 0.301)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 4.4 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 25 (ignored 13)
+>>> >>> Depth [3] Time 11.7 sec (0.2 min): [src->tgt] BFS source 4; Visited neighbors 5 (ignored 1); [tgt->src] BFS source 25; Visited neighbors 142 (ignored 45)
+>>> Path between apply and excited does not exist or is too long (> 6).
+
+
+*** Example: 5; Choice: b; SCORE: 5.604 (total_w_sum = 481.961; total_path_len = 43; match_pair_n = 7; total_pair_n = 14)
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "letter" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "skylar" (Similarity: 0.349)
+>>> >>> Depth [1] Time 0.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 7); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 4.6 sec (0.1 min): [src->tgt] BFS source 10; Visited neighbors 50 (ignored 109); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 22.4 sec (0.4 min): [src->tgt] BFS source 50; Visited neighbors 219 (ignored 417); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between letter and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "letter" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "mail" (Similarity: 0.571)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 5)
+>>> Found 1 path(s) between "letter" and "mail".
+
+letter is like post
+post is like mail
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "letter" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "harvard" (Similarity: 0.241)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 3)
+>>> >>> Depth [2] Time 8.2 sec (0.1 min): [src->tgt] BFS source 11; Visited neighbors 67 (ignored 83); [tgt->src] BFS source 7; Visited neighbors 42 (ignored 6)
+>>> >>> Depth [3] Time 49.2 sec (0.8 min): [src->tgt] BFS source 67; Visited neighbors 368 (ignored 314); [tgt->src] BFS source 42; Visited neighbors 263 (ignored 101)
+>>> Found 25 path(s) between "letter" and "harvard".
+
+letter is like note
+note is like writing
+paper is like writing
+paper is like sheet
+page is like sheet
+page is like book
+reading is like book
+Sometimes reading causes learning
+school is used for learning
+school is like place
+city is a type of place
+You are likely to find college in city
+harvard is a type of college
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "letter" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "letter" To "excited" (Similarity: 0.293)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 112 (ignored 39); [tgt->src] BFS source 7; Visited neighbors 25 (ignored 13)
+>>> >>> Depth [3] Time 58.7 sec (1.0 min): [src->tgt] BFS source 112; Visited neighbors 588 (ignored 283); [tgt->src] BFS source 25; Visited neighbors 145 (ignored 42)
+>>> Found 20 path(s) between "letter" and "excited".
+
+letter is like note
+note is used for communication
+writing is like communication
+paper is like writing
+paper is like wood
+wood is like material
+bone is like material
+bone is like body
+body is like human
+person is like human
+person wants excited
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "away" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "away" To "letter" (Similarity: 0.306)
+>>> >>> Depth [1] Time 3.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 12.8 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 50 (ignored 3); [tgt->src] BFS source 15; Visited neighbors 154 (ignored 7)
+>>> Found 1 path(s) between "away" and "letter".
+
+away is the opposite of home
+home is like house
+You are likely to find mail in house
+letter is like mail
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "away" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "away" To "skylar" (Similarity: 0.261)
+>>> >>> Depth [1] Time 0.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 5.1 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 53 (ignored 4); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 47.0 sec (0.8 min): [src->tgt] BFS source 53; Visited neighbors 283 (ignored 81); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between away and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "away" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "away" To "mail" (Similarity: 0.302)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 9.8 sec (0.2 min): [src->tgt] BFS source 9; Visited neighbors 56 (ignored 1); [tgt->src] BFS source 14; Visited neighbors 107 (ignored 4)
+>>> Found 5 path(s) between "away" and "mail".
+
+away is the opposite of home
+nest is like home
+nest is like house
+You are likely to find mail in house
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "away" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "away" To "harvard" (Similarity: 0.190)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 3)
+>>> >>> Depth [2] Time 6.7 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 54 (ignored 3); [tgt->src] BFS source 7; Visited neighbors 46 (ignored 2)
+>>> Found 1 path(s) between "away" and "harvard".
+
+away is the opposite of home
+home is like place
+city is a type of place
+You are likely to find college in city
+harvard is a type of college
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "away" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "away" To "excited" (Similarity: 0.290)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 6.1 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 43 (ignored 6); [tgt->src] BFS source 7; Visited neighbors 25 (ignored 13)
+>>> Found 1 path(s) between "away" and "excited".
+
+away is like gone
+gone and intoxicated have similar meanings
+intoxicated is similar to excited
+excited and excited have similar meanings
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "throw" To "letter"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "throw" To "letter" (Similarity: 0.301)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 14.1 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 35 (ignored 3); [tgt->src] BFS source 15; Visited neighbors 154 (ignored 7)
+>>> >>> Depth [3] Time 103.3 sec (1.7 min): [src->tgt] BFS source 35; Visited neighbors 156 (ignored 9); [tgt->src] BFS source 154; Visited neighbors 991 (ignored 121)
+>>> Found 10 path(s) between "throw" and "letter".
+
+basketball is used for throw
+basketball is round
+ring is like round
+ring is like finger
+finger is like hand
+You are likely to find writing instrument in hand
+quill is a type of writing instrument
+quill is used for writing
+writing is like communication
+note is used for communication
+letter is like note
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "throw" To "skylar"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "throw" To "skylar" (Similarity: 0.244)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [2] Time 3.2 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 31 (ignored 8); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 12.7 sec (0.2 min): [src->tgt] BFS source 31; Visited neighbors 147 (ignored 11); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between throw and skylar does not exist or is too long (> 6).
+
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "throw" To "mail"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "throw" To "mail" (Similarity: 0.350)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 9.0 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 28 (ignored 11); [tgt->src] BFS source 13; Visited neighbors 93 (ignored 18)
+>>> Found 1 path(s) between "throw" and "mail".
+
+throw and throw have similar meanings
+deliver is a specific way of doing throw
+deliver and deliver have similar meanings
+deliver is like packages
+You are likely to find packages in mail
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "throw" To "harvard"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "throw" To "harvard" (Similarity: 0.122)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 13.9 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 38 (ignored 0); [tgt->src] BFS source 10; Visited neighbors 71 (ignored 1)
+>>> >>> Depth [3] Time 69.2 sec (1.2 min): [src->tgt] BFS source 38; Visited neighbors 164 (ignored 4); [tgt->src] BFS source 71; Visited neighbors 511 (ignored 36)
+>>> Found 3 path(s) between "throw" and "harvard".
+
+basketball is used for throw
+basketball is round
+planets is round
+planets is large
+large is like big
+city is like big
+You are likely to find college in city
+harvard is a type of college
+
+
+Example: 5; Choice: "(c) throw the letter away."; From "throw" To "excited"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "throw" To "excited" (Similarity: 0.241)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 1)
+>>> >>> Depth [2] Time 5.9 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 35 (ignored 3); [tgt->src] BFS source 7; Visited neighbors 33 (ignored 4)
+>>> >>> Depth [3] Time 28.9 sec (0.5 min): [src->tgt] BFS source 35; Visited neighbors 157 (ignored 11); [tgt->src] BFS source 33; Visited neighbors 211 (ignored 39)
+>>> Found 1 path(s) between "throw" and "excited".
+
+throw and throw have similar meanings
+throw is a specific way of doing put
+stand is a specific way of doing put
+stand up and stand have similar meanings
+In order for jump up and down to happen, stand up needs to happen
+You would jump up and down because you want to excited
+
+*** Example: 5; Choice: c; SCORE: 9.893 (total_w_sum = 919.132; total_path_len = 73; match_pair_n = 11; total_pair_n = 14)
+
+*** DONE *** Example: 5 - Running Time: 1703.0 sec (28.4 min)
+
+Accuracy: 1.0.
+Done!
+Total Running Time: 1703.4 sec (28.4 min)

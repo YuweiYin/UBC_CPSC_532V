@@ -1,0 +1,14 @@
+// The path the concepts from "open" to "card".Path Length: 5; Weight Sum: 39.443696049595374; Average Weight: 7.888739209919075
+digraph "8_a---open-card---PLen5_WSum39.444_WAvg7.889" {
+	0 [label=open]
+	1 [label=field]
+	2 [label=baseball]
+	3 [label=game]
+	4 [label=playing]
+	5 [label=card]
+	0 -> 1 [label="RelatedTo; 2.449" dir=back weight=2.449]
+	1 -> 2 [label="RelatedTo; 5.247" dir=forward weight=5.247]
+	2 -> 3 [label="IsA; 17.144" dir=forward weight=17.144]
+	3 -> 4 [label="RelatedTo; 9.398" dir=forward weight=9.398]
+	4 -> 5 [label="RelatedTo; 5.205" dir=back weight=5.205]
+}

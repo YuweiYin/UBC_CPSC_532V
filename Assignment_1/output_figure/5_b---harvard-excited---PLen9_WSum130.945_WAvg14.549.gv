@@ -1,0 +1,22 @@
+// The path the concepts from "harvard" to "excited".Path Length: 9; Weight Sum: 130.94464611057424; Average Weight: 14.549405123397138
+digraph "5_b---harvard-excited---PLen9_WSum130.945_WAvg14.549" {
+	0 [label=harvard]
+	1 [label=college]
+	2 [label=city]
+	3 [label=place]
+	4 [label=school]
+	5 [label=learning]
+	6 [label=book]
+	7 [label=character]
+	8 [label=person]
+	9 [label=excited]
+	0 -> 1 [label="IsA; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="AtLocation; 7.633" dir=forward weight=7.633]
+	2 -> 3 [label="IsA; 14.266" dir=forward weight=14.266]
+	3 -> 4 [label="RelatedTo; 20.390" dir=back weight=20.390]
+	4 -> 5 [label="UsedFor; 27.318" dir=forward weight=27.318]
+	5 -> 6 [label="UsedFor; 35.565" dir=back weight=35.565]
+	6 -> 7 [label="RelatedTo; 12.713" dir=back weight=12.713]
+	7 -> 8 [label="RelatedTo; 9.231" dir=forward weight=9.231]
+	8 -> 9 [label="Desires; 2.828" dir=forward weight=2.828]
+}

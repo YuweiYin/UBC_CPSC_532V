@@ -1,0 +1,14 @@
+// The path the concepts from "nice" to "mark".Path Length: 5; Weight Sum: 38.44046314425178; Average Weight: 7.688092628850356
+digraph "9_a---nice-mark---PLen5_WSum38.440_WAvg7.688" {
+	0 [label=nice]
+	1 [label=kind]
+	2 [label=people]
+	3 [label=person]
+	4 [label=name]
+	5 [label=mark]
+	0 -> 1 [label="RelatedTo; 4.240" dir=back weight=4.240]
+	1 -> 2 [label="HasProperty; 9.139" dir=back weight=9.139]
+	2 -> 3 [label="RelatedTo; 14.838" dir=back weight=14.838]
+	3 -> 4 [label="RelatedTo; 7.059" dir=back weight=7.059]
+	4 -> 5 [label="RelatedTo; 3.165" dir=back weight=3.165]
+}

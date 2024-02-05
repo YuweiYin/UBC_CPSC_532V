@@ -1,0 +1,137 @@
+Namespace(verbose=False, example_id=2, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 2; Choice: "(a) She was certain she had the flu."; From "certain" To "cancelled"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "certain" To "cancelled" (Similarity: 0.186)
+>>> >>> Depth [1] Time 2.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 9.5 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 23 (ignored 10); [tgt->src] BFS source 5; Visited neighbors 14 (ignored 5)
+>>> >>> Depth [3] Time 40.8 sec (0.7 min): [src->tgt] BFS source 23; Visited neighbors 47 (ignored 39); [tgt->src] BFS source 14; Visited neighbors 67 (ignored 14)
+>>> Path between certain and cancelled does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(a) She was certain she had the flu."; From "certain" To "cause"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "certain" To "cause" (Similarity: 0.397)
+>>> >>> Depth [1] Time 2.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 10); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 14)
+>>> >>> Depth [2] Time 4.1 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 5 (ignored 23); [tgt->src] BFS source 2; Visited neighbors 6 (ignored 25)
+>>> >>> Depth [3] Time 8.7 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 4 (ignored 26); [tgt->src] BFS source 6; Visited neighbors 7 (ignored 28)
+>>> Path between certain and cause does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(a) She was certain she had the flu."; From "certain" To "host"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "certain" To "host" (Similarity: 0.220)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 8.0 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 23 (ignored 1); [tgt->src] BFS source 7; Visited neighbors 20 (ignored 0)
+>>> >>> Depth [3] Time 24.3 sec (0.4 min): [src->tgt] BFS source 23; Visited neighbors 54 (ignored 1); [tgt->src] BFS source 20; Visited neighbors 76 (ignored 2)
+>>> Path between certain and host does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(a) She was certain she had the flu."; From "certain" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "certain" To "party" (Similarity: 0.277)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 30.1 sec (0.5 min): [src->tgt] BFS source 7; Visited neighbors 21 (ignored 3); [tgt->src] BFS source 17; Visited neighbors 167 (ignored 7)
+>>> >>> Depth [3] Time 154.5 sec (2.6 min): [src->tgt] BFS source 21; Visited neighbors 46 (ignored 1); [tgt->src] BFS source 167; Visited neighbors 1055 (ignored 145)
+>>> Found 1 path(s) between "certain" and "party".
+
+certainly is like certain
+certainly is like doubt
+doubt is part of human experience
+sex is part of human experience
+sex is fun
+party is like fun
+
+*** Example: 2; Choice: a; SCORE: 2.532 (total_w_sum = 60.779; total_path_len = 6; match_pair_n = 1; total_pair_n = 4)
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "catch" To "cancelled"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "catch" To "cancelled" (Similarity: 0.217)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 7); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 5.7 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 33 (ignored 14); [tgt->src] BFS source 5; Visited neighbors 14 (ignored 5)
+>>> >>> Depth [3] Time 25.8 sec (0.4 min): [src->tgt] BFS source 33; Visited neighbors 187 (ignored 74); [tgt->src] BFS source 14; Visited neighbors 62 (ignored 26)
+>>> Path between catch and cancelled does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "catch" To "cause"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "catch" To "cause" (Similarity: 0.353)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 17); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 11)
+>>> >>> Depth [2] Time 2.3 sec (0.0 min): [src->tgt] BFS source 2; Visited neighbors 8 (ignored 12); [tgt->src] BFS source 3; Visited neighbors 9 (ignored 25)
+>>> >>> Depth [3] Time 7.5 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 26 (ignored 61); [tgt->src] BFS source 9; Visited neighbors 16 (ignored 17)
+>>> Path between catch and cause does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "catch" To "host"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "catch" To "host" (Similarity: 0.279)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 1)
+>>> >>> Depth [2] Time 7.3 sec (0.1 min): [src->tgt] BFS source 11; Visited neighbors 32 (ignored 3); [tgt->src] BFS source 6; Visited neighbors 17 (ignored 0)
+>>> Found 1 path(s) between "catch" and "host".
+
+catch and catch have similar meanings
+catch is a type of adult
+host is a type of adult
+host and host have similar meanings
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "catch" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "catch" To "party" (Similarity: 0.268)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 13.6 sec (0.2 min): [src->tgt] BFS source 12; Visited neighbors 50 (ignored 4); [tgt->src] BFS source 17; Visited neighbors 168 (ignored 6)
+>>> >>> Depth [3] Time 100.4 sec (1.7 min): [src->tgt] BFS source 50; Visited neighbors 286 (ignored 30); [tgt->src] BFS source 168; Visited neighbors 1076 (ignored 128)
+>>> Found 29 path(s) between "catch" and "party".
+
+Something you do when you fish is catch
+fish is like animal
+dog is like animal
+You are likely to find dog in table
+You are likely to find food in table
+cake is like food
+cake is like birthday
+birthday is like celebration
+party is like celebration
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "worried" To "cancelled"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "worried" To "cancelled" (Similarity: 0.248)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 3.6 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 5; Visited neighbors 12 (ignored 7)
+>>> >>> Depth [3] Time 8.5 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 29 (ignored 3); [tgt->src] BFS source 12; Visited neighbors 45 (ignored 35)
+>>> Path between worried and cancelled does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "worried" To "cause"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "worried" To "cause" (Similarity: 0.396)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 17); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 14)
+>>> >>> Depth [2] Time 1.0 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 2; Visited neighbors 6 (ignored 25)
+>>> >>> Depth [3] Time 2.6 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 6; Visited neighbors 7 (ignored 28)
+>>> Path between worried and cause does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "worried" To "host"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "worried" To "host" (Similarity: 0.173)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 4.2 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 20 (ignored 0)
+>>> >>> Depth [3] Time 11.6 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 30 (ignored 2); [tgt->src] BFS source 20; Visited neighbors 78 (ignored 0)
+>>> Path between worried and host does not exist or is too long (> 6).
+
+
+
+Example: 2; Choice: "(b) She worried she would catch the flu."; From "worried" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "worried" To "party" (Similarity: 0.225)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 3; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 17; Visited neighbors 170 (ignored 4)
+>>> >>> Depth [3] Time 82.3 sec (1.4 min): [src->tgt] BFS source 7; Visited neighbors 31 (ignored 0); [tgt->src] BFS source 170; Visited neighbors 1137 (ignored 67)
+>>> Path between worried and party does not exist or is too long (> 6).
+
+
+*** Example: 2; Choice: b; SCORE: 4.638 (total_w_sum = 241.150; total_path_len = 13; match_pair_n = 2; total_pair_n = 8)
+
+*** DONE *** Example: 2 - Running Time: 585.3 sec (9.8 min)
+
+Accuracy: 1.0.
+Done!
+Total Running Time: 585.7 sec (9.8 min)

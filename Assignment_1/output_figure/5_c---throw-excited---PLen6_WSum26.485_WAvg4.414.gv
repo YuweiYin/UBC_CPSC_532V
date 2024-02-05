@@ -1,0 +1,16 @@
+// The path the concepts from "throw" to "excited".Path Length: 6; Weight Sum: 26.485281374238575; Average Weight: 4.414213562373096
+digraph "5_c---throw-excited---PLen6_WSum26.485_WAvg4.414" {
+	0 [label=throw]
+	1 [label=throw]
+	2 [label=put]
+	3 [label=stand]
+	4 [label="stand up"]
+	5 [label="jump up and down"]
+	6 [label=excited]
+	0 -> 1 [label="Synonym; 2.000" dir=forward weight=2.000]
+	1 -> 2 [label="MannerOf; 4.000" dir=forward weight=4.000]
+	2 -> 3 [label="MannerOf; 6.000" dir=back weight=6.000]
+	3 -> 4 [label="Synonym; 6.828" dir=back weight=6.828]
+	4 -> 5 [label="HasPrerequisite; 4.828" dir=back weight=4.828]
+	5 -> 6 [label="MotivatedByGoal; 2.828" dir=forward weight=2.828]
+}

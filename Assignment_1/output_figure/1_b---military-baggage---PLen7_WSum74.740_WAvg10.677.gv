@@ -1,0 +1,18 @@
+// The path the concepts from "military" to "baggage".Path Length: 7; Weight Sum: 74.73998349829935; Average Weight: 10.67714049975705
+digraph "1_b---military-baggage---PLen7_WSum74.740_WAvg10.677" {
+	0 [label=military]
+	1 [label=army]
+	2 [label=group]
+	3 [label=crowd]
+	4 [label=people]
+	5 [label=human]
+	6 [label=airport]
+	7 [label=baggage]
+	0 -> 1 [label="RelatedTo; 4.759" dir=back weight=4.759]
+	1 -> 2 [label="RelatedTo; 7.611" dir=forward weight=7.611]
+	2 -> 3 [label="RelatedTo; 17.508" dir=back weight=17.508]
+	3 -> 4 [label="RelatedTo; 24.341" dir=forward weight=24.341]
+	4 -> 5 [label="HasProperty; 10.765" dir=forward weight=10.765]
+	5 -> 6 [label="AtLocation; 6.293" dir=forward weight=6.293]
+	6 -> 7 [label="AtLocation; 3.464" dir=back weight=3.464]
+}

@@ -1,0 +1,16 @@
+// The path the concepts from "store" to "bag".Path Length: 6; Weight Sum: 69.54892643459974; Average Weight: 11.591487739099955
+digraph "1_c---store-bag---PLen6_WSum69.549_WAvg11.591" {
+	0 [label=store]
+	1 [label=market]
+	2 [label=bread]
+	3 [label=food]
+	4 [label=kitchen]
+	5 [label=potato]
+	6 [label=bag]
+	0 -> 1 [label="RelatedTo; 5.574" dir=back weight=5.574]
+	1 -> 2 [label="AtLocation; 9.574" dir=back weight=9.574]
+	2 -> 3 [label="RelatedTo; 17.303" dir=forward weight=17.303]
+	3 -> 4 [label="AtLocation; 24.514" dir=forward weight=24.514]
+	4 -> 5 [label="AtLocation; 9.757" dir=back weight=9.757]
+	5 -> 6 [label="AtLocation; 2.828" dir=forward weight=2.828]
+}

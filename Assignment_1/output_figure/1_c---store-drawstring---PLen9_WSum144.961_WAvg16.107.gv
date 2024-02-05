@@ -1,0 +1,22 @@
+// The path the concepts from "store" to "drawstring".Path Length: 9; Weight Sum: 144.96134004538018; Average Weight: 16.1068155605978
+digraph "1_c---store-drawstring---PLen9_WSum144.961_WAvg16.107" {
+	0 [label=store]
+	1 [label=town]
+	2 [label=city]
+	3 [label=place]
+	4 [label=bed]
+	5 [label=floor]
+	6 [label=cat]
+	7 [label=bag]
+	8 [label="bucket bag"]
+	9 [label=drawstring]
+	0 -> 1 [label="AtLocation; 4.472" dir=forward weight=4.472]
+	1 -> 2 [label="RelatedTo; 12.752" dir=back weight=12.752]
+	2 -> 3 [label="IsA; 19.385" dir=forward weight=19.385]
+	3 -> 4 [label="RelatedTo; 27.747" dir=back weight=27.747]
+	4 -> 5 [label="AtLocation; 34.071" dir=back weight=34.071]
+	5 -> 6 [label="AtLocation; 38.071" dir=back weight=38.071]
+	6 -> 7 [label="AtLocation; 5.464" dir=forward weight=5.464]
+	7 -> 8 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	8 -> 9 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

@@ -1,0 +1,16 @@
+// The path the concepts from "garbage" to "drawstring".Path Length: 6; Weight Sum: 25.434664363614893; Average Weight: 4.239110727269149
+digraph "1_a---garbage-drawstring---PLen6_WSum25.435_WAvg4.239" {
+	0 [label=garbage]
+	1 [label="garbage can"]
+	2 [label=alley]
+	3 [label=cat]
+	4 [label=bag]
+	5 [label="bucket bag"]
+	6 [label=drawstring]
+	0 -> 1 [label="AtLocation; 2.828" dir=forward weight=2.828]
+	1 -> 2 [label="AtLocation; 5.657" dir=forward weight=5.657]
+	2 -> 3 [label="AtLocation; 8.485" dir=back weight=8.485]
+	3 -> 4 [label="AtLocation; 5.464" dir=forward weight=5.464]
+	4 -> 5 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	5 -> 6 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

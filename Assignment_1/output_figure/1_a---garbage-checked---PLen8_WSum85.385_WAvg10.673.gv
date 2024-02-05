@@ -1,0 +1,20 @@
+// The path the concepts from "garbage" to "checked".Path Length: 8; Weight Sum: 85.38548902096196; Average Weight: 10.673186127620244
+digraph "1_a---garbage-checked---PLen8_WSum85.385_WAvg10.673" {
+	0 [label=garbage]
+	1 [label=waste]
+	2 [label=trash]
+	3 [label=recycled]
+	4 [label=paper]
+	5 [label=card]
+	6 [label=poker]
+	7 [label="check call"]
+	8 [label=checked]
+	0 -> 1 [label="RelatedTo; 6.382" dir=back weight=6.382]
+	1 -> 2 [label="RelatedTo; 12.122" dir=forward weight=12.122]
+	2 -> 3 [label="ReceivesAction; 15.586" dir=forward weight=15.586]
+	3 -> 4 [label="ReceivesAction; 17.586" dir=back weight=17.586]
+	4 -> 5 [label="RelatedTo; 24.405" dir=back weight=24.405]
+	5 -> 6 [label="RelatedTo; 6.305" dir=forward weight=6.305]
+	6 -> 7 [label="HasContext; 2.000" dir=back weight=2.000]
+	7 -> 8 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

@@ -1,0 +1,20 @@
+// The path the concepts from "dream" to "paul".Path Length: 8; Weight Sum: 125.84482552872748; Average Weight: 15.730603191090935
+digraph "9_e---dream-paul---PLen8_WSum125.845_WAvg15.731" {
+	0 [label=dream]
+	1 [label=sleep]
+	2 [label=night]
+	3 [label=evening]
+	4 [label=day]
+	5 [label=birthday]
+	6 [label=personal]
+	7 [label=name]
+	8 [label=paul]
+	0 -> 1 [label="HasSubevent; 9.798" dir=back weight=9.798]
+	1 -> 2 [label="RelatedTo; 14.519" dir=forward weight=14.519]
+	2 -> 3 [label="RelatedTo; 22.663" dir=back weight=22.663]
+	3 -> 4 [label="RelatedTo; 27.460" dir=forward weight=27.460]
+	4 -> 5 [label="RelatedTo; 37.005" dir=back weight=37.005]
+	5 -> 6 [label="RelatedTo; 8.588" dir=forward weight=8.588]
+	6 -> 7 [label="RelatedTo; 4.747" dir=back weight=4.747]
+	7 -> 8 [label="RelatedTo; 1.064" dir=back weight=1.064]
+}

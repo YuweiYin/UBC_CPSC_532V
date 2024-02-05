@@ -1,0 +1,20 @@
+// The path the concepts from "plan" to "credit".Path Length: 8; Weight Sum: 86.05113942248425; Average Weight: 10.756392427810532
+digraph "8_b---plan-credit---PLen8_WSum86.051_WAvg10.756" {
+	0 [label=plan]
+	1 [label=design]
+	2 [label=art]
+	3 [label=music]
+	4 [label=note]
+	5 [label=paper]
+	6 [label=card]
+	7 [label=charge]
+	8 [label=credit]
+	0 -> 1 [label="RelatedTo; 3.871" dir=back weight=3.871]
+	1 -> 2 [label="RelatedTo; 7.574" dir=forward weight=7.574]
+	2 -> 3 [label="RelatedTo; 12.701" dir=back weight=12.701]
+	3 -> 4 [label="RelatedTo; 22.830" dir=back weight=22.830]
+	4 -> 5 [label="RelatedTo; 17.197" dir=forward weight=17.197]
+	5 -> 6 [label="RelatedTo; 12.611" dir=back weight=12.611]
+	6 -> 7 [label="RelatedTo; 5.792" dir=back weight=5.792]
+	7 -> 8 [label="RelatedTo; 3.476" dir=forward weight=3.476]
+}

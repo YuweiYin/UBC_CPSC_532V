@@ -1,0 +1,14 @@
+// The path the concepts from "horse" to "judge".Path Length: 5; Weight Sum: 67.9346277142731; Average Weight: 13.58692554285462
+digraph "9_b---horse-judge---PLen5_WSum67.935_WAvg13.587" {
+	0 [label=horse]
+	1 [label=animal]
+	2 [label=farm]
+	3 [label=place]
+	4 [label=court]
+	5 [label=judge]
+	0 -> 1 [label="RelatedTo; 11.754" dir=forward weight=11.754]
+	1 -> 2 [label="RelatedTo; 16.882" dir=back weight=16.882]
+	2 -> 3 [label="RelatedTo; 24.238" dir=forward weight=24.238]
+	3 -> 4 [label="RelatedTo; 9.802" dir=back weight=9.802]
+	4 -> 5 [label="RelatedTo; 5.259" dir=back weight=5.259]
+}

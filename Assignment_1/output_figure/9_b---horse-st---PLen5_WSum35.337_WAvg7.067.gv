@@ -1,0 +1,14 @@
+// The path the concepts from "horse" to "st".Path Length: 5; Weight Sum: 35.33720518745103; Average Weight: 7.067441037490207
+digraph "9_b---horse-st---PLen5_WSum35.337_WAvg7.067" {
+	0 [label=horse]
+	1 [label=riding]
+	2 [label=bicycle]
+	3 [label=street]
+	4 [label=st]
+	5 [label=st]
+	0 -> 1 [label="RelatedTo; 6.109" dir=forward weight=6.109]
+	1 -> 2 [label="UsedFor; 10.109" dir=back weight=10.109]
+	2 -> 3 [label="AtLocation; 11.462" dir=forward weight=11.462]
+	3 -> 4 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	4 -> 5 [label="FormOf; 2.828" dir=back weight=2.828]
+}

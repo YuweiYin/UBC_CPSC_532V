@@ -1,0 +1,12 @@
+// The path the concepts from "away" to "excited".Path Length: 4; Weight Sum: 14.500461522076721; Average Weight: 3.6251153805191803
+digraph "5_c---away-excited---PLen4_WSum14.500_WAvg3.625" {
+	0 [label=away]
+	1 [label=gone]
+	2 [label=intoxicated]
+	3 [label=excited]
+	4 [label=excited]
+	0 -> 1 [label="RelatedTo; 3.250" dir=forward weight=3.250]
+	1 -> 2 [label="Synonym; 5.250" dir=forward weight=5.250]
+	2 -> 3 [label="SimilarTo; 4.000" dir=forward weight=4.000]
+	3 -> 4 [label="Synonym; 2.000" dir=back weight=2.000]
+}

@@ -1,0 +1,12 @@
+// The path the concepts from "press" to "bottle".Path Length: 4; Weight Sum: 23.50691342486026; Average Weight: 5.876728356215065
+digraph "10_b---press-bottle---PLen4_WSum23.507_WAvg5.877" {
+	0 [label=press]
+	1 [label=down]
+	2 [label=drop]
+	3 [label=water]
+	4 [label=bottle]
+	0 -> 1 [label="RelatedTo; 2.492" dir=forward weight=2.492]
+	1 -> 2 [label="RelatedTo; 5.662" dir=back weight=5.662]
+	2 -> 3 [label="RelatedTo; 11.352" dir=forward weight=11.352]
+	3 -> 4 [label="AtLocation; 4.000" dir=forward weight=4.000]
+}

@@ -1,0 +1,18 @@
+// The path the concepts from "store" to "checked".Path Length: 7; Weight Sum: 72.96824460507857; Average Weight: 10.424034943582653
+digraph "1_c---store-checked---PLen7_WSum72.968_WAvg10.424" {
+	0 [label=store]
+	1 [label=book]
+	2 [label=page]
+	3 [label=paper]
+	4 [label=card]
+	5 [label=poker]
+	6 [label="check call"]
+	7 [label=checked]
+	0 -> 1 [label="AtLocation; 3.464" dir=back weight=3.464]
+	1 -> 2 [label="RelatedTo; 14.029" dir=back weight=14.029]
+	2 -> 3 [label="RelatedTo; 19.676" dir=forward weight=19.676]
+	3 -> 4 [label="RelatedTo; 26.495" dir=back weight=26.495]
+	4 -> 5 [label="RelatedTo; 6.305" dir=forward weight=6.305]
+	5 -> 6 [label="HasContext; 2.000" dir=back weight=2.000]
+	6 -> 7 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

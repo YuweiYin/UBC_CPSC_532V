@@ -1,0 +1,20 @@
+// The path the concepts from "dream" to "bailey".Path Length: 8; Weight Sum: 121.13955555819368; Average Weight: 15.14244444477421
+digraph "9_e---dream-bailey---PLen8_WSum121.140_WAvg15.142" {
+	0 [label=dream]
+	1 [label=sleep]
+	2 [label=night]
+	3 [label=evening]
+	4 [label=dark]
+	5 [label=shade]
+	6 [label=tree]
+	7 [label=apple]
+	8 [label=bailey]
+	0 -> 1 [label="HasSubevent; 9.798" dir=back weight=9.798]
+	1 -> 2 [label="RelatedTo; 14.519" dir=forward weight=14.519]
+	2 -> 3 [label="RelatedTo; 22.663" dir=back weight=22.663]
+	3 -> 4 [label="RelatedTo; 25.363" dir=forward weight=25.363]
+	4 -> 5 [label="RelatedTo; 30.826" dir=back weight=30.826]
+	5 -> 6 [label="RelatedTo; 11.674" dir=forward weight=11.674]
+	6 -> 7 [label="RelatedTo; 5.297" dir=back weight=5.297]
+	7 -> 8 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

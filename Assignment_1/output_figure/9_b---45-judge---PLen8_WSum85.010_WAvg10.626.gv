@@ -1,0 +1,20 @@
+// The path the concepts from "45" to "judge".Path Length: 8; Weight Sum: 85.00986532536899; Average Weight: 10.626233165671124
+digraph "9_b---45-judge---PLen8_WSum85.010_WAvg10.626" {
+	0 [label=45]
+	1 [label=ep]
+	2 [label=record]
+	3 [label=music]
+	4 [label=dance]
+	5 [label=body]
+	6 [label=human]
+	7 [label=person]
+	8 [label=judge]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 10.702" dir=forward weight=10.702]
+	3 -> 4 [label="RelatedTo; 19.905" dir=back weight=19.905]
+	4 -> 5 [label="RelatedTo; 21.441" dir=forward weight=21.441]
+	5 -> 6 [label="RelatedTo; 17.489" dir=forward weight=17.489]
+	6 -> 7 [label="RelatedTo; 9.736" dir=back weight=9.736]
+	7 -> 8 [label="RelatedTo; 2.738" dir=back weight=2.738]
+}

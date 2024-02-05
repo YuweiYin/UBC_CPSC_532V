@@ -1,0 +1,18 @@
+// The path the concepts from "celebrated" to "st".Path Length: 7; Weight Sum: 51.51586674412421; Average Weight: 7.359409534874887
+digraph "9_c---celebrated-st---PLen7_WSum51.516_WAvg7.359" {
+	0 [label=celebrated]
+	1 [label=person]
+	2 [label=body]
+	3 [label=eye]
+	4 [label=ball]
+	5 [label=street]
+	6 [label=st]
+	7 [label=st]
+	0 -> 1 [label="Desires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 7.181" dir=back weight=7.181]
+	2 -> 3 [label="RelatedTo; 14.128" dir=back weight=14.128]
+	3 -> 4 [label="RelatedTo; 12.893" dir=forward weight=12.893]
+	4 -> 5 [label="AtLocation; 7.657" dir=forward weight=7.657]
+	5 -> 6 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	6 -> 7 [label="FormOf; 2.828" dir=back weight=2.828]
+}

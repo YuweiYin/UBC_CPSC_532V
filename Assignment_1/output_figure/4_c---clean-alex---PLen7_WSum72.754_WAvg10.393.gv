@@ -1,0 +1,18 @@
+// The path the concepts from "clean" to "alex".Path Length: 7; Weight Sum: 72.75351329671739; Average Weight: 10.393359042388198
+digraph "4_c---clean-alex---PLen7_WSum72.754_WAvg10.393" {
+	0 [label=clean]
+	1 [label=cloth]
+	2 [label=wool]
+	3 [label=clothing]
+	4 [label=person]
+	5 [label=persons]
+	6 [label=al]
+	7 [label=alex]
+	0 -> 1 [label="UsedFor; 7.746" dir=back weight=7.746]
+	1 -> 2 [label="RelatedTo; 13.839" dir=back weight=13.839]
+	2 -> 3 [label="RelatedTo; 19.584" dir=forward weight=19.584]
+	3 -> 4 [label="Desires; 25.584" dir=back weight=25.584]
+	4 -> 5 [label="FormOf; 3.000" dir=back weight=3.000]
+	5 -> 6 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	6 -> 7 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

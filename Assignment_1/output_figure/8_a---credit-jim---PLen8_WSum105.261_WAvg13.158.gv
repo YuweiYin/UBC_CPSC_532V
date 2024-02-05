@@ -1,0 +1,20 @@
+// The path the concepts from "credit" to "jim".Path Length: 8; Weight Sum: 105.26129779943864; Average Weight: 13.15766222492983
+digraph "8_a---credit-jim---PLen8_WSum105.261_WAvg13.158" {
+	0 [label=credit]
+	1 [label=charge]
+	2 [label=card]
+	3 [label=paper]
+	4 [label=wood]
+	5 [label=tree]
+	6 [label=squirrel]
+	7 [label=nuts]
+	8 [label=jim]
+	0 -> 1 [label="RelatedTo; 3.476" dir=back weight=3.476]
+	1 -> 2 [label="RelatedTo; 5.792" dir=forward weight=5.792]
+	2 -> 3 [label="RelatedTo; 12.611" dir=forward weight=12.611]
+	3 -> 4 [label="RelatedTo; 19.376" dir=forward weight=19.376]
+	4 -> 5 [label="RelatedTo; 30.887" dir=forward weight=30.887]
+	5 -> 6 [label="RelatedTo; 21.489" dir=back weight=21.489]
+	6 -> 7 [label="RelatedTo; 10.632" dir=forward weight=10.632]
+	7 -> 8 [label="HasProperty; 1.000" dir=back weight=1.000]
+}

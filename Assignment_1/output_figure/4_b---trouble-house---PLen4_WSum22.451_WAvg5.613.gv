@@ -1,0 +1,12 @@
+// The path the concepts from "trouble" to "house".Path Length: 4; Weight Sum: 22.450842777148484; Average Weight: 5.612710694287121
+digraph "4_b---trouble-house---PLen4_WSum22.451_WAvg5.613" {
+	0 [label=trouble]
+	1 [label=danger]
+	2 [label=person]
+	3 [label=servant]
+	4 [label=house]
+	0 -> 1 [label="RelatedTo; 2.298" dir=back weight=2.298]
+	1 -> 2 [label="NotDesires; 5.126" dir=back weight=5.126]
+	2 -> 3 [label="RelatedTo; 10.147" dir=back weight=10.147]
+	3 -> 4 [label="RelatedTo; 4.880" dir=forward weight=4.880]
+}

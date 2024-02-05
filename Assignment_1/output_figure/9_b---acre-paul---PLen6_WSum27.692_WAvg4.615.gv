@@ -1,0 +1,16 @@
+// The path the concepts from "acre" to "paul".Path Length: 6; Weight Sum: 27.69196545146668; Average Weight: 4.6153275752444465
+digraph "9_b---acre-paul---PLen6_WSum27.692_WAvg4.615" {
+	0 [label=acre]
+	1 [label="acre foot"]
+	2 [label=foot]
+	3 [label=body]
+	4 [label=person]
+	5 [label=name]
+	6 [label=paul]
+	0 -> 1 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 3.000" dir=forward weight=3.000]
+	2 -> 3 [label="RelatedTo; 6.533" dir=forward weight=6.533]
+	3 -> 4 [label="RelatedTo; 10.138" dir=forward weight=10.138]
+	4 -> 5 [label="RelatedTo; 4.957" dir=back weight=4.957]
+	5 -> 6 [label="RelatedTo; 1.064" dir=back weight=1.064]
+}

@@ -1,0 +1,12 @@
+// The path the concepts from "buy" to "mark".Path Length: 4; Weight Sum: 16.880801733432147; Average Weight: 4.220200433358037
+digraph "9_b---buy-mark---PLen4_WSum16.881_WAvg4.220" {
+	0 [label=buy]
+	1 [label="pay for"]
+	2 [label=person]
+	3 [label=name]
+	4 [label=mark]
+	0 -> 1 [label="HasLastSubevent; 2.828" dir=forward weight=2.828]
+	1 -> 2 [label="NotDesires; 3.828" dir=back weight=3.828]
+	2 -> 3 [label="RelatedTo; 7.059" dir=back weight=7.059]
+	3 -> 4 [label="RelatedTo; 3.165" dir=back weight=3.165]
+}

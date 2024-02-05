@@ -1,0 +1,16 @@
+// The path the concepts from "plan" to "jim".Path Length: 6; Weight Sum: 34.64621130674031; Average Weight: 5.774368551123385
+digraph "8_b---plan-jim---PLen6_WSum34.646_WAvg5.774" {
+	0 [label=plan]
+	1 [label=design]
+	2 [label=art]
+	3 [label=statue]
+	4 [label=park]
+	5 [label=kids]
+	6 [label=jim]
+	0 -> 1 [label="RelatedTo; 3.871" dir=back weight=3.871]
+	1 -> 2 [label="RelatedTo; 7.574" dir=forward weight=7.574]
+	2 -> 3 [label="RelatedTo; 12.737" dir=back weight=12.737]
+	3 -> 4 [label="AtLocation; 6.464" dir=forward weight=6.464]
+	4 -> 5 [label="AtLocation; 3.000" dir=back weight=3.000]
+	5 -> 6 [label="HasA; 1.000" dir=back weight=1.000]
+}

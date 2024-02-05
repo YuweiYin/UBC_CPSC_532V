@@ -1,0 +1,12 @@
+// The path the concepts from "horse" to "bailey".Path Length: 4; Weight Sum: 18.34297013663737; Average Weight: 4.585742534159342
+digraph "9_b---horse-bailey---PLen4_WSum18.343_WAvg4.586" {
+	0 [label=horse]
+	1 [label=big]
+	2 [label=tree]
+	3 [label=apple]
+	4 [label=bailey]
+	0 -> 1 [label="RelatedTo; 4.038" dir=forward weight=4.038]
+	1 -> 2 [label="RelatedTo; 8.008" dir=back weight=8.008]
+	2 -> 3 [label="RelatedTo; 5.297" dir=back weight=5.297]
+	3 -> 4 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

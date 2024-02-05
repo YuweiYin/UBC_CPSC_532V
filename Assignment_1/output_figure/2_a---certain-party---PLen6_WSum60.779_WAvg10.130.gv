@@ -1,0 +1,16 @@
+// The path the concepts from "certain" to "party".Path Length: 6; Weight Sum: 60.77904780405031; Average Weight: 10.129841300675052
+digraph "2_a---certain-party---PLen6_WSum60.779_WAvg10.130" {
+	0 [label=certain]
+	1 [label=certainly]
+	2 [label=doubt]
+	3 [label="human experience"]
+	4 [label=sex]
+	5 [label=fun]
+	6 [label=party]
+	0 -> 1 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 3.000" dir=forward weight=3.000]
+	2 -> 3 [label="PartOf; 5.828" dir=forward weight=5.828]
+	3 -> 4 [label="PartOf; 23.444" dir=back weight=23.444]
+	4 -> 5 [label="HasProperty; 18.152" dir=forward weight=18.152]
+	5 -> 6 [label="RelatedTo; 8.354" dir=back weight=8.354]
+}

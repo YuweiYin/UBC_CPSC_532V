@@ -1,0 +1,16 @@
+// The path the concepts from "farm" to "judge".Path Length: 6; Weight Sum: 89.85661696962575; Average Weight: 14.976102828270959
+digraph "9_b---farm-judge---PLen6_WSum89.857_WAvg14.976" {
+	0 [label=farm]
+	1 [label=place]
+	2 [label=home]
+	3 [label=house]
+	4 [label=room]
+	5 [label=court]
+	6 [label=judge]
+	0 -> 1 [label="RelatedTo; 7.356" dir=forward weight=7.356]
+	1 -> 2 [label="RelatedTo; 14.260" dir=back weight=14.260]
+	2 -> 3 [label="RelatedTo; 23.243" dir=forward weight=23.243]
+	3 -> 4 [label="RelatedTo; 32.225" dir=back weight=32.225]
+	4 -> 5 [label="RelatedTo; 7.513" dir=back weight=7.513]
+	5 -> 6 [label="RelatedTo; 5.259" dir=back weight=5.259]
+}

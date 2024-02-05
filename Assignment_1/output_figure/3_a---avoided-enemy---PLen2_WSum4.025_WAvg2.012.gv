@@ -1,0 +1,8 @@
+// The path the concepts from "avoided" to "enemy".Path Length: 2; Weight Sum: 4.024845673131659; Average Weight: 2.0124228365658294
+digraph "3_a---avoided-enemy---PLen2_WSum4.025_WAvg2.012" {
+	0 [label=avoided]
+	1 [label=person]
+	2 [label=enemy]
+	0 -> 1 [label="NotDesires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 2.025" dir=back weight=2.025]
+}

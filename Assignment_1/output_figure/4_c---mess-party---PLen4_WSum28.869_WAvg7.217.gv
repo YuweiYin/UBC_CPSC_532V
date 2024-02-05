@@ -1,0 +1,12 @@
+// The path the concepts from "mess" to "party".Path Length: 4; Weight Sum: 28.868860355758784; Average Weight: 7.217215088939696
+digraph "4_c---mess-party---PLen4_WSum28.869_WAvg7.217" {
+	0 [label=mess]
+	1 [label="having party"]
+	2 [label=dance]
+	3 [label=fun]
+	4 [label=party]
+	0 -> 1 [label="Causes; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="HasSubevent; 5.657" dir=forward weight=5.657]
+	2 -> 3 [label="RelatedTo; 12.029" dir=forward weight=12.029]
+	3 -> 4 [label="RelatedTo; 8.354" dir=back weight=8.354]
+}

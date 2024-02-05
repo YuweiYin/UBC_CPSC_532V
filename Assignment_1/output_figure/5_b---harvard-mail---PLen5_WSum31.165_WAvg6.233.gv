@@ -1,0 +1,14 @@
+// The path the concepts from "harvard" to "mail".Path Length: 5; Weight Sum: 31.165478646987957; Average Weight: 6.233095729397592
+digraph "5_b---harvard-mail---PLen5_WSum31.165_WAvg6.233" {
+	0 [label=harvard]
+	1 [label=college]
+	2 [label=city]
+	3 [label=billboard]
+	4 [label=advertisement]
+	5 [label=mail]
+	0 -> 1 [label="IsA; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="AtLocation; 7.633" dir=forward weight=7.633]
+	2 -> 3 [label="AtLocation; 12.532" dir=back weight=12.532]
+	3 -> 4 [label="UsedFor; 6.000" dir=forward weight=6.000]
+	4 -> 5 [label="AtLocation; 4.000" dir=forward weight=4.000]
+}

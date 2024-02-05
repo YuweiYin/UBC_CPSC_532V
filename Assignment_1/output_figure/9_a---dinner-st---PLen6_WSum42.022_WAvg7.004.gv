@@ -1,0 +1,16 @@
+// The path the concepts from "dinner" to "st".Path Length: 6; Weight Sum: 42.02247283432352; Average Weight: 7.003745472387254
+digraph "9_a---dinner-st---PLen6_WSum42.022_WAvg7.004" {
+	0 [label=dinner]
+	1 [label=bread]
+	2 [label=roll]
+	3 [label=ball]
+	4 [label=street]
+	5 [label=st]
+	6 [label=st]
+	0 -> 1 [label="AtLocation; 3.464" dir=back weight=3.464]
+	1 -> 2 [label="RelatedTo; 9.386" dir=back weight=9.386]
+	2 -> 3 [label="CapableOf; 13.858" dir=back weight=13.858]
+	3 -> 4 [label="AtLocation; 7.657" dir=forward weight=7.657]
+	4 -> 5 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	5 -> 6 [label="FormOf; 2.828" dir=back weight=2.828]
+}

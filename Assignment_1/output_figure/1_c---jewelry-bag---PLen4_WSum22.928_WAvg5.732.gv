@@ -1,0 +1,12 @@
+// The path the concepts from "jewelry" to "bag".Path Length: 4; Weight Sum: 22.928203230275507; Average Weight: 5.732050807568877
+digraph "1_c---jewelry-bag---PLen4_WSum22.928_WAvg5.732" {
+	0 [label=jewelry]
+	1 [label=person]
+	2 [label=clothing]
+	3 [label=drawer]
+	4 [label=bag]
+	0 -> 1 [label="Desires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="Desires; 8.000" dir=forward weight=8.000]
+	2 -> 3 [label="AtLocation; 9.464" dir=forward weight=9.464]
+	3 -> 4 [label="AtLocation; 3.464" dir=back weight=3.464]
+}

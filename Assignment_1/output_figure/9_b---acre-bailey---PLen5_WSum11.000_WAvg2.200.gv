@@ -1,0 +1,14 @@
+// The path the concepts from "acre" to "bailey".Path Length: 5; Weight Sum: 11.0; Average Weight: 2.2
+digraph "9_b---acre-bailey---PLen5_WSum11.000_WAvg2.200" {
+	0 [label=acre]
+	1 [label="acre foot"]
+	2 [label=us]
+	3 [label=bailey]
+	4 [label=rockall]
+	5 [label=bailey]
+	0 -> 1 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="HasContext; 3.000" dir=forward weight=3.000]
+	2 -> 3 [label="HasContext; 3.000" dir=back weight=3.000]
+	3 -> 4 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	4 -> 5 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

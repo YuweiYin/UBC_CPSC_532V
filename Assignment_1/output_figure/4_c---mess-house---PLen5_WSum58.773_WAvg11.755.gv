@@ -1,0 +1,14 @@
+// The path the concepts from "mess" to "house".Path Length: 5; Weight Sum: 58.77343363947565; Average Weight: 11.75468672789513
+digraph "4_c---mess-house---PLen5_WSum58.773_WAvg11.755" {
+	0 [label=mess]
+	1 [label=desk]
+	2 [label=table]
+	3 [label=furniture]
+	4 [label=room]
+	5 [label=house]
+	0 -> 1 [label="AtLocation; 4.472" dir=forward weight=4.472]
+	1 -> 2 [label="RelatedTo; 12.373" dir=forward weight=12.373]
+	2 -> 3 [label="RelatedTo; 19.965" dir=forward weight=19.965]
+	3 -> 4 [label="AtLocation; 12.982" dir=forward weight=12.982]
+	4 -> 5 [label="RelatedTo; 8.982" dir=forward weight=8.982]
+}

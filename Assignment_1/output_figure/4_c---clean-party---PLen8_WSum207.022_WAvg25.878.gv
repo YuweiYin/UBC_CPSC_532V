@@ -1,0 +1,20 @@
+// The path the concepts from "clean" to "party".Path Length: 8; Weight Sum: 207.0217902519133; Average Weight: 25.877723781489163
+digraph "4_c---clean-party---PLen8_WSum207.022_WAvg25.878" {
+	0 [label=clean]
+	1 [label=cloth]
+	2 [label=napkin]
+	3 [label=table]
+	4 [label=food]
+	5 [label=cake]
+	6 [label=birthday]
+	7 [label=celebration]
+	8 [label=party]
+	0 -> 1 [label="UsedFor; 7.746" dir=back weight=7.746]
+	1 -> 2 [label="RelatedTo; 13.955" dir=back weight=13.955]
+	2 -> 3 [label="RelatedTo; 18.775" dir=forward weight=18.775]
+	3 -> 4 [label="AtLocation; 53.909" dir=back weight=53.909]
+	4 -> 5 [label="RelatedTo; 46.698" dir=back weight=46.698]
+	5 -> 6 [label="RelatedTo; 36.032" dir=forward weight=36.032]
+	6 -> 7 [label="RelatedTo; 20.796" dir=forward weight=20.796]
+	7 -> 8 [label="RelatedTo; 9.110" dir=back weight=9.110]
+}

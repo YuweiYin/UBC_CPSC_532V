@@ -1,0 +1,18 @@
+// The path the concepts from "dream" to "mark".Path Length: 7; Weight Sum: 85.73875299770887; Average Weight: 12.248393285386982
+digraph "9_e---dream-mark---PLen7_WSum85.739_WAvg12.248" {
+	0 [label=dream]
+	1 [label=night]
+	2 [label=evening]
+	3 [label=day]
+	4 [label=birthday]
+	5 [label=personal]
+	6 [label=name]
+	7 [label=mark]
+	0 -> 1 [label="RelatedTo; 5.365" dir=forward weight=5.365]
+	1 -> 2 [label="RelatedTo; 13.510" dir=back weight=13.510]
+	2 -> 3 [label="RelatedTo; 18.307" dir=forward weight=18.307]
+	3 -> 4 [label="RelatedTo; 27.852" dir=back weight=27.852]
+	4 -> 5 [label="RelatedTo; 10.690" dir=forward weight=10.690]
+	5 -> 6 [label="RelatedTo; 6.849" dir=back weight=6.849]
+	6 -> 7 [label="RelatedTo; 3.165" dir=back weight=3.165]
+}

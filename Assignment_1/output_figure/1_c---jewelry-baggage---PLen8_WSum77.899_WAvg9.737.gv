@@ -1,0 +1,20 @@
+// The path the concepts from "jewelry" to "baggage".Path Length: 8; Weight Sum: 77.89876206479988; Average Weight: 9.737345258099985
+digraph "1_c---jewelry-baggage---PLen8_WSum77.899_WAvg9.737" {
+	0 [label=jewelry]
+	1 [label=decoration]
+	2 [label=carpeting]
+	3 [label=room]
+	4 [label=place]
+	5 [label=city]
+	6 [label="parking lot"]
+	7 [label=airport]
+	8 [label=baggage]
+	0 -> 1 [label="UsedFor; 2.828" dir=forward weight=2.828]
+	1 -> 2 [label="UsedFor; 5.657" dir=back weight=5.657]
+	2 -> 3 [label="AtLocation; 10.129" dir=forward weight=10.129]
+	3 -> 4 [label="RelatedTo; 21.365" dir=forward weight=21.365]
+	4 -> 5 [label="IsA; 17.398" dir=back weight=17.398]
+	5 -> 6 [label="AtLocation; 10.765" dir=back weight=10.765]
+	6 -> 7 [label="AtLocation; 6.293" dir=forward weight=6.293]
+	7 -> 8 [label="AtLocation; 3.464" dir=back weight=3.464]
+}

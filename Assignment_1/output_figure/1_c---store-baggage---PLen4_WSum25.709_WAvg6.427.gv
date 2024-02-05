@@ -1,0 +1,12 @@
+// The path the concepts from "store" to "baggage".Path Length: 4; Weight Sum: 25.708925241095322; Average Weight: 6.4272313102738305
+digraph "1_c---store-baggage---PLen4_WSum25.709_WAvg6.427" {
+	0 [label=store]
+	1 [label=town]
+	2 [label=city]
+	3 [label="train station"]
+	4 [label=baggage]
+	0 -> 1 [label="AtLocation; 4.472" dir=forward weight=4.472]
+	1 -> 2 [label="RelatedTo; 12.752" dir=back weight=12.752]
+	2 -> 3 [label="AtLocation; 5.657" dir=back weight=5.657]
+	3 -> 4 [label="AtLocation; 2.828" dir=back weight=2.828]
+}

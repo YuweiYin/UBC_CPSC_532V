@@ -1,0 +1,20 @@
+// The path the concepts from "read" to "letter".Path Length: 8; Weight Sum: 122.2585052657841; Average Weight: 15.282313158223012
+digraph "5_a---read-letter---PLen8_WSum122.259_WAvg15.282" {
+	0 [label=read]
+	1 [label=books]
+	2 [label=table]
+	3 [label=napkin]
+	4 [label=paper]
+	5 [label=writing]
+	6 [label=communication]
+	7 [label=note]
+	8 [label=letter]
+	0 -> 1 [label="ReceivesAction; 10.198" dir=back weight=10.198]
+	1 -> 2 [label="AtLocation; 14.198" dir=forward weight=14.198]
+	2 -> 3 [label="RelatedTo; 19.018" dir=back weight=19.018]
+	3 -> 4 [label="RelatedTo; 30.069" dir=forward weight=30.069]
+	4 -> 5 [label="RelatedTo; 23.562" dir=forward weight=23.562]
+	5 -> 6 [label="RelatedTo; 13.135" dir=forward weight=13.135]
+	6 -> 7 [label="UsedFor; 7.453" dir=back weight=7.453]
+	7 -> 8 [label="RelatedTo; 4.625" dir=back weight=4.625]
+}

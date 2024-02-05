@@ -1,0 +1,18 @@
+// The path the concepts from "trouble" to "party".Path Length: 7; Weight Sum: 111.04481941804747; Average Weight: 15.863545631149638
+digraph "4_b---trouble-party---PLen7_WSum111.045_WAvg15.864" {
+	0 [label=trouble]
+	1 [label=problem]
+	2 [label=math]
+	3 [label=number]
+	4 [label=age]
+	5 [label=birthday]
+	6 [label=celebration]
+	7 [label=party]
+	0 -> 1 [label="RelatedTo; 3.258" dir=forward weight=3.258]
+	1 -> 2 [label="RelatedTo; 5.678" dir=forward weight=5.678]
+	2 -> 3 [label="RelatedTo; 9.235" dir=back weight=9.235]
+	3 -> 4 [label="RelatedTo; 33.967" dir=back weight=33.967]
+	4 -> 5 [label="RelatedTo; 29.000" dir=back weight=29.000]
+	5 -> 6 [label="RelatedTo; 20.796" dir=forward weight=20.796]
+	6 -> 7 [label="RelatedTo; 9.110" dir=back weight=9.110]
+}

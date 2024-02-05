@@ -1,0 +1,18 @@
+// The path the concepts from "lawrence" to "york".Path Length: 7; Weight Sum: 63.38718764236632; Average Weight: 9.055312520338045
+digraph "7_b---lawrence-york---PLen7_WSum63.387_WAvg9.055" {
+	0 [label=lawrence]
+	1 [label=usa]
+	2 [label=dollar]
+	3 [label=bank]
+	4 [label=place]
+	5 [label=college]
+	6 [label=city]
+	7 [label=york]
+	0 -> 1 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="RelatedTo; 3.092" dir=back weight=3.092]
+	2 -> 3 [label="AtLocation; 5.920" dir=forward weight=5.920]
+	3 -> 4 [label="RelatedTo; 22.692" dir=forward weight=22.692]
+	4 -> 5 [label="IsA; 17.936" dir=back weight=17.936]
+	5 -> 6 [label="AtLocation; 9.690" dir=forward weight=9.690]
+	6 -> 7 [label="RelatedTo; 3.057" dir=forward weight=3.057]
+}

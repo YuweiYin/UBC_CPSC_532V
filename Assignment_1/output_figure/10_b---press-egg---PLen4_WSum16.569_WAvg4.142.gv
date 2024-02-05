@@ -1,0 +1,12 @@
+// The path the concepts from "press" to "egg".Path Length: 4; Weight Sum: 16.568930061775262; Average Weight: 4.1422325154438155
+digraph "10_b---press-egg---PLen4_WSum16.569_WAvg4.142" {
+	0 [label=press]
+	1 [label=media]
+	2 [label=record]
+	3 [label=round]
+	4 [label=egg]
+	0 -> 1 [label="RelatedTo; 2.135" dir=forward weight=2.135]
+	1 -> 2 [label="RelatedTo; 3.259" dir=back weight=3.259]
+	2 -> 3 [label="RelatedTo; 7.928" dir=forward weight=7.928]
+	3 -> 4 [label="RelatedTo; 3.247" dir=back weight=3.247]
+}

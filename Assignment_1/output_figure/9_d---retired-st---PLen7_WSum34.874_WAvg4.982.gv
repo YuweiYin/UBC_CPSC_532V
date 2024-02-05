@@ -1,0 +1,18 @@
+// The path the concepts from "retired" to "st".Path Length: 7; Weight Sum: 34.87366453794302; Average Weight: 4.981952076849003
+digraph "9_d---retired-st---PLen7_WSum34.874_WAvg4.982" {
+	0 [label=retired]
+	1 [label=unretired]
+	2 [label=work]
+	3 [label=play]
+	4 [label=ball]
+	5 [label=street]
+	6 [label=st]
+	7 [label=st]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="DistinctFrom; 4.903" dir=back weight=4.903]
+	3 -> 4 [label="UsedFor; 11.657" dir=back weight=11.657]
+	4 -> 5 [label="AtLocation; 7.657" dir=forward weight=7.657]
+	5 -> 6 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	6 -> 7 [label="FormOf; 2.828" dir=back weight=2.828]
+}

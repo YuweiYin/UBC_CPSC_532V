@@ -1,0 +1,14 @@
+// The path the concepts from "dinner" to "mark".Path Length: 5; Weight Sum: 33.24863192519738; Average Weight: 6.649726385039476
+digraph "9_a---dinner-mark---PLen5_WSum33.249_WAvg6.650" {
+	0 [label=dinner]
+	1 [label=bread]
+	2 [label=roll]
+	3 [label=small]
+	4 [label=mole]
+	5 [label=mark]
+	0 -> 1 [label="AtLocation; 3.464" dir=back weight=3.464]
+	1 -> 2 [label="RelatedTo; 9.386" dir=back weight=9.386]
+	2 -> 3 [label="RelatedTo; 11.825" dir=forward weight=11.825]
+	3 -> 4 [label="RelatedTo; 5.670" dir=back weight=5.670]
+	4 -> 5 [label="RelatedTo; 2.903" dir=forward weight=2.903]
+}

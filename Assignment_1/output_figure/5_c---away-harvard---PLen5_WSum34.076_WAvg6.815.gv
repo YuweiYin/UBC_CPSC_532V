@@ -1,0 +1,14 @@
+// The path the concepts from "away" to "harvard".Path Length: 5; Weight Sum: 34.07578533253398; Average Weight: 6.815157066506797
+digraph "5_c---away-harvard---PLen5_WSum34.076_WAvg6.815" {
+	0 [label=away]
+	1 [label=home]
+	2 [label=place]
+	3 [label=city]
+	4 [label=college]
+	5 [label=harvard]
+	0 -> 1 [label="Antonym; 2.136" dir=forward weight=2.136]
+	1 -> 2 [label="RelatedTo; 9.040" dir=forward weight=9.040]
+	2 -> 3 [label="IsA; 14.266" dir=back weight=14.266]
+	3 -> 4 [label="AtLocation; 7.633" dir=back weight=7.633]
+	4 -> 5 [label="IsA; 1.000" dir=back weight=1.000]
+}

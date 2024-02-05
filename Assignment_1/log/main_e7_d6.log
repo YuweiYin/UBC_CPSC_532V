@@ -1,0 +1,128 @@
+Namespace(verbose=False, example_id=7, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 7; Choice: "(a) Kevin"; From "kevin" To "hates"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "kevin" To "hates" (Similarity: 0.241)
+>>> >>> Depth [1] Time 3.9 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 11.0 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 34 (ignored 3); [tgt->src] BFS source 4; Visited neighbors 30 (ignored 0)
+>>> >>> Depth [3] Time 120.2 sec (2.0 min): [src->tgt] BFS source 34; Visited neighbors 128 (ignored 45); [tgt->src] BFS source 30; Visited neighbors 215 (ignored 52)
+>>> Found 1 path(s) between "kevin" and "hates".
+
+kevin is a word used in the context of british
+sickle cell anaemia is a word used in the context of british
+sickle cell anaemia is like oxygen
+oxygen is a type of gas
+gas is like fuel
+oil is like fuel
+oil is like hates
+
+
+Example: 7; Choice: "(a) Kevin"; From "kevin" To "crowds"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "kevin" To "crowds" (Similarity: 0.167)
+>>> >>> Depth [1] Time 1.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 32.2 sec (0.5 min): [src->tgt] BFS source 8; Visited neighbors 35 (ignored 3); [tgt->src] BFS source 10; Visited neighbors 99 (ignored 4)
+>>> >>> Depth [3] Time 168.0 sec (2.8 min): [src->tgt] BFS source 35; Visited neighbors 154 (ignored 12); [tgt->src] BFS source 99; Visited neighbors 635 (ignored 36)
+>>> Found 4 path(s) between "kevin" and "crowds".
+
+kevin is a word used in the context of british
+babygro is a word used in the context of british
+babygro is like baby
+baby is like human
+person is like human
+person is like people
+crowd is like people
+crowds is a form of the word crowd
+
+
+Example: 7; Choice: "(a) Kevin"; From "kevin" To "york"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "kevin" To "york" (Similarity: 0.178)
+>>> >>> Depth [1] Time 2.4 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 11.1 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 35 (ignored 2); [tgt->src] BFS source 7; Visited neighbors 55 (ignored 0)
+>>> >>> Depth [3] Time 83.3 sec (1.4 min): [src->tgt] BFS source 35; Visited neighbors 155 (ignored 9); [tgt->src] BFS source 55; Visited neighbors 354 (ignored 28)
+>>> Found 3 path(s) between "kevin" and "york".
+
+keavy is like kevin
+keavy is like ireland
+ireland is a type of country
+You are likely to find capital in country
+capital is like city
+city is like york
+
+
+Example: 7; Choice: "(a) Kevin"; From "kevin" To "lawrence"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "kevin" To "lawrence" (Similarity: 0.346)
+>>> >>> Depth [1] Time 1.5 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 2)
+>>> >>> Depth [2] Time 13.6 sec (0.2 min): [src->tgt] BFS source 2; Visited neighbors 8 (ignored 26); [tgt->src] BFS source 10; Visited neighbors 16 (ignored 5)
+>>> >>> Depth [3] Time 26.5 sec (0.4 min): [src->tgt] BFS source 8; Visited neighbors 17 (ignored 66); [tgt->src] BFS source 16; Visited neighbors 16 (ignored 8)
+>>> Path between kevin and lawrence does not exist or is too long (> 6).
+
+
+*** Example: 7; Choice: a; SCORE: 6.798 (total_w_sum = 190.357; total_path_len = 21; match_pair_n = 3; total_pair_n = 4)
+
+
+Example: 7; Choice: "(b) Lawrence"; From "lawrence" To "hates"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lawrence" To "hates" (Similarity: 0.181)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 9.3 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 33 (ignored 1); [tgt->src] BFS source 4; Visited neighbors 30 (ignored 0)
+>>> >>> Depth [3] Time 48.9 sec (0.8 min): [src->tgt] BFS source 33; Visited neighbors 133 (ignored 21); [tgt->src] BFS source 30; Visited neighbors 243 (ignored 19)
+>>> Found 2 path(s) between "lawrence" and "hates".
+
+lawrence is like usa
+usa is a type of country
+You are likely to find land in country
+land is like ground
+You are likely to find oil in ground
+oil is like hates
+
+
+Example: 7; Choice: "(b) Lawrence"; From "lawrence" To "crowds"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lawrence" To "crowds" (Similarity: 0.158)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 8.4 sec (0.1 min): [src->tgt] BFS source 11; Visited neighbors 32 (ignored 2); [tgt->src] BFS source 10; Visited neighbors 99 (ignored 4)
+>>> >>> Depth [3] Time 53.7 sec (0.9 min): [src->tgt] BFS source 32; Visited neighbors 139 (ignored 6); [tgt->src] BFS source 99; Visited neighbors 643 (ignored 28)
+>>> Found 7 path(s) between "lawrence" and "crowds".
+
+lawrence is like usa
+usa is a type of country
+china is a type of country
+You are likely to find human in china
+person is like human
+person is like people
+crowd is like people
+crowds is a form of the word crowd
+
+
+Example: 7; Choice: "(b) Lawrence"; From "lawrence" To "york"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lawrence" To "york" (Similarity: 0.323)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 6.1 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 24 (ignored 4); [tgt->src] BFS source 7; Visited neighbors 51 (ignored 8)
+>>> >>> Depth [3] Time 30.2 sec (0.5 min): [src->tgt] BFS source 24; Visited neighbors 98 (ignored 24); [tgt->src] BFS source 51; Visited neighbors 227 (ignored 200)
+>>> Found 4 path(s) between "lawrence" and "york".
+
+lawrence is like usa
+dollar is like usa
+You are likely to find dollar in bank
+bank is like place
+college is a type of place
+You are likely to find college in city
+city is like york
+
+
+Example: 7; Choice: "(b) Lawrence"; From "lawrence" To "kevin"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lawrence" To "kevin" (Similarity: 0.346)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 9); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 3)
+>>> >>> Depth [2] Time 5.0 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 9 (ignored 2); [tgt->src] BFS source 6; Visited neighbors 15 (ignored 13)
+>>> Found 2 path(s) between "lawrence" and "kevin".
+
+the word lawrie is derived from the word lawrence
+lawrie is like given name
+kev is like given name
+kev is like kevin
+
+*** Example: 7; Choice: b; SCORE: 8.322 (total_w_sum = 208.056; total_path_len = 25; match_pair_n = 4; total_pair_n = 4)
+
+*** DONE *** Example: 7 - Running Time: 644.0 sec (10.7 min)
+
+Accuracy: 1.0.
+Done!
+Total Running Time: 644.4 sec (10.7 min)

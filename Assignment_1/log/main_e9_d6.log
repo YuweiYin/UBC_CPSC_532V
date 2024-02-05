@@ -1,0 +1,878 @@
+Namespace(verbose=False, example_id=9, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "dinner" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dinner" To "judge" (Similarity: 0.256)
+>>> >>> Depth [1] Time 2.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 41.1 sec (0.7 min): [src->tgt] BFS source 11; Visited neighbors 77 (ignored 18); [tgt->src] BFS source 17; Visited neighbors 148 (ignored 11)
+>>> >>> Depth [3] Time 333.7 sec (5.6 min): [src->tgt] BFS source 77; Visited neighbors 439 (ignored 153); [tgt->src] BFS source 148; Visited neighbors 564 (ignored 138)
+>>> Found 25 path(s) between "dinner" and "judge".
+
+plate is like dinner
+You are likely to find plate in table
+desk is like table
+You are likely to find floor in desk
+You are likely to find cat in floor
+cat is like animal
+farm is like animal
+farm is like home
+home is like place
+court is like place
+judge is like court
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "dinner" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dinner" To "st" (Similarity: 0.192)
+>>> >>> Depth [1] Time 2.4 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 20.1 sec (0.3 min): [src->tgt] BFS source 16; Visited neighbors 121 (ignored 36); [tgt->src] BFS source 7; Visited neighbors 37 (ignored 2)
+>>> Found 1 path(s) between "dinner" and "st".
+
+You are likely to find bread in dinner
+roll is like bread
+ball can roll
+You are likely to find ball in street
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "dinner" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dinner" To "mark" (Similarity: 0.216)
+>>> >>> Depth [1] Time 3.4 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 14 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 18.9 sec (0.3 min): [src->tgt] BFS source 14; Visited neighbors 109 (ignored 6); [tgt->src] BFS source 7; Visited neighbors 63 (ignored 5)
+>>> Found 2 path(s) between "dinner" and "mark".
+
+You are likely to find bread in dinner
+roll is like bread
+roll is like small
+mole is like small
+mole is like mark
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "dinner" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dinner" To "bailey" (Similarity: 0.234)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 24.2 sec (0.4 min): [src->tgt] BFS source 13; Visited neighbors 99 (ignored 25); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> Found 4 path(s) between "dinner" and "bailey".
+
+plate is like dinner
+You are likely to find plate in table
+table is like eating
+apple is used for eating
+bailey is like apple
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "dinner" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dinner" To "paul" (Similarity: 0.276)
+>>> >>> Depth [1] Time 2.3 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 26.2 sec (0.4 min): [src->tgt] BFS source 15; Visited neighbors 116 (ignored 33); [tgt->src] BFS source 11; Visited neighbors 54 (ignored 2)
+>>> >>> Depth [3] Time 116.2 sec (1.9 min): [src->tgt] BFS source 116; Visited neighbors 603 (ignored 192); [tgt->src] BFS source 54; Visited neighbors 235 (ignored 50)
+>>> Found 13 path(s) between "dinner" and "paul".
+
+plate is like dinner
+You are likely to find plate in table
+desk is like table
+You are likely to find floor in desk
+You are likely to find cat in floor
+cat is like animal
+farm is like animal
+farm is like home
+home is like personal
+name is like personal
+paul is like name
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "nice" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "nice" To "judge" (Similarity: 0.224)
+>>> >>> Depth [1] Time 1.5 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 11.9 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 59 (ignored 9); [tgt->src] BFS source 17; Visited neighbors 153 (ignored 6)
+>>> Found 1 path(s) between "nice" and "judge".
+
+kind is like nice
+people is kind
+people is human
+person is like human
+judge is like person
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "nice" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "nice" To "st" (Similarity: 0.175)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 5.7 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 55 (ignored 13); [tgt->src] BFS source 7; Visited neighbors 37 (ignored 2)
+>>> >>> Depth [3] Time 62.0 sec (1.0 min): [src->tgt] BFS source 55; Visited neighbors 380 (ignored 70); [tgt->src] BFS source 37; Visited neighbors 275 (ignored 32)
+>>> Found 7 path(s) between "nice" and "st".
+
+kind is like nice
+people is kind
+You are likely to find people in apartment
+You are likely to find apartment in town
+You are likely to find road in town
+street is like road
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "nice" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "nice" To "mark" (Similarity: 0.267)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 6.1 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 47 (ignored 28); [tgt->src] BFS source 7; Visited neighbors 61 (ignored 7)
+>>> Found 1 path(s) between "nice" and "mark".
+
+kind is like nice
+people is kind
+person is like people
+name is like person
+mark is like name
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "nice" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "nice" To "bailey" (Similarity: 0.197)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 8.6 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 52 (ignored 21); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> >>> Depth [3] Time 53.2 sec (0.9 min): [src->tgt] BFS source 52; Visited neighbors 358 (ignored 67); [tgt->src] BFS source 48; Visited neighbors 309 (ignored 72)
+>>> Found 14 path(s) between "nice" and "bailey".
+
+sex is nice
+sex is fun
+party is like fun
+cake is like party
+cake is like eaten
+fruit can be eaten
+apple is like fruit
+bailey is like apple
+
+
+Example: 9; Choice: "(a) had a nice dinner"; From "nice" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "nice" To "paul" (Similarity: 0.218)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 7.5 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 56 (ignored 14); [tgt->src] BFS source 12; Visited neighbors 55 (ignored 1)
+>>> Found 1 path(s) between "nice" and "paul".
+
+kind is like nice
+people is kind
+person is like people
+name is like person
+paul is like name
+
+*** Example: 9; Choice: a; SCORE: 14.164 (total_w_sum = 977.312; total_path_len = 69; match_pair_n = 10; total_pair_n = 10)
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "45" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "45" To "judge" (Similarity: 0.259)
+>>> >>> Depth [1] Time 1.3 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 13.3 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 44 (ignored 3); [tgt->src] BFS source 17; Visited neighbors 148 (ignored 11)
+>>> >>> Depth [3] Time 97.2 sec (1.6 min): [src->tgt] BFS source 44; Visited neighbors 144 (ignored 10); [tgt->src] BFS source 148; Visited neighbors 562 (ignored 140)
+>>> Found 3 path(s) between "45" and "judge".
+
+ep is like 45
+ep is like record
+record is like music
+dance is like music
+dance is like body
+body is like human
+person is like human
+judge is like person
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "45" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "45" To "st" (Similarity: 0.282)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 1)
+>>> >>> Depth [2] Time 6.0 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 39 (ignored 25); [tgt->src] BFS source 6; Visited neighbors 24 (ignored 35)
+>>> >>> Depth [3] Time 24.9 sec (0.4 min): [src->tgt] BFS source 39; Visited neighbors 98 (ignored 81); [tgt->src] BFS source 24; Visited neighbors 135 (ignored 115)
+>>> Found 2 path(s) between "45" and "st".
+
+ep is like 45
+ep is like record
+record is like music
+song is like music
+verse is like song
+verse is like stanza
+st is like stanza
+st is a form of the word st
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "45" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "45" To "mark" (Similarity: 0.281)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 6.5 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 44 (ignored 2); [tgt->src] BFS source 7; Visited neighbors 59 (ignored 9)
+>>> >>> Depth [3] Time 66.4 sec (1.1 min): [src->tgt] BFS source 44; Visited neighbors 134 (ignored 14); [tgt->src] BFS source 59; Visited neighbors 265 (ignored 56)
+>>> Found 1 path(s) between "45" and "mark".
+
+ep is like 45
+ep is like record
+record is like music
+note is like music
+note is like small
+mole is like small
+mole is like mark
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "45" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "45" To "bailey" (Similarity: 0.224)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 9.3 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 44 (ignored 2); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> >>> Depth [3] Time 37.3 sec (0.6 min): [src->tgt] BFS source 44; Visited neighbors 135 (ignored 13); [tgt->src] BFS source 48; Visited neighbors 290 (ignored 92)
+>>> Found 3 path(s) between "45" and "bailey".
+
+ep is like 45
+ep is like record
+record is like plate
+plate is like eating
+fruit is used for eating
+apple is like fruit
+bailey is like apple
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "45" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "45" To "paul" (Similarity: 0.283)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 7.8 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 44 (ignored 2); [tgt->src] BFS source 11; Visited neighbors 54 (ignored 2)
+>>> >>> Depth [3] Time 39.2 sec (0.7 min): [src->tgt] BFS source 44; Visited neighbors 133 (ignored 20); [tgt->src] BFS source 54; Visited neighbors 233 (ignored 52)
+>>> Found 1 path(s) between "45" and "paul".
+
+ep is like 45
+ep is like record
+record is like music
+metal is a type of music
+silver is like metal
+pollard is like silver
+paul is like pollard
+paul is like paulson
+the word paulson is derived from the word paul
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "buy" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "buy" To "judge" (Similarity: 0.264)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 18.4 sec (0.3 min): [src->tgt] BFS source 17; Visited neighbors 122 (ignored 83); [tgt->src] BFS source 17; Visited neighbors 146 (ignored 13)
+>>> >>> Depth [3] Time 158.6 sec (2.6 min): [src->tgt] BFS source 122; Visited neighbors 684 (ignored 297); [tgt->src] BFS source 146; Visited neighbors 560 (ignored 142)
+>>> Found 32 path(s) between "buy" and "judge".
+
+In order for buy to happen, paying needs to happen
+paying is a form of the word pay
+pay is like money
+wallet is like money
+wallet is like pocket
+You are likely to find hand in pocket
+hand is like body
+body is like human
+person is like human
+judge is like person
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "buy" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "buy" To "st" (Similarity: 0.228)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 12.0 sec (0.2 min): [src->tgt] BFS source 17; Visited neighbors 118 (ignored 80); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 83.2 sec (1.4 min): [src->tgt] BFS source 118; Visited neighbors 644 (ignored 335); [tgt->src] BFS source 35; Visited neighbors 237 (ignored 65)
+>>> Found 11 path(s) between "buy" and "st".
+
+Something you do when you go to mall is buy
+In order for go to mall to happen, get in car needs to happen
+In order for drive to happen, get in car needs to happen
+drive is like car
+You are likely to find car in road
+street is like road
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "buy" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "buy" To "mark" (Similarity: 0.269)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 14 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 9.8 sec (0.2 min): [src->tgt] BFS source 14; Visited neighbors 104 (ignored 59); [tgt->src] BFS source 7; Visited neighbors 61 (ignored 7)
+>>> Found 1 path(s) between "buy" and "mark".
+
+the last thing you do when you buy is pay for
+person does not want pay for
+name is like person
+mark is like name
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "buy" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "buy" To "bailey" (Similarity: 0.192)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 13.1 sec (0.2 min): [src->tgt] BFS source 15; Visited neighbors 108 (ignored 73); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> >>> Depth [3] Time 72.8 sec (1.2 min): [src->tgt] BFS source 108; Visited neighbors 665 (ignored 239); [tgt->src] BFS source 48; Visited neighbors 313 (ignored 68)
+>>> Found 25 path(s) between "buy" and "bailey".
+
+In order for buy to happen, have money needs to happen
+In order for shop to happen, have money needs to happen
+You are likely to find food in shop
+You are likely to find food in supermarket
+You are likely to find bread in supermarket
+bread is used for eating
+fruit is used for eating
+apple is like fruit
+bailey is like apple
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "buy" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "buy" To "paul" (Similarity: 0.316)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 7); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 2)
+>>> >>> Depth [2] Time 10.2 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 91 (ignored 69); [tgt->src] BFS source 10; Visited neighbors 48 (ignored 10)
+>>> Found 2 path(s) between "buy" and "paul".
+
+the last thing you do when you buy is pay for
+person does not want pay for
+name is like person
+paul is like name
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "horse" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "horse" To "judge" (Similarity: 0.303)
+>>> >>> Depth [1] Time 3.9 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 24.5 sec (0.4 min): [src->tgt] BFS source 17; Visited neighbors 108 (ignored 33); [tgt->src] BFS source 17; Visited neighbors 137 (ignored 22)
+>>> Found 2 path(s) between "horse" and "judge".
+
+horse is like animal
+farm is like animal
+farm is like place
+court is like place
+judge is like court
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "horse" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "horse" To "st" (Similarity: 0.170)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 19 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 12.8 sec (0.2 min): [src->tgt] BFS source 19; Visited neighbors 132 (ignored 8); [tgt->src] BFS source 7; Visited neighbors 37 (ignored 2)
+>>> Found 1 path(s) between "horse" and "st".
+
+horse is like riding
+bicycle is used for riding
+You are likely to find bicycle in street
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "horse" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "horse" To "mark" (Similarity: 0.244)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 18 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 11.4 sec (0.2 min): [src->tgt] BFS source 18; Visited neighbors 123 (ignored 16); [tgt->src] BFS source 7; Visited neighbors 62 (ignored 6)
+>>> >>> Depth [3] Time 156.7 sec (2.6 min): [src->tgt] BFS source 123; Visited neighbors 803 (ignored 190); [tgt->src] BFS source 62; Visited neighbors 286 (ignored 47)
+>>> Found 23 path(s) between "horse" and "mark".
+
+horse is like animal
+You are likely to find animal in zoo
+You are likely to find cat in zoo
+You are likely to find cat in bed
+bed is like place
+home is like place
+home is like house
+room is like house
+floor is like room
+floor is like ground
+mole is like ground
+mole is like mark
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "horse" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "horse" To "bailey" (Similarity: 0.241)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 12.9 sec (0.2 min): [src->tgt] BFS source 16; Visited neighbors 105 (ignored 17); [tgt->src] BFS source 14; Visited neighbors 47 (ignored 11)
+>>> Found 2 path(s) between "horse" and "bailey".
+
+horse is like big
+tree is like big
+apple is like tree
+bailey is like apple
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "horse" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "horse" To "paul" (Similarity: 0.216)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 14.9 sec (0.2 min): [src->tgt] BFS source 17; Visited neighbors 124 (ignored 13); [tgt->src] BFS source 12; Visited neighbors 55 (ignored 1)
+>>> >>> Depth [3] Time 81.2 sec (1.4 min): [src->tgt] BFS source 124; Visited neighbors 832 (ignored 143); [tgt->src] BFS source 55; Visited neighbors 258 (ignored 16)
+>>> Found 11 path(s) between "horse" and "paul".
+
+horse is like animal
+cat is like animal
+You are likely to find cat in bed
+bed is like place
+home is like place
+home is like house
+servant is like house
+servant is like person
+name is like person
+paul is like name
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "acre" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "acre" To "judge" (Similarity: 0.227)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 8.8 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 17; Visited neighbors 152 (ignored 7)
+>>> >>> Depth [3] Time 96.4 sec (1.6 min): [src->tgt] BFS source 14; Visited neighbors 75 (ignored 5); [tgt->src] BFS source 152; Visited neighbors 597 (ignored 97)
+>>> Found 6 path(s) between "acre" and "judge".
+
+acre foot is like acre
+acre foot is like foot
+leg is like foot
+leg is like body
+body is like human
+person is like human
+judge is like person
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "acre" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "acre" To "st" (Similarity: 0.233)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 4.2 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 12 (ignored 2); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 20.0 sec (0.3 min): [src->tgt] BFS source 12; Visited neighbors 62 (ignored 14); [tgt->src] BFS source 35; Visited neighbors 236 (ignored 66)
+>>> Found 5 path(s) between "acre" and "st".
+
+acre foot is like acre
+acre foot is like foot
+leg is like foot
+leg is like walking
+street is used for walking
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "acre" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "acre" To "mark" (Similarity: 0.176)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 0)
+>>> >>> Depth [2] Time 4.7 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 8; Visited neighbors 70 (ignored 3)
+>>> >>> Depth [3] Time 35.3 sec (0.6 min): [src->tgt] BFS source 14; Visited neighbors 79 (ignored 1); [tgt->src] BFS source 70; Visited neighbors 329 (ignored 9)
+>>> Found 3 path(s) between "acre" and "mark".
+
+acre foot is like acre
+acre foot is a word used in the context of agriculture
+farm is like agriculture
+farm is like animal
+mole is like animal
+mole is like mark
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "acre" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "acre" To "bailey" (Similarity: 0.236)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 6.9 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 13 (ignored 1); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> Found 1 path(s) between "acre" and "bailey".
+
+acre foot is like acre
+acre foot is a word used in the context of us
+bailey is a word used in the context of us
+bailey is like rockall
+bailey is like rockall
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "acre" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "acre" To "paul" (Similarity: 0.200)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 5.8 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 12; Visited neighbors 55 (ignored 1)
+>>> >>> Depth [3] Time 28.9 sec (0.5 min): [src->tgt] BFS source 14; Visited neighbors 80 (ignored 0); [tgt->src] BFS source 55; Visited neighbors 264 (ignored 10)
+>>> Found 1 path(s) between "acre" and "paul".
+
+acre foot is like acre
+acre foot is like foot
+foot is like body
+body is like person
+name is like person
+paul is like name
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "farm" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "farm" To "judge" (Similarity: 0.233)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 19 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 16.4 sec (0.3 min): [src->tgt] BFS source 19; Visited neighbors 190 (ignored 36); [tgt->src] BFS source 17; Visited neighbors 151 (ignored 8)
+>>> Found 2 path(s) between "farm" and "judge".
+
+farm is like place
+home is like place
+home is like house
+room is like house
+court is like room
+judge is like court
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "farm" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "farm" To "st" (Similarity: 0.194)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 10.5 sec (0.2 min): [src->tgt] BFS source 16; Visited neighbors 161 (ignored 33); [tgt->src] BFS source 7; Visited neighbors 37 (ignored 2)
+>>> >>> Depth [3] Time 132.8 sec (2.2 min): [src->tgt] BFS source 161; Visited neighbors 1032 (ignored 273); [tgt->src] BFS source 37; Visited neighbors 267 (ignored 40)
+>>> Found 28 path(s) between "farm" and "st".
+
+chicken is like farm
+chicken is a type of food
+plate is like food
+You are likely to find plate in table
+You are likely to find dog in table
+dog wants bone
+bone is like part
+verse is like part
+verse is like stanza
+st is like stanza
+st is a form of the word st
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "farm" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "farm" To "mark" (Similarity: 0.187)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 18 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 0)
+>>> >>> Depth [2] Time 11.9 sec (0.2 min): [src->tgt] BFS source 18; Visited neighbors 199 (ignored 21); [tgt->src] BFS source 8; Visited neighbors 70 (ignored 3)
+>>> Found 2 path(s) between "farm" and "mark".
+
+sheep is like farm
+sheep is like animal
+cow is like animal
+cow is like mammal
+mole is like mammal
+mole is like mark
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "farm" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "farm" To "bailey" (Similarity: 0.212)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 13.9 sec (0.2 min): [src->tgt] BFS source 17; Visited neighbors 175 (ignored 43); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> Found 6 path(s) between "farm" and "bailey".
+
+farm is like place
+home is like place
+home is like house
+You are likely to find computer in house
+apple is like computer
+bailey is like apple
+
+
+Example: 9; Choice: "(b) he buy a 45-acre horse farm"; From "farm" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "farm" To "paul" (Similarity: 0.224)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 18 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 13.3 sec (0.2 min): [src->tgt] BFS source 18; Visited neighbors 176 (ignored 26); [tgt->src] BFS source 12; Visited neighbors 55 (ignored 1)
+>>> >>> Depth [3] Time 115.2 sec (1.9 min): [src->tgt] BFS source 176; Visited neighbors 1184 (ignored 237); [tgt->src] BFS source 55; Visited neighbors 258 (ignored 16)
+>>> Found 11 path(s) between "farm" and "paul".
+
+sheep is like farm
+sheep is like animal
+bird is like animal
+egg is like bird
+egg is like product
+wool is like product
+wool is like white
+bread is like white
+You are likely to find bread in supermarket
+You are likely to find people in supermarket
+person is like people
+name is like person
+paul is like name
+
+*** Example: 9; Choice: b; SCORE: 13.924 (total_w_sum = 2548.006; total_path_len = 183; match_pair_n = 25; total_pair_n = 25)
+
+
+Example: 9; Choice: "(c) he celebrated"; From "celebrated" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "celebrated" To "judge" (Similarity: 0.124)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> Found 1 path(s) between "celebrated" and "judge".
+
+person wants celebrated
+judge is like person
+
+
+Example: 9; Choice: "(c) he celebrated"; From "celebrated" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "celebrated" To "st" (Similarity: 0.262)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 7.8 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 15 (ignored 14); [tgt->src] BFS source 7; Visited neighbors 34 (ignored 5)
+>>> >>> Depth [3] Time 25.4 sec (0.4 min): [src->tgt] BFS source 15; Visited neighbors 57 (ignored 46); [tgt->src] BFS source 34; Visited neighbors 210 (ignored 127)
+>>> Found 4 path(s) between "celebrated" and "st".
+
+person wants celebrated
+body is like person
+eye is like body
+eye is like ball
+You are likely to find ball in street
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(c) he celebrated"; From "celebrated" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "celebrated" To "mark" (Similarity: 0.229)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 4.9 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 26 (ignored 3); [tgt->src] BFS source 7; Visited neighbors 63 (ignored 5)
+>>> >>> Depth [3] Time 37.8 sec (0.6 min): [src->tgt] BFS source 26; Visited neighbors 166 (ignored 37); [tgt->src] BFS source 63; Visited neighbors 293 (ignored 40)
+>>> Found 8 path(s) between "celebrated" and "mark".
+
+person wants celebrated
+person is like human
+body is like human
+feet is like body
+ground is like feet
+mole is like ground
+mole is like mark
+
+
+Example: 9; Choice: "(c) he celebrated"; From "celebrated" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "celebrated" To "bailey" (Similarity: 0.150)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 7.6 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 26 (ignored 3); [tgt->src] BFS source 14; Visited neighbors 52 (ignored 5)
+>>> >>> Depth [3] Time 49.5 sec (0.8 min): [src->tgt] BFS source 26; Visited neighbors 190 (ignored 21); [tgt->src] BFS source 52; Visited neighbors 349 (ignored 40)
+>>> Found 6 path(s) between "celebrated" and "bailey".
+
+person wants celebrated
+person is like human
+body is like human
+blood is like body
+blood is like red
+apple is red
+bailey is like apple
+
+
+Example: 9; Choice: "(c) he celebrated"; From "celebrated" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "celebrated" To "paul" (Similarity: 0.215)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 6.5 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 26 (ignored 3); [tgt->src] BFS source 12; Visited neighbors 55 (ignored 1)
+>>> >>> Depth [3] Time 34.8 sec (0.6 min): [src->tgt] BFS source 26; Visited neighbors 185 (ignored 24); [tgt->src] BFS source 55; Visited neighbors 258 (ignored 16)
+>>> Found 1 path(s) between "celebrated" and "paul".
+
+person wants celebrated
+person is like human
+You are likely to find human in church
+You are likely to find bishop in church
+paulian is like bishop
+the word paulian is derived from the word paul
+
+*** Example: 9; Choice: c; SCORE: 8.219 (total_w_sum = 238.342; total_path_len = 29; match_pair_n = 5; total_pair_n = 5)
+
+
+Example: 9; Choice: "(d) mark retired"; From "mark" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mark" To "judge" (Similarity: 0.404)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 4)
+>>> >>> Depth [2] Time 6.3 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 13 (ignored 16); [tgt->src] BFS source 13; Visited neighbors 87 (ignored 47)
+>>> Found 1 path(s) between "mark" and "judge".
+
+question is like mark
+question is like sentence
+Sometimes conducting trial causes sentence
+In order for conducting trial to happen, judge needs to happen
+
+
+Example: 9; Choice: "(d) mark retired"; From "mark" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mark" To "st" (Similarity: 0.248)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 6.1 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 50 (ignored 20); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 35.7 sec (0.6 min): [src->tgt] BFS source 50; Visited neighbors 192 (ignored 103); [tgt->src] BFS source 35; Visited neighbors 227 (ignored 76)
+>>> Found 8 path(s) between "mark" and "st".
+
+mole is like mark
+mole is like ground
+ground is like surface
+road is like surface
+street is like road
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(d) mark retired"; From "mark" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mark" To "bailey" (Similarity: 0.333)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 12)
+>>> >>> Depth [2] Time 3.9 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 14 (ignored 16); [tgt->src] BFS source 7; Visited neighbors 15 (ignored 23)
+>>> >>> Depth [3] Time 12.5 sec (0.2 min): [src->tgt] BFS source 14; Visited neighbors 26 (ignored 121); [tgt->src] BFS source 15; Visited neighbors 72 (ignored 86)
+>>> Path between mark and bailey does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(d) mark retired"; From "mark" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mark" To "paul" (Similarity: 0.384)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 3)
+>>> Found 1 path(s) between "mark" and "paul".
+
+mark is like name
+paul is like name
+
+
+Example: 9; Choice: "(d) mark retired"; From "retired" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "retired" To "judge" (Similarity: 0.290)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 12.4 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 32 (ignored 6); [tgt->src] BFS source 17; Visited neighbors 140 (ignored 19)
+>>> >>> Depth [3] Time 137.6 sec (2.3 min): [src->tgt] BFS source 32; Visited neighbors 152 (ignored 37); [tgt->src] BFS source 140; Visited neighbors 503 (ignored 147)
+>>> Found 5 path(s) between "retired" and "judge".
+
+unretired is like retired
+unretired is like work
+work is like job
+servant is like job
+servant is like slave
+slave is a type of person
+judge is like person
+
+
+Example: 9; Choice: "(d) mark retired"; From "retired" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "retired" To "st" (Similarity: 0.234)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 9.5 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 34 (ignored 12); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 31.9 sec (0.5 min): [src->tgt] BFS source 34; Visited neighbors 156 (ignored 17); [tgt->src] BFS source 35; Visited neighbors 235 (ignored 67)
+>>> Found 2 path(s) between "retired" and "st".
+
+unretired is like retired
+unretired is like work
+it cannot be both play and work
+ball is used for play
+You are likely to find ball in street
+st is like street
+st is a form of the word st
+
+
+Example: 9; Choice: "(d) mark retired"; From "retired" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "retired" To "mark" (Similarity: 0.289)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 6.9 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 30 (ignored 8); [tgt->src] BFS source 7; Visited neighbors 59 (ignored 9)
+>>> >>> Depth [3] Time 39.5 sec (0.7 min): [src->tgt] BFS source 30; Visited neighbors 145 (ignored 25); [tgt->src] BFS source 59; Visited neighbors 263 (ignored 58)
+>>> Found 5 path(s) between "retired" and "mark".
+
+sunbird is like retired
+sunbird is like bird
+chicken is like bird
+chicken is like animal
+mole is like animal
+mole is like mark
+
+
+Example: 9; Choice: "(d) mark retired"; From "retired" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "retired" To "bailey" (Similarity: 0.334)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 1 (ignored 9); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 12)
+>>> >>> Depth [2] Time 3.6 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 1); [tgt->src] BFS source 7; Visited neighbors 15 (ignored 23)
+>>> >>> Depth [3] Time 7.0 sec (0.1 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 15; Visited neighbors 71 (ignored 87)
+>>> Path between retired and bailey does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(d) mark retired"; From "retired" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "retired" To "paul" (Similarity: 0.314)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 2)
+>>> >>> Depth [2] Time 7.8 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 15); [tgt->src] BFS source 10; Visited neighbors 48 (ignored 10)
+>>> >>> Depth [3] Time 32.1 sec (0.5 min): [src->tgt] BFS source 24; Visited neighbors 111 (ignored 46); [tgt->src] BFS source 48; Visited neighbors 177 (ignored 119)
+>>> Path between retired and paul does not exist or is too long (> 6).
+
+
+*** Example: 9; Choice: d; SCORE: 4.430 (total_w_sum = 219.287; total_path_len = 33; match_pair_n = 6; total_pair_n = 9)
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "participating" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "participating" To "judge" (Similarity: 0.265)
+>>> >>> Depth [1] Time 3.4 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 12.8 sec (0.2 min): [src->tgt] BFS source 3; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 17; Visited neighbors 145 (ignored 14)
+>>> >>> Depth [3] Time 82.8 sec (1.4 min): [src->tgt] BFS source 10; Visited neighbors 37 (ignored 13); [tgt->src] BFS source 145; Visited neighbors 559 (ignored 143)
+>>> Path between participating and judge does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "participating" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "participating" To "st" (Similarity: 0.223)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 4.5 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 20.6 sec (0.3 min): [src->tgt] BFS source 10; Visited neighbors 36 (ignored 5); [tgt->src] BFS source 35; Visited neighbors 240 (ignored 62)
+>>> Path between participating and st does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "participating" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "participating" To "mark" (Similarity: 0.260)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 4.6 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 61 (ignored 7)
+>>> >>> Depth [3] Time 30.4 sec (0.5 min): [src->tgt] BFS source 10; Visited neighbors 34 (ignored 18); [tgt->src] BFS source 61; Visited neighbors 281 (ignored 53)
+>>> Path between participating and mark does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "participating" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "participating" To "bailey" (Similarity: 0.214)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 10.3 sec (0.2 min): [src->tgt] BFS source 3; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 14; Visited neighbors 48 (ignored 10)
+>>> >>> Depth [3] Time 51.6 sec (0.9 min): [src->tgt] BFS source 10; Visited neighbors 35 (ignored 16); [tgt->src] BFS source 48; Visited neighbors 293 (ignored 88)
+>>> Path between participating and bailey does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "participating" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "participating" To "paul" (Similarity: 0.256)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 7.9 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 11; Visited neighbors 54 (ignored 2)
+>>> >>> Depth [3] Time 30.1 sec (0.5 min): [src->tgt] BFS source 10; Visited neighbors 36 (ignored 5); [tgt->src] BFS source 54; Visited neighbors 244 (ignored 37)
+>>> Path between participating and paul does not exist or is too long (> 6).
+
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "dream" To "judge"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dream" To "judge" (Similarity: 0.204)
+>>> >>> Depth [1] Time 1.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 32.5 sec (0.5 min): [src->tgt] BFS source 16; Visited neighbors 121 (ignored 23); [tgt->src] BFS source 17; Visited neighbors 154 (ignored 5)
+>>> Found 2 path(s) between "dream" and "judge".
+
+dream is like sleeping
+Sometimes sleeping causes death
+Sometimes deciding criminal s fate causes death
+deciding criminal s fate is used for judge
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "dream" To "st"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dream" To "st" (Similarity: 0.222)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 8.6 sec (0.1 min): [src->tgt] BFS source 12; Visited neighbors 57 (ignored 76); [tgt->src] BFS source 7; Visited neighbors 35 (ignored 4)
+>>> >>> Depth [3] Time 74.6 sec (1.2 min): [src->tgt] BFS source 57; Visited neighbors 310 (ignored 183); [tgt->src] BFS source 35; Visited neighbors 240 (ignored 62)
+>>> Found 7 path(s) between "dream" and "st".
+
+Something you do when you sleep is dream
+sleep is like night
+evening is like night
+evening is like day
+morning is like day
+morning is like time
+month is like time
+month is like unit
+stokes is like unit
+stokes and st have similar meanings
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "dream" To "mark"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dream" To "mark" (Similarity: 0.259)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 12); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 2)
+>>> >>> Depth [2] Time 7.3 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 35 (ignored 58); [tgt->src] BFS source 7; Visited neighbors 61 (ignored 7)
+>>> >>> Depth [3] Time 45.6 sec (0.8 min): [src->tgt] BFS source 35; Visited neighbors 181 (ignored 139); [tgt->src] BFS source 61; Visited neighbors 281 (ignored 53)
+>>> Found 10 path(s) between "dream" and "mark".
+
+dream is like night
+evening is like night
+evening is like day
+birthday is like day
+birthday is like personal
+name is like personal
+mark is like name
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "dream" To "bailey"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dream" To "bailey" (Similarity: 0.256)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 11.7 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 53 (ignored 81); [tgt->src] BFS source 14; Visited neighbors 47 (ignored 11)
+>>> >>> Depth [3] Time 51.6 sec (0.9 min): [src->tgt] BFS source 53; Visited neighbors 283 (ignored 272); [tgt->src] BFS source 47; Visited neighbors 260 (ignored 118)
+>>> Found 8 path(s) between "dream" and "bailey".
+
+Something you do when you sleep is dream
+sleep is like night
+evening is like night
+evening is like dark
+shade is like dark
+shade is like tree
+apple is like tree
+bailey is like apple
+
+
+Example: 9; Choice: "(e) he dream of participating himself"; From "dream" To "paul"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "dream" To "paul" (Similarity: 0.273)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 11.0 sec (0.2 min): [src->tgt] BFS source 12; Visited neighbors 69 (ignored 71); [tgt->src] BFS source 11; Visited neighbors 54 (ignored 2)
+>>> >>> Depth [3] Time 70.6 sec (1.2 min): [src->tgt] BFS source 69; Visited neighbors 367 (ignored 214); [tgt->src] BFS source 54; Visited neighbors 238 (ignored 47)
+>>> Found 6 path(s) between "dream" and "paul".
+
+Something you do when you sleep is dream
+sleep is like night
+evening is like night
+evening is like day
+birthday is like day
+birthday is like personal
+name is like personal
+paul is like name
+
+*** Example: 9; Choice: e; SCORE: 7.559 (total_w_sum = 559.399; total_path_len = 37; match_pair_n = 5; total_pair_n = 10)
+
+*** DONE *** Example: 9 - Running Time: 3444.0 sec (57.4 min)
+
+Accuracy: 0.0.
+Done!
+Total Running Time: 3444.4 sec (57.4 min)

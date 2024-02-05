@@ -1,0 +1,16 @@
+// The path the concepts from "kevin" to "york".Path Length: 6; Weight Sum: 43.05911869214165; Average Weight: 7.176519782023608
+digraph "7_a---kevin-york---PLen6_WSum43.059_WAvg7.177" {
+	0 [label=kevin]
+	1 [label=keavy]
+	2 [label=ireland]
+	3 [label=country]
+	4 [label=capital]
+	5 [label=city]
+	6 [label=york]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="IsA; 6.472" dir=forward weight=6.472]
+	3 -> 4 [label="AtLocation; 19.007" dir=back weight=19.007]
+	4 -> 5 [label="RelatedTo; 11.523" dir=forward weight=11.523]
+	5 -> 6 [label="RelatedTo; 3.057" dir=forward weight=3.057]
+}

@@ -1,0 +1,18 @@
+// The path the concepts from "45" to "mark".Path Length: 7; Weight Sum: 47.86788402157485; Average Weight: 6.838269145939265
+digraph "9_b---45-mark---PLen7_WSum47.868_WAvg6.838" {
+	0 [label=45]
+	1 [label=ep]
+	2 [label=record]
+	3 [label=music]
+	4 [label=note]
+	5 [label=small]
+	6 [label=mole]
+	7 [label=mark]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 10.702" dir=forward weight=10.702]
+	3 -> 4 [label="RelatedTo; 16.335" dir=back weight=16.335]
+	4 -> 5 [label="RelatedTo; 9.257" dir=forward weight=9.257]
+	5 -> 6 [label="RelatedTo; 5.670" dir=back weight=5.670]
+	6 -> 7 [label="RelatedTo; 2.903" dir=forward weight=2.903]
+}

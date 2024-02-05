@@ -1,0 +1,12 @@
+// The path the concepts from "safe" to "bag".Path Length: 4; Weight Sum: 25.63957329604929; Average Weight: 6.409893324012322
+digraph "1_d---safe-bag---PLen4_WSum25.640_WAvg6.410" {
+	0 [label=safe]
+	1 [label=box]
+	2 [label=container]
+	3 [label=drawer]
+	4 [label=bag]
+	0 -> 1 [label="RelatedTo; 3.398" dir=forward weight=3.398]
+	1 -> 2 [label="RelatedTo; 11.849" dir=forward weight=11.849]
+	2 -> 3 [label="IsA; 6.928" dir=back weight=6.928]
+	3 -> 4 [label="AtLocation; 3.464" dir=back weight=3.464]
+}

@@ -1,0 +1,16 @@
+// The path the concepts from "having" to "parents".Path Length: 6; Weight Sum: 60.72410165852729; Average Weight: 10.120683609754549
+digraph "4_a---having-parents---PLen6_WSum60.724_WAvg10.121" {
+	0 [label=having]
+	1 [label=play]
+	2 [label=toy]
+	3 [label=child]
+	4 [label=daughter]
+	5 [label=family]
+	6 [label=parents]
+	0 -> 1 [label="RelatedTo; 2.093" dir=back weight=2.093]
+	1 -> 2 [label="RelatedTo; 9.149" dir=back weight=9.149]
+	2 -> 3 [label="RelatedTo; 23.180" dir=forward weight=23.180]
+	3 -> 4 [label="RelatedTo; 15.650" dir=back weight=15.650]
+	4 -> 5 [label="RelatedTo; 7.631" dir=forward weight=7.631]
+	5 -> 6 [label="RelatedTo; 3.021" dir=forward weight=3.021]
+}

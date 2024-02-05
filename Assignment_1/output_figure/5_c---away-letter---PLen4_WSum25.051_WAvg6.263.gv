@@ -1,0 +1,12 @@
+// The path the concepts from "away" to "letter".Path Length: 4; Weight Sum: 25.050606782635384; Average Weight: 6.262651695658846
+digraph "5_c---away-letter---PLen4_WSum25.051_WAvg6.263" {
+	0 [label=away]
+	1 [label=home]
+	2 [label=house]
+	3 [label=mail]
+	4 [label=letter]
+	0 -> 1 [label="Antonym; 2.136" dir=forward weight=2.136]
+	1 -> 2 [label="RelatedTo; 11.120" dir=forward weight=11.120]
+	2 -> 3 [label="AtLocation; 7.311" dir=back weight=7.311]
+	3 -> 4 [label="RelatedTo; 4.483" dir=back weight=4.483]
+}

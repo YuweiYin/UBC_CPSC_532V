@@ -1,0 +1,8 @@
+// The path the concepts from "mark" to "paul".Path Length: 2; Weight Sum: 4.229438358268883; Average Weight: 2.1147191791344415
+digraph "9_d---mark-paul---PLen2_WSum4.229_WAvg2.115" {
+	0 [label=mark]
+	1 [label=name]
+	2 [label=paul]
+	0 -> 1 [label="RelatedTo; 3.165" dir=forward weight=3.165]
+	1 -> 2 [label="RelatedTo; 1.064" dir=back weight=1.064]
+}

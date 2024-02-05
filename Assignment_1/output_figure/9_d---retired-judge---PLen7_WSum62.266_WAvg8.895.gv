@@ -1,0 +1,18 @@
+// The path the concepts from "retired" to "judge".Path Length: 7; Weight Sum: 62.26553582083207; Average Weight: 8.895076545833152
+digraph "9_d---retired-judge---PLen7_WSum62.266_WAvg8.895" {
+	0 [label=retired]
+	1 [label=unretired]
+	2 [label=work]
+	3 [label=job]
+	4 [label=servant]
+	5 [label=slave]
+	6 [label=person]
+	7 [label=judge]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 9.190" dir=forward weight=9.190]
+	3 -> 4 [label="RelatedTo; 21.222" dir=back weight=21.222]
+	4 -> 5 [label="RelatedTo; 17.378" dir=forward weight=17.378]
+	5 -> 6 [label="IsA; 8.738" dir=forward weight=8.738]
+	6 -> 7 [label="RelatedTo; 2.738" dir=back weight=2.738]
+}

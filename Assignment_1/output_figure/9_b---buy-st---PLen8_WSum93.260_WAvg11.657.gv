@@ -1,0 +1,20 @@
+// The path the concepts from "buy" to "st".Path Length: 8; Weight Sum: 93.25954097586478; Average Weight: 11.657442621983098
+digraph "9_b---buy-st---PLen8_WSum93.260_WAvg11.657" {
+	0 [label=buy]
+	1 [label="go to mall"]
+	2 [label="get in car"]
+	3 [label=drive]
+	4 [label=car]
+	5 [label=road]
+	6 [label=street]
+	7 [label=st]
+	8 [label=st]
+	0 -> 1 [label="HasSubevent; 4.000" dir=back weight=4.000]
+	1 -> 2 [label="HasPrerequisite; 8.472" dir=forward weight=8.472]
+	2 -> 3 [label="HasPrerequisite; 15.683" dir=back weight=15.683]
+	3 -> 4 [label="RelatedTo; 26.155" dir=forward weight=26.155]
+	4 -> 5 [label="AtLocation; 17.882" dir=forward weight=17.882]
+	5 -> 6 [label="RelatedTo; 13.410" dir=back weight=13.410]
+	6 -> 7 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	7 -> 8 [label="FormOf; 2.828" dir=back weight=2.828]
+}

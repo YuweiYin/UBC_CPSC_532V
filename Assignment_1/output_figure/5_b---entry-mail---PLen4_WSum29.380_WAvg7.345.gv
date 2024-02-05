@@ -1,0 +1,12 @@
+// The path the concepts from "entry" to "mail".Path Length: 4; Weight Sum: 29.37981748203351; Average Weight: 7.344954370508377
+digraph "5_b---entry-mail---PLen4_WSum29.380_WAvg7.345" {
+	0 [label=entry]
+	1 [label=door]
+	2 [label=room]
+	3 [label=house]
+	4 [label=mail]
+	0 -> 1 [label="RelatedTo; 5.134" dir=back weight=5.134]
+	1 -> 2 [label="RelatedTo; 9.607" dir=forward weight=9.607]
+	2 -> 3 [label="RelatedTo; 11.810" dir=forward weight=11.810]
+	3 -> 4 [label="AtLocation; 2.828" dir=back weight=2.828]
+}

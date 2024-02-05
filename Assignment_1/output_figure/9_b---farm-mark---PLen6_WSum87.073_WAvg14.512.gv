@@ -1,0 +1,16 @@
+// The path the concepts from "farm" to "mark".Path Length: 6; Weight Sum: 87.0729574891424; Average Weight: 14.512159581523733
+digraph "9_b---farm-mark---PLen6_WSum87.073_WAvg14.512" {
+	0 [label=farm]
+	1 [label=sheep]
+	2 [label=animal]
+	3 [label=cow]
+	4 [label=mammal]
+	5 [label=mole]
+	6 [label=mark]
+	0 -> 1 [label="RelatedTo; 5.511" dir=back weight=5.511]
+	1 -> 2 [label="RelatedTo; 17.917" dir=forward weight=17.917]
+	2 -> 3 [label="RelatedTo; 26.531" dir=back weight=26.531]
+	3 -> 4 [label="RelatedTo; 28.561" dir=forward weight=28.561]
+	4 -> 5 [label="RelatedTo; 5.649" dir=back weight=5.649]
+	5 -> 6 [label="RelatedTo; 2.903" dir=forward weight=2.903]
+}

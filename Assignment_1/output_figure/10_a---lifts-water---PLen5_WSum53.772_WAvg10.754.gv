@@ -1,0 +1,14 @@
+// The path the concepts from "lifts" to "water".Path Length: 5; Weight Sum: 53.77170489682274; Average Weight: 10.754340979364548
+digraph "10_a---lifts-water---PLen5_WSum53.772_WAvg10.754" {
+	0 [label=lifts]
+	1 [label=lift]
+	2 [label=up]
+	3 [label=drop]
+	4 [label=rain]
+	5 [label=water]
+	0 -> 1 [label="FormOf; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="RelatedTo; 6.298" dir=forward weight=6.298]
+	2 -> 3 [label="Antonym; 19.688" dir=back weight=19.688]
+	3 -> 4 [label="RelatedTo; 17.405" dir=forward weight=17.405]
+	4 -> 5 [label="IsA; 9.381" dir=forward weight=9.381]
+}

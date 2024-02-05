@@ -1,0 +1,14 @@
+// The path the concepts from "nice" to "paul".Path Length: 5; Weight Sum: 34.23758642771402; Average Weight: 6.847517285542804
+digraph "9_a---nice-paul---PLen5_WSum34.238_WAvg6.848" {
+	0 [label=nice]
+	1 [label=kind]
+	2 [label=people]
+	3 [label=person]
+	4 [label=name]
+	5 [label=paul]
+	0 -> 1 [label="RelatedTo; 4.240" dir=back weight=4.240]
+	1 -> 2 [label="HasProperty; 9.139" dir=back weight=9.139]
+	2 -> 3 [label="RelatedTo; 14.838" dir=back weight=14.838]
+	3 -> 4 [label="RelatedTo; 4.957" dir=back weight=4.957]
+	4 -> 5 [label="RelatedTo; 1.064" dir=back weight=1.064]
+}

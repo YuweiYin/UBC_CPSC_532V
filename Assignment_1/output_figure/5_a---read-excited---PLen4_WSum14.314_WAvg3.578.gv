@@ -1,0 +1,12 @@
+// The path the concepts from "read" to "excited".Path Length: 4; Weight Sum: 14.31370849898476; Average Weight: 3.57842712474619
+digraph "5_a---read-excited---PLen4_WSum14.314_WAvg3.578" {
+	0 [label=read]
+	1 [label="see exciting story"]
+	2 [label="get excited"]
+	3 [label="jump up and down"]
+	4 [label=excited]
+	0 -> 1 [label="HasSubevent; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="HasSubevent; 4.828" dir=forward weight=4.828]
+	2 -> 3 [label="HasPrerequisite; 3.828" dir=back weight=3.828]
+	3 -> 4 [label="MotivatedByGoal; 2.828" dir=forward weight=2.828]
+}

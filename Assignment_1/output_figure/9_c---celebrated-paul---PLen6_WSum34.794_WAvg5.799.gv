@@ -1,0 +1,16 @@
+// The path the concepts from "celebrated" to "paul".Path Length: 6; Weight Sum: 34.79395839954082; Average Weight: 5.798993066590136
+digraph "9_c---celebrated-paul---PLen6_WSum34.794_WAvg5.799" {
+	0 [label=celebrated]
+	1 [label=person]
+	2 [label=human]
+	3 [label=church]
+	4 [label=bishop]
+	5 [label=paulian]
+	6 [label=paul]
+	0 -> 1 [label="Desires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 8.998" dir=forward weight=8.998]
+	2 -> 3 [label="AtLocation; 13.897" dir=forward weight=13.897]
+	3 -> 4 [label="AtLocation; 6.899" dir=back weight=6.899]
+	4 -> 5 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	5 -> 6 [label="DerivedFrom; 1.000" dir=forward weight=1.000]
+}

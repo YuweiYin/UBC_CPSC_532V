@@ -1,0 +1,12 @@
+// The path the concepts from "punish" to "parents".Path Length: 4; Weight Sum: 15.0; Average Weight: 3.75
+digraph "4_a---punish-parents---PLen4_WSum15.000_WAvg3.750" {
+	0 [label=punish]
+	1 [label="pass sentence"]
+	2 [label=justice]
+	3 [label="all people"]
+	4 [label=parents]
+	0 -> 1 [label="MotivatedByGoal; 4.000" dir=back weight=4.000]
+	1 -> 2 [label="HasSubevent; 6.000" dir=forward weight=6.000]
+	2 -> 3 [label="UsedFor; 3.000" dir=forward weight=3.000]
+	3 -> 4 [label="HasA; 2.000" dir=forward weight=2.000]
+}

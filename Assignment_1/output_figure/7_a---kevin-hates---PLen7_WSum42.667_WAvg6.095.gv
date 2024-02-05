@@ -1,0 +1,18 @@
+// The path the concepts from "kevin" to "hates".Path Length: 7; Weight Sum: 42.666882372689145; Average Weight: 6.0952689103841635
+digraph "7_a---kevin-hates---PLen7_WSum42.667_WAvg6.095" {
+	0 [label=kevin]
+	1 [label=british]
+	2 [label="sickle cell anaemia"]
+	3 [label=oxygen]
+	4 [label=gas]
+	5 [label=fuel]
+	6 [label=oil]
+	7 [label=hates]
+	0 -> 1 [label="HasContext; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="HasContext; 3.000" dir=back weight=3.000]
+	2 -> 3 [label="RelatedTo; 4.000" dir=forward weight=4.000]
+	3 -> 4 [label="IsA; 17.533" dir=forward weight=17.533]
+	4 -> 5 [label="RelatedTo; 10.604" dir=forward weight=10.604]
+	5 -> 6 [label="RelatedTo; 6.365" dir=back weight=6.365]
+	6 -> 7 [label="RelatedTo; 0.165" dir=forward weight=0.165]
+}

@@ -1,0 +1,12 @@
+// The path the concepts from "clean" to "parents".Path Length: 4; Weight Sum: 28.320360509575856; Average Weight: 7.080090127393964
+digraph "4_c---clean-parents---PLen4_WSum28.320_WAvg7.080" {
+	0 [label=clean]
+	1 [label=cloth]
+	2 [label=clothing]
+	3 [label=person]
+	4 [label=parents]
+	0 -> 1 [label="UsedFor; 7.746" dir=back weight=7.746]
+	1 -> 2 [label="UsedFor; 10.574" dir=forward weight=10.574]
+	2 -> 3 [label="Desires; 8.000" dir=back weight=8.000]
+	3 -> 4 [label="Desires; 2.000" dir=forward weight=2.000]
+}

@@ -1,0 +1,12 @@
+// The path the concepts from "mark" to "judge".Path Length: 4; Weight Sum: 16.57173892333372; Average Weight: 4.14293473083343
+digraph "9_d---mark-judge---PLen4_WSum16.572_WAvg4.143" {
+	0 [label=mark]
+	1 [label=question]
+	2 [label=sentence]
+	3 [label="conducting trial"]
+	4 [label=judge]
+	0 -> 1 [label="RelatedTo; 2.708" dir=back weight=2.708]
+	1 -> 2 [label="RelatedTo; 5.936" dir=forward weight=5.936]
+	2 -> 3 [label="Causes; 4.464" dir=back weight=4.464]
+	3 -> 4 [label="HasPrerequisite; 3.464" dir=forward weight=3.464]
+}

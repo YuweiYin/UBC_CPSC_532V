@@ -1,0 +1,8 @@
+// The path the concepts from "party" to "parents".Path Length: 2; Weight Sum: 6.8294927269848955; Average Weight: 3.4147463634924478
+digraph "4_a---party-parents---PLen2_WSum6.829_WAvg3.415" {
+	0 [label=party]
+	1 [label=people]
+	2 [label=parents]
+	0 -> 1 [label="RelatedTo; 4.829" dir=forward weight=4.829]
+	1 -> 2 [label="HasA; 2.000" dir=forward weight=2.000]
+}

@@ -1,0 +1,14 @@
+// The path the concepts from "party" to "house".Path Length: 5; Weight Sum: 55.367192980471984; Average Weight: 11.073438596094396
+digraph "4_a---party-house---PLen5_WSum55.367_WAvg11.073" {
+	0 [label=party]
+	1 [label=fun]
+	2 [label="having sex"]
+	3 [label=bedroom]
+	4 [label=carpet]
+	5 [label=house]
+	0 -> 1 [label="RelatedTo; 8.354" dir=forward weight=8.354]
+	1 -> 2 [label="UsedFor; 13.646" dir=back weight=13.646]
+	2 -> 3 [label="UsedFor; 15.047" dir=back weight=15.047]
+	3 -> 4 [label="AtLocation; 10.574" dir=back weight=10.574]
+	4 -> 5 [label="AtLocation; 7.746" dir=forward weight=7.746]
+}

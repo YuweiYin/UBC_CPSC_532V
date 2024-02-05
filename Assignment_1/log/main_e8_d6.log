@@ -1,0 +1,366 @@
+Namespace(verbose=False, example_id=8, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "card" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "card" To "spend" (Similarity: 0.451)
+>>> >>> Depth [1] Time 2.3 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 13); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 6)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 19 (ignored 89); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 1)
+>>> >>> Depth [3] Time 37.2 sec (0.6 min): [src->tgt] BFS source 19; Visited neighbors 85 (ignored 155); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 0)
+>>> Path between card and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "card" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "card" To "debt" (Similarity: 0.402)
+>>> >>> Depth [1] Time 2.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 12); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 3)
+>>> >>> Depth [2] Time 21.5 sec (0.4 min): [src->tgt] BFS source 8; Visited neighbors 42 (ignored 80); [tgt->src] BFS source 8; Visited neighbors 38 (ignored 41)
+>>> Found 2 path(s) between "card" and "debt".
+
+card is like credit
+charge is like credit
+tax is like charge
+tax is like money
+debt is like money
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "card" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "card" To "jim" (Similarity: 0.184)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 18 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 42.7 sec (0.7 min): [src->tgt] BFS source 18; Visited neighbors 174 (ignored 11); [tgt->src] BFS source 13; Visited neighbors 53 (ignored 5)
+>>> Found 3 path(s) between "card" and "jim".
+
+card is like playing
+game is like playing
+toy is like game
+toy is like kids
+jim has kids
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "card" To "credit"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "card" To "credit" (Similarity: 0.501)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 12); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 14)
+>>> Found 1 path(s) between "card" and "credit".
+
+charge is like card
+charge is like credit
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "open" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "open" To "spend" (Similarity: 0.278)
+>>> >>> Depth [1] Time 10.8 sec (0.2 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 0)
+>>> >>> Depth [2] Time 25.5 sec (0.4 min): [src->tgt] BFS source 7; Visited neighbors 53 (ignored 24); [tgt->src] BFS source 2; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [3] Time 103.6 sec (1.7 min): [src->tgt] BFS source 53; Visited neighbors 314 (ignored 100); [tgt->src] BFS source 7; Visited neighbors 6 (ignored 0)
+>>> Path between open and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "open" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "open" To "debt" (Similarity: 0.128)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 0)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 80 (ignored 10); [tgt->src] BFS source 9; Visited neighbors 62 (ignored 0)
+>>> >>> Depth [3] Time 167.5 sec (2.8 min): [src->tgt] BFS source 80; Visited neighbors 586 (ignored 32); [tgt->src] BFS source 62; Visited neighbors 367 (ignored 25)
+>>> Found 15 path(s) between "open" and "debt".
+
+door is like open
+door is like house
+room is like house
+room is like area
+country is like area
+farm is like country
+farm is like place
+bank is like place
+bank is like money
+debt is like money
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "open" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "open" To "jim" (Similarity: 0.238)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 4)
+>>> >>> Depth [2] Time 7.0 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 66 (ignored 5); [tgt->src] BFS source 10; Visited neighbors 48 (ignored 13)
+>>> >>> Depth [3] Time 88.9 sec (1.5 min): [src->tgt] BFS source 66; Visited neighbors 451 (ignored 184); [tgt->src] BFS source 48; Visited neighbors 272 (ignored 33)
+>>> Found 31 path(s) between "open" and "jim".
+
+door is like open
+door is like house
+room is like house
+room is like area
+country is like area
+farm is like country
+farm is like animal
+squirrel is like animal
+squirrel is like nuts
+jim is nuts
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "open" To "credit"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "open" To "credit" (Similarity: 0.239)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 7.0 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 63 (ignored 10); [tgt->src] BFS source 7; Visited neighbors 44 (ignored 0)
+>>> >>> Depth [3] Time 58.4 sec (1.0 min): [src->tgt] BFS source 63; Visited neighbors 493 (ignored 67); [tgt->src] BFS source 44; Visited neighbors 263 (ignored 16)
+>>> Found 14 path(s) between "open" and "credit".
+
+door is like open
+door is like house
+room is like house
+room is like area
+country is like area
+You are likely to find government in country
+tax is like government
+tax is like charge
+charge is like credit
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "open" To "card"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "open" To "card" (Similarity: 0.342)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 10.8 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 49 (ignored 24); [tgt->src] BFS source 18; Visited neighbors 148 (ignored 42)
+>>> Found 2 path(s) between "open" and "card".
+
+field is like open
+field is like baseball
+baseball is a type of game
+game is like playing
+card is like playing
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "credit" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "credit" To "spend" (Similarity: 0.401)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 6)
+>>> >>> Depth [2] Time 3.1 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 31 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 1)
+>>> >>> Depth [3] Time 13.4 sec (0.2 min): [src->tgt] BFS source 31; Visited neighbors 121 (ignored 81); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 0)
+>>> Path between credit and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "credit" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "credit" To "debt" (Similarity: 0.622)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 17); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 13)
+>>> >>> Depth [2] Time 2.7 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 6; Visited neighbors 17 (ignored 74)
+>>> >>> Depth [3] Time 6.7 sec (0.1 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 17; Visited neighbors 19 (ignored 140)
+>>> Path between credit and debt does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "credit" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "credit" To "jim" (Similarity: 0.253)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 4)
+>>> >>> Depth [2] Time 6.5 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 42 (ignored 2); [tgt->src] BFS source 10; Visited neighbors 47 (ignored 14)
+>>> >>> Depth [3] Time 34.8 sec (0.6 min): [src->tgt] BFS source 42; Visited neighbors 236 (ignored 48); [tgt->src] BFS source 47; Visited neighbors 256 (ignored 34)
+>>> Found 9 path(s) between "credit" and "jim".
+
+charge is like credit
+charge is like card
+card is like paper
+paper is like wood
+wood is like tree
+squirrel is like tree
+squirrel is like nuts
+jim is nuts
+
+
+Example: 8; Choice: "(a) Jim decided to open another credit card."; From "credit" To "card"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "credit" To "card" (Similarity: 0.501)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 5)
+>>> Found 1 path(s) between "credit" and "card".
+
+charge is like credit
+charge is like card
+
+*** Example: 8; Choice: a; SCORE: 9.208 (total_w_sum = 744.850; total_path_len = 56; match_pair_n = 9; total_pair_n = 13)
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "devise" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "devise" To "spend" (Similarity: 0.238)
+>>> >>> Depth [1] Time 1.4 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 0)
+>>> >>> Depth [2] Time 6.4 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 2; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [3] Time 19.2 sec (0.3 min): [src->tgt] BFS source 24; Visited neighbors 44 (ignored 10); [tgt->src] BFS source 7; Visited neighbors 6 (ignored 0)
+>>> Path between devise and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "devise" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "devise" To "debt" (Similarity: 0.144)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 0)
+>>> >>> Depth [2] Time 6.6 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 9; Visited neighbors 61 (ignored 1)
+>>> >>> Depth [3] Time 32.9 sec (0.5 min): [src->tgt] BFS source 24; Visited neighbors 54 (ignored 0); [tgt->src] BFS source 61; Visited neighbors 362 (ignored 30)
+>>> Path between devise and debt does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "devise" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "devise" To "jim" (Similarity: 0.188)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 2)
+>>> >>> Depth [2] Time 9.8 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 12; Visited neighbors 53 (ignored 5)
+>>> >>> Depth [3] Time 36.3 sec (0.6 min): [src->tgt] BFS source 24; Visited neighbors 54 (ignored 0); [tgt->src] BFS source 53; Visited neighbors 325 (ignored 25)
+>>> Path between devise and jim does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "devise" To "credit"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "devise" To "credit" (Similarity: 0.225)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 5.6 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 44 (ignored 0)
+>>> >>> Depth [3] Time 26.4 sec (0.4 min): [src->tgt] BFS source 24; Visited neighbors 46 (ignored 8); [tgt->src] BFS source 44; Visited neighbors 265 (ignored 14)
+>>> Found 1 path(s) between "devise" and "credit".
+
+devise and devise have similar meanings
+devise is a type of inheritance
+inheritance is a type of transferred property
+transferred property is a type of possession
+assets is a type of possession
+credit is a type of assets
+credit and credit have similar meanings
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "devise" To "card"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "devise" To "card" (Similarity: 0.238)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 11.2 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 18; Visited neighbors 173 (ignored 17)
+>>> >>> Depth [3] Time 131.8 sec (2.2 min): [src->tgt] BFS source 24; Visited neighbors 46 (ignored 8); [tgt->src] BFS source 173; Visited neighbors 1154 (ignored 93)
+>>> Found 2 path(s) between "devise" and "card".
+
+devise and devise have similar meanings
+devise is a word used in the context of law
+supreme court is a word used in the context of law
+supreme court is a type of court
+court and court have similar meanings
+court is like tennis
+tennis is a type of sport
+baseball is a type of sport
+baseball is a type of game
+game is like playing
+card is like playing
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "plan" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "plan" To "spend" (Similarity: 0.381)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 6)
+>>> >>> Depth [2] Time 4.4 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 21 (ignored 22); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 1)
+>>> >>> Depth [3] Time 22.4 sec (0.4 min): [src->tgt] BFS source 21; Visited neighbors 47 (ignored 33); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 0)
+>>> Path between plan and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "plan" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "plan" To "debt" (Similarity: 0.261)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 0)
+>>> >>> Depth [2] Time 6.7 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 33 (ignored 7); [tgt->src] BFS source 9; Visited neighbors 57 (ignored 5)
+>>> >>> Depth [3] Time 41.1 sec (0.7 min): [src->tgt] BFS source 33; Visited neighbors 122 (ignored 26); [tgt->src] BFS source 57; Visited neighbors 297 (ignored 80)
+>>> Found 3 path(s) between "plan" and "debt".
+
+In order for commit murder to happen, plan needs to happen
+In order for commit murder to happen, kill person needs to happen
+knife is used for kill person
+You are likely to find knife in pocket
+wallet is like pocket
+wallet is like money
+debt is like money
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "plan" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "plan" To "jim" (Similarity: 0.196)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 3)
+>>> >>> Depth [2] Time 7.7 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 48 (ignored 9); [tgt->src] BFS source 11; Visited neighbors 53 (ignored 5)
+>>> >>> Depth [3] Time 43.9 sec (0.7 min): [src->tgt] BFS source 48; Visited neighbors 176 (ignored 24); [tgt->src] BFS source 53; Visited neighbors 325 (ignored 25)
+>>> Found 3 path(s) between "plan" and "jim".
+
+design is like plan
+design is like art
+statue is like art
+You are likely to find statue in park
+You are likely to find kids in park
+jim has kids
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "plan" To "credit"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "plan" To "credit" (Similarity: 0.290)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 5.1 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 31 (ignored 11); [tgt->src] BFS source 7; Visited neighbors 43 (ignored 1)
+>>> >>> Depth [3] Time 30.1 sec (0.5 min): [src->tgt] BFS source 31; Visited neighbors 116 (ignored 23); [tgt->src] BFS source 43; Visited neighbors 237 (ignored 50)
+>>> Found 1 path(s) between "plan" and "credit".
+
+design is like plan
+design is like art
+music is like art
+note is like music
+note is like paper
+card is like paper
+charge is like card
+charge is like credit
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "plan" To "card"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "plan" To "card" (Similarity: 0.343)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 12.0 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 28 (ignored 12); [tgt->src] BFS source 18; Visited neighbors 148 (ignored 42)
+>>> >>> Depth [3] Time 77.7 sec (1.3 min): [src->tgt] BFS source 28; Visited neighbors 100 (ignored 24); [tgt->src] BFS source 148; Visited neighbors 831 (ignored 291)
+>>> Found 4 path(s) between "plan" and "card".
+
+design is like plan
+design is like art
+dance is like art
+dance is like activity
+play is like activity
+ball is used for play
+ball is a type of toy
+toy is like fun
+game is like fun
+game is like playing
+card is like playing
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "repayment" To "spend"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "repayment" To "spend" (Similarity: 0.498)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 6)
+>>> >>> Depth [2] Time 1.1 sec (0.0 min): [src->tgt] BFS source 2; Visited neighbors 8 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 1)
+>>> >>> Depth [3] Time 7.1 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 0)
+>>> Path between repayment and spend does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "repayment" To "debt"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "repayment" To "debt" (Similarity: 0.684)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 14)
+>>> >>> Depth [2] Time 2.3 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 5; Visited neighbors 7 (ignored 67)
+>>> >>> Depth [3] Time 3.1 sec (0.1 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 8 (ignored 86)
+>>> Path between repayment and debt does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "repayment" To "jim"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "repayment" To "jim" (Similarity: 0.176)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 6.4 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 9 (ignored 0); [tgt->src] BFS source 13; Visited neighbors 54 (ignored 4)
+>>> >>> Depth [3] Time 29.1 sec (0.5 min): [src->tgt] BFS source 9; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 54; Visited neighbors 329 (ignored 21)
+>>> Path between repayment and jim does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "repayment" To "credit"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "repayment" To "credit" (Similarity: 0.548)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 15)
+>>> >>> Depth [2] Time 1.0 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 2; Visited neighbors 5 (ignored 27)
+>>> >>> Depth [3] Time 2.3 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 5; Visited neighbors 6 (ignored 56)
+>>> Path between repayment and credit does not exist or is too long (> 6).
+
+
+
+Example: 8; Choice: "(b) Jim decided to devise a plan for repayment."; From "repayment" To "card"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "repayment" To "card" (Similarity: 0.342)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 9.3 sec (0.2 min): [src->tgt] BFS source 2; Visited neighbors 9 (ignored 0); [tgt->src] BFS source 18; Visited neighbors 148 (ignored 42)
+>>> Found 1 path(s) between "repayment" and "card".
+
+repayment and repayment have similar meanings
+repayment is a type of payment
+credit is a type of payment
+credit and credit have similar meanings
+card is like credit
+
+*** Example: 8; Choice: b; SCORE: 6.077 (total_w_sum = 716.193; total_path_len = 55; match_pair_n = 7; total_pair_n = 15)
+
+*** DONE *** Example: 8 - Running Time: 1301.6 sec (21.7 min)
+
+Accuracy: 0.0.
+Done!
+Total Running Time: 1302.0 sec (21.7 min)

@@ -1,0 +1,8 @@
+// The path the concepts from "celebrated" to "judge".Path Length: 2; Weight Sum: 4.737882393383616; Average Weight: 2.368941196691808
+digraph "9_c---celebrated-judge---PLen2_WSum4.738_WAvg2.369" {
+	0 [label=celebrated]
+	1 [label=person]
+	2 [label=judge]
+	0 -> 1 [label="Desires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 2.738" dir=back weight=2.738]
+}

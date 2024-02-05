@@ -1,0 +1,14 @@
+// The path the concepts from "throw" to "mail".Path Length: 5; Weight Sum: 18.932304845413263; Average Weight: 3.7864609690826527
+digraph "5_c---throw-mail---PLen5_WSum18.932_WAvg3.786" {
+	0 [label=throw]
+	1 [label=throw]
+	2 [label=deliver]
+	3 [label=deliver]
+	4 [label=packages]
+	5 [label=mail]
+	0 -> 1 [label="Synonym; 2.000" dir=forward weight=2.000]
+	1 -> 2 [label="MannerOf; 4.000" dir=back weight=4.000]
+	2 -> 3 [label="Synonym; 5.734" dir=back weight=5.734]
+	3 -> 4 [label="RelatedTo; 3.734" dir=forward weight=3.734]
+	4 -> 5 [label="AtLocation; 3.464" dir=forward weight=3.464]
+}

@@ -1,0 +1,14 @@
+// The path the concepts from "card" to "jim".Path Length: 5; Weight Sum: 36.239367767544735; Average Weight: 7.247873553508947
+digraph "8_a---card-jim---PLen5_WSum36.239_WAvg7.248" {
+	0 [label=card]
+	1 [label=playing]
+	2 [label=game]
+	3 [label=toy]
+	4 [label=kids]
+	5 [label=jim]
+	0 -> 1 [label="RelatedTo; 5.205" dir=forward weight=5.205]
+	1 -> 2 [label="RelatedTo; 9.398" dir=back weight=9.398]
+	2 -> 3 [label="RelatedTo; 13.683" dir=back weight=13.683]
+	3 -> 4 [label="RelatedTo; 6.953" dir=forward weight=6.953]
+	4 -> 5 [label="HasA; 1.000" dir=back weight=1.000]
+}

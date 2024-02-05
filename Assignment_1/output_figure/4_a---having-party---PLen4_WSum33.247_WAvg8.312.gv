@@ -1,0 +1,12 @@
+// The path the concepts from "having" to "party".Path Length: 4; Weight Sum: 33.247369271615426; Average Weight: 8.311842317903857
+digraph "4_a---having-party---PLen4_WSum33.247_WAvg8.312" {
+	0 [label=having]
+	1 [label=play]
+	2 [label=game]
+	3 [label=fun]
+	4 [label=party]
+	0 -> 1 [label="RelatedTo; 2.093" dir=back weight=2.093]
+	1 -> 2 [label="RelatedTo; 8.562" dir=back weight=8.562]
+	2 -> 3 [label="RelatedTo; 14.238" dir=forward weight=14.238]
+	3 -> 4 [label="RelatedTo; 8.354" dir=back weight=8.354]
+}

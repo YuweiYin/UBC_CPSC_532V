@@ -1,0 +1,12 @@
+// The path the concepts from "jewelry" to "checked".Path Length: 4; Weight Sum: 21.687443354226467; Average Weight: 5.421860838556617
+digraph "1_c---jewelry-checked---PLen4_WSum21.687_WAvg5.422" {
+	0 [label=jewelry]
+	1 [label=ring]
+	2 [label=call]
+	3 [label="check call"]
+	4 [label=checked]
+	0 -> 1 [label="RelatedTo; 7.065" dir=back weight=7.065]
+	1 -> 2 [label="RelatedTo; 11.622" dir=back weight=11.622]
+	2 -> 3 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	3 -> 4 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

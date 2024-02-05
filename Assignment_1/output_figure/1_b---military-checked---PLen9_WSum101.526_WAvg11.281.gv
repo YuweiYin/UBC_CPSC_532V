@@ -1,0 +1,22 @@
+// The path the concepts from "military" to "checked".Path Length: 9; Weight Sum: 101.52557871052986; Average Weight: 11.28061985672554
+digraph "1_b---military-checked---PLen9_WSum101.526_WAvg11.281" {
+	0 [label=military]
+	1 [label=army]
+	2 [label=rank]
+	3 [label=captain]
+	4 [label=chief]
+	5 [label=person]
+	6 [label=character]
+	7 [label=syllabary]
+	8 [label=syllables]
+	9 [label=checked]
+	0 -> 1 [label="RelatedTo; 4.759" dir=back weight=4.759]
+	1 -> 2 [label="RelatedTo; 7.712" dir=back weight=7.712]
+	2 -> 3 [label="RelatedTo; 14.827" dir=back weight=14.827]
+	3 -> 4 [label="RelatedTo; 18.976" dir=forward weight=18.976]
+	4 -> 5 [label="RelatedTo; 21.425" dir=forward weight=21.425]
+	5 -> 6 [label="RelatedTo; 27.827" dir=back weight=27.827]
+	6 -> 7 [label="RelatedTo; 3.000" dir=back weight=3.000]
+	7 -> 8 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	8 -> 9 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

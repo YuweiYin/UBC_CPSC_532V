@@ -1,0 +1,156 @@
+Namespace(verbose=False, example_id=10, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 10; Choice: "(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk."; From "lifts" To "egg"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lifts" To "egg" (Similarity: 0.148)
+>>> >>> Depth [1] Time 2.6 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 27.8 sec (0.5 min): [src->tgt] BFS source 4; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 18; Visited neighbors 172 (ignored 0)
+>>> >>> Depth [3] Time 304.4 sec (5.1 min): [src->tgt] BFS source 24; Visited neighbors 138 (ignored 0); [tgt->src] BFS source 172; Visited neighbors 1196 (ignored 40)
+>>> Found 11 path(s) between "lifts" and "egg".
+
+lifts is a form of the word lift
+lift is like elevator
+You are likely to find elevator in building
+house is like building
+home is like house
+farm is like home
+farm is like animal
+chick is like animal
+chick is like baby
+nest is like baby
+nest is like bird
+chicken is like bird
+egg is like chicken
+
+
+Example: 10; Choice: "(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk."; From "lifts" To "water"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lifts" To "water" (Similarity: 0.280)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 27.7 sec (0.5 min): [src->tgt] BFS source 4; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 15; Visited neighbors 184 (ignored 3)
+>>> Found 1 path(s) between "lifts" and "water".
+
+lifts is a form of the word lift
+lift is like up
+drop is the opposite of up
+drop is like rain
+rain is a type of water
+
+
+Example: 10; Choice: "(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk."; From "lifts" To "separate"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lifts" To "separate" (Similarity: 0.197)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 7.4 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 6; Visited neighbors 18 (ignored 0)
+>>> Found 1 path(s) between "lifts" and "separate".
+
+heaver is like lifts
+heaver is a type of bar
+bar is used for separate
+separate and separate have similar meanings
+
+
+Example: 10; Choice: "(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk."; From "lifts" To "yolk"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lifts" To "yolk" (Similarity: 0.179)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 4.4 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 21 (ignored 5); [tgt->src] BFS source 6; Visited neighbors 32 (ignored 0)
+>>> >>> Depth [3] Time 35.9 sec (0.6 min): [src->tgt] BFS source 21; Visited neighbors 119 (ignored 33); [tgt->src] BFS source 32; Visited neighbors 206 (ignored 21)
+>>> Found 4 path(s) between "lifts" and "yolk".
+
+heaver is like lifts
+heaver is like bar
+You are likely to find human in bar
+baby is like human
+nest is like baby
+nest is like bird
+chicken is like bird
+egg is like chicken
+egg is like yolk
+
+
+Example: 10; Choice: "(a) Squeeze the water bottle and press it against the yolk. Release, which creates suction and lifts the yolk."; From "lifts" To "bottle"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "lifts" To "bottle" (Similarity: 0.197)
+>>> >>> Depth [1] Time 2.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 25.2 sec (0.4 min): [src->tgt] BFS source 4; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 12; Visited neighbors 83 (ignored 0)
+>>> Found 1 path(s) between "lifts" and "bottle".
+
+heaver is like lifts
+heaver is like bar
+You are likely to find beer in bar
+You are likely to find beer in bottle
+
+*** Example: 10; Choice: a; SCORE: 20.416 (total_w_sum = 714.567; total_path_len = 35; match_pair_n = 5; total_pair_n = 5)
+
+
+Example: 10; Choice: "(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk."; From "press" To "egg"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "press" To "egg" (Similarity: 0.212)
+>>> >>> Depth [1] Time 4.7 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 18 (ignored 0)
+>>> >>> Depth [2] Time 20.8 sec (0.3 min): [src->tgt] BFS source 13; Visited neighbors 65 (ignored 3); [tgt->src] BFS source 18; Visited neighbors 170 (ignored 2)
+>>> Found 2 path(s) between "press" and "egg".
+
+press is like media
+record is like media
+record is like round
+egg is like round
+
+
+Example: 10; Choice: "(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk."; From "press" To "water"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "press" To "water" (Similarity: 0.228)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 15 (ignored 0)
+>>> >>> Depth [2] Time 12.1 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 68 (ignored 0); [tgt->src] BFS source 15; Visited neighbors 187 (ignored 0)
+>>> Found 2 path(s) between "press" and "water".
+
+press is like push
+push is like action
+wave is like action
+wave is like sea
+lake is like sea
+You are likely to find fish in lake
+You are likely to find fish in water
+
+
+Example: 10; Choice: "(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk."; From "press" To "separate"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "press" To "separate" (Similarity: 0.253)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 7.1 sec (0.1 min): [src->tgt] BFS source 13; Visited neighbors 67 (ignored 1); [tgt->src] BFS source 6; Visited neighbors 17 (ignored 1)
+>>> >>> Depth [3] Time 78.1 sec (1.3 min): [src->tgt] BFS source 67; Visited neighbors 347 (ignored 30); [tgt->src] BFS source 17; Visited neighbors 53 (ignored 1)
+>>> Path between press and separate does not exist or is too long (> 6).
+
+
+
+Example: 10; Choice: "(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk."; From "press" To "yolk"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "press" To "yolk" (Similarity: 0.187)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 7.0 sec (0.1 min): [src->tgt] BFS source 12; Visited neighbors 58 (ignored 13); [tgt->src] BFS source 6; Visited neighbors 32 (ignored 0)
+>>> >>> Depth [3] Time 36.3 sec (0.6 min): [src->tgt] BFS source 58; Visited neighbors 345 (ignored 13); [tgt->src] BFS source 32; Visited neighbors 206 (ignored 21)
+>>> Found 12 path(s) between "press" and "yolk".
+
+press is like push
+push is like action
+drop is like action
+drop is like small
+chick is like small
+chick is like baby
+nest is like baby
+nest is like bird
+chicken is like bird
+egg is like chicken
+egg is like yolk
+
+
+Example: 10; Choice: "(b) Place the water bottle and press it against the yolk. Keep pushing, which creates suction and lifts the yolk."; From "press" To "bottle"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "press" To "bottle" (Similarity: 0.241)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 0)
+>>> >>> Depth [2] Time 9.7 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 66 (ignored 2); [tgt->src] BFS source 12; Visited neighbors 83 (ignored 0)
+>>> Found 1 path(s) between "press" and "bottle".
+
+press is like down
+drop is like down
+drop is like water
+You are likely to find water in bottle
+
+*** Example: 10; Choice: b; SCORE: 12.586 (total_w_sum = 409.040; total_path_len = 26; match_pair_n = 4; total_pair_n = 5)
+
+*** DONE *** Example: 10 - Running Time: 624.9 sec (10.4 min)
+
+Accuracy: 1.0.
+Done!
+Total Running Time: 625.3 sec (10.4 min)

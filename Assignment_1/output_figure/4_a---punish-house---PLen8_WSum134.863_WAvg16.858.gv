@@ -1,0 +1,20 @@
+// The path the concepts from "punish" to "house".Path Length: 8; Weight Sum: 134.86324213085985; Average Weight: 16.85790526635748
+digraph "4_a---punish-house---PLen8_WSum134.863_WAvg16.858" {
+	0 [label=punish]
+	1 [label="pass sentence"]
+	2 [label=crime]
+	3 [label=robbery]
+	4 [label=bank]
+	5 [label=place]
+	6 [label=nest]
+	7 [label=home]
+	8 [label=house]
+	0 -> 1 [label="MotivatedByGoal; 4.000" dir=back weight=4.000]
+	1 -> 2 [label="CausesDesire; 6.828" dir=back weight=6.828]
+	2 -> 3 [label="RelatedTo; 10.862" dir=back weight=10.862]
+	3 -> 4 [label="RelatedTo; 31.535" dir=forward weight=31.535]
+	4 -> 5 [label="RelatedTo; 28.490" dir=forward weight=28.490]
+	5 -> 6 [label="RelatedTo; 23.734" dir=back weight=23.734]
+	6 -> 7 [label="RelatedTo; 20.431" dir=forward weight=20.431]
+	7 -> 8 [label="RelatedTo; 8.984" dir=forward weight=8.984]
+}

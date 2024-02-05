@@ -1,0 +1,14 @@
+// The path the concepts from "card" to "debt".Path Length: 5; Weight Sum: 32.04255638293539; Average Weight: 6.4085112765870775
+digraph "8_a---card-debt---PLen5_WSum32.043_WAvg6.409" {
+	0 [label=card]
+	1 [label=credit]
+	2 [label=charge]
+	3 [label=tax]
+	4 [label=money]
+	5 [label=debt]
+	0 -> 1 [label="RelatedTo; 2.603" dir=forward weight=2.603]
+	1 -> 2 [label="RelatedTo; 6.079" dir=back weight=6.079]
+	2 -> 3 [label="RelatedTo; 8.696" dir=back weight=8.696]
+	3 -> 4 [label="RelatedTo; 10.104" dir=forward weight=10.104]
+	4 -> 5 [label="RelatedTo; 4.561" dir=back weight=4.561]
+}

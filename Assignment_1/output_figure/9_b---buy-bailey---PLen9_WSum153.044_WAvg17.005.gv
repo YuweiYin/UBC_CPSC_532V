@@ -1,0 +1,22 @@
+// The path the concepts from "buy" to "bailey".Path Length: 9; Weight Sum: 153.04392045008234; Average Weight: 17.00488005000915
+digraph "9_b---buy-bailey---PLen9_WSum153.044_WAvg17.005" {
+	0 [label=buy]
+	1 [label="have money"]
+	2 [label=shop]
+	3 [label=food]
+	4 [label=supermarket]
+	5 [label=bread]
+	6 [label=eating]
+	7 [label=fruit]
+	8 [label=apple]
+	9 [label=bailey]
+	0 -> 1 [label="HasPrerequisite; 9.165" dir=forward weight=9.165]
+	1 -> 2 [label="HasPrerequisite; 13.637" dir=back weight=13.637]
+	2 -> 3 [label="AtLocation; 16.466" dir=back weight=16.466]
+	3 -> 4 [label="AtLocation; 23.099" dir=forward weight=23.099]
+	4 -> 5 [label="AtLocation; 27.099" dir=back weight=27.099]
+	5 -> 6 [label="UsedFor; 27.213" dir=forward weight=27.213]
+	6 -> 7 [label="UsedFor; 21.556" dir=back weight=21.556]
+	7 -> 8 [label="RelatedTo; 13.810" dir=back weight=13.810]
+	8 -> 9 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

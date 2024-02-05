@@ -1,0 +1,20 @@
+// The path the concepts from "45" to "st".Path Length: 8; Weight Sum: 62.38158274810975; Average Weight: 7.797697843513719
+digraph "9_b---45-st---PLen8_WSum62.382_WAvg7.798" {
+	0 [label=45]
+	1 [label=ep]
+	2 [label=record]
+	3 [label=music]
+	4 [label=song]
+	5 [label=verse]
+	6 [label=stanza]
+	7 [label=st]
+	8 [label=st]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 10.702" dir=forward weight=10.702]
+	3 -> 4 [label="RelatedTo; 18.114" dir=back weight=18.114]
+	4 -> 5 [label="RelatedTo; 14.383" dir=back weight=14.383]
+	5 -> 6 [label="RelatedTo; 8.525" dir=forward weight=8.525]
+	6 -> 7 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	7 -> 8 [label="FormOf; 2.828" dir=back weight=2.828]
+}

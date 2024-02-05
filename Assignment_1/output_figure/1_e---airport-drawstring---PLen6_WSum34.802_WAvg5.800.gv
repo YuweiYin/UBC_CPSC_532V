@@ -1,0 +1,16 @@
+// The path the concepts from "airport" to "drawstring".Path Length: 6; Weight Sum: 34.80209308575647; Average Weight: 5.800348847626078
+digraph "1_e---airport-drawstring---PLen6_WSum34.802_WAvg5.800" {
+	0 [label=airport]
+	1 [label=traveller]
+	2 [label=ireland]
+	3 [label=potato]
+	4 [label=bag]
+	5 [label="bucket bag"]
+	6 [label=drawstring]
+	0 -> 1 [label="AtLocation; 6.325" dir=back weight=6.325]
+	1 -> 2 [label="HasContext; 8.325" dir=forward weight=8.325]
+	2 -> 3 [label="AtLocation; 12.325" dir=back weight=12.325]
+	3 -> 4 [label="AtLocation; 4.828" dir=forward weight=4.828]
+	4 -> 5 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	5 -> 6 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

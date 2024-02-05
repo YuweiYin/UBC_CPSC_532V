@@ -1,0 +1,476 @@
+Namespace(verbose=False, example_id=1, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 1; Choice: "(a) garbage can"; From "garbage" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "garbage" To "drawstring" (Similarity: 0.245)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 6.7 sec (0.1 min): [src->tgt] BFS source 10; Visited neighbors 45 (ignored 29); [tgt->src] BFS source 5; Visited neighbors 15 (ignored 1)
+>>> >>> Depth [3] Time 27.3 sec (0.5 min): [src->tgt] BFS source 45; Visited neighbors 212 (ignored 53); [tgt->src] BFS source 15; Visited neighbors 56 (ignored 4)
+>>> Found 1 path(s) between "garbage" and "drawstring".
+
+You are likely to find garbage in garbage can
+You are likely to find garbage can in alley
+You are likely to find cat in alley
+You are likely to find cat in bag
+bucket bag is like bag
+bucket bag is like drawstring
+
+
+Example: 1; Choice: "(a) garbage can"; From "garbage" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "garbage" To "woman" (Similarity: 0.206)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 9.2 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 48 (ignored 8); [tgt->src] BFS source 10; Visited neighbors 96 (ignored 0)
+>>> >>> Depth [3] Time 112.5 sec (1.9 min): [src->tgt] BFS source 48; Visited neighbors 245 (ignored 26); [tgt->src] BFS source 96; Visited neighbors 577 (ignored 42)
+>>> Found 14 path(s) between "garbage" and "woman".
+
+waste is like garbage
+waste is like trash
+trash can be recycled
+glass can be recycled
+glass is like sand
+sand is like small
+baby is like small
+baby is like human
+child is like human
+boy is like child
+boy is like young
+chick is like young
+chick is like girl
+girl is like female
+dress is like female
+dress is like woman
+
+
+Example: 1; Choice: "(a) garbage can"; From "garbage" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "garbage" To "bag" (Similarity: 0.355)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 12.0 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 49 (ignored 8); [tgt->src] BFS source 11; Visited neighbors 95 (ignored 17)
+>>> >>> Depth [3] Time 98.5 sec (1.6 min): [src->tgt] BFS source 49; Visited neighbors 217 (ignored 61); [tgt->src] BFS source 95; Visited neighbors 583 (ignored 169)
+>>> Found 25 path(s) between "garbage" and "bag".
+
+waste is like garbage
+waste is like trash
+You are likely to find cardboard box in trash
+You are likely to find cardboard box in garage
+You are likely to find mouse in garage
+You are likely to find mouse in pantry
+You are likely to find pantry in kitchen
+You are likely to find table in kitchen
+You are likely to find dog in table
+dog is like animal
+cat is like animal
+You are likely to find cat in bag
+
+
+Example: 1; Choice: "(a) garbage can"; From "garbage" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "garbage" To "checked" (Similarity: 0.230)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 9 (ignored 2)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 6; Visited neighbors 37 (ignored 8); [tgt->src] BFS source 9; Visited neighbors 61 (ignored 8)
+>>> >>> Depth [3] Time 56.8 sec (0.9 min): [src->tgt] BFS source 37; Visited neighbors 162 (ignored 51); [tgt->src] BFS source 61; Visited neighbors 250 (ignored 153)
+>>> Found 2 path(s) between "garbage" and "checked".
+
+waste is like garbage
+waste is like trash
+trash can be recycled
+paper can be recycled
+card is like paper
+card is like poker
+check call is a word used in the context of poker
+check call is like checked
+
+
+Example: 1; Choice: "(a) garbage can"; From "garbage" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "garbage" To "baggage" (Similarity: 0.328)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 10.3 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 48 (ignored 9); [tgt->src] BFS source 10; Visited neighbors 54 (ignored 14)
+>>> >>> Depth [3] Time 55.4 sec (0.9 min): [src->tgt] BFS source 48; Visited neighbors 204 (ignored 64); [tgt->src] BFS source 54; Visited neighbors 327 (ignored 98)
+>>> Found 10 path(s) between "garbage" and "baggage".
+
+waste is like garbage
+waste is like trash
+trash can be recycled
+recycle bin is like recycled
+recycle bin is like location
+place is like location
+city is a type of place
+You are likely to find parking lot in city
+You are likely to find parking lot in airport
+You are likely to find baggage in airport
+
+*** Example: 1; Choice: a; SCORE: 17.362 (total_w_sum = 902.828; total_path_len = 52; match_pair_n = 5; total_pair_n = 5)
+
+
+Example: 1; Choice: "(b) military"; From "military" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "military" To "drawstring" (Similarity: 0.172)
+>>> >>> Depth [1] Time 4.8 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 8.2 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 59 (ignored 5); [tgt->src] BFS source 5; Visited neighbors 16 (ignored 0)
+>>> >>> Depth [3] Time 52.7 sec (0.9 min): [src->tgt] BFS source 59; Visited neighbors 261 (ignored 33); [tgt->src] BFS source 16; Visited neighbors 65 (ignored 2)
+>>> Path between military and drawstring does not exist or is too long (> 6).
+
+
+
+Example: 1; Choice: "(b) military"; From "military" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "military" To "woman" (Similarity: 0.296)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 9.2 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 67 (ignored 7); [tgt->src] BFS source 10; Visited neighbors 92 (ignored 4)
+>>> >>> Depth [3] Time 80.0 sec (1.3 min): [src->tgt] BFS source 67; Visited neighbors 293 (ignored 63); [tgt->src] BFS source 92; Visited neighbors 487 (ignored 120)
+>>> Found 10 path(s) between "military" and "woman".
+
+army is like military
+army is like group
+crowd is like group
+crowd is like people
+people is human
+child is like human
+boy is like child
+boy is like young
+chick is like young
+chick is like girl
+girl is like female
+dress is like female
+dress is like woman
+
+
+Example: 1; Choice: "(b) military"; From "military" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "military" To "bag" (Similarity: 0.323)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 9.0 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 69 (ignored 5); [tgt->src] BFS source 11; Visited neighbors 101 (ignored 11)
+>>> >>> Depth [3] Time 78.2 sec (1.3 min): [src->tgt] BFS source 69; Visited neighbors 286 (ignored 65); [tgt->src] BFS source 101; Visited neighbors 645 (ignored 113)
+>>> Found 11 path(s) between "military" and "bag".
+
+army is like military
+rank is like army
+captain is like rank
+captain is like ship
+boat is like ship
+You are likely to find boat in water
+You are likely to find water in soup
+soup is like food
+You are likely to find food in supermarket
+You are likely to find bag in supermarket
+
+
+Example: 1; Choice: "(b) military"; From "military" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "military" To "checked" (Similarity: 0.206)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 0)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 67 (ignored 7); [tgt->src] BFS source 11; Visited neighbors 68 (ignored 11)
+>>> >>> Depth [3] Time 59.9 sec (1.0 min): [src->tgt] BFS source 67; Visited neighbors 333 (ignored 30); [tgt->src] BFS source 68; Visited neighbors 286 (ignored 53)
+>>> Found 2 path(s) between "military" and "checked".
+
+army is like military
+rank is like army
+captain is like rank
+captain is like chief
+chief is like person
+character is like person
+syllabary is like character
+syllabary is like syllables
+checked is like syllables
+
+
+Example: 1; Choice: "(b) military"; From "military" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "military" To "baggage" (Similarity: 0.350)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 3)
+>>> >>> Depth [2] Time 5.9 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 36 (ignored 11); [tgt->src] BFS source 8; Visited neighbors 48 (ignored 19)
+>>> >>> Depth [3] Time 36.7 sec (0.6 min): [src->tgt] BFS source 36; Visited neighbors 110 (ignored 45); [tgt->src] BFS source 48; Visited neighbors 259 (ignored 132)
+>>> Found 2 path(s) between "military" and "baggage".
+
+army is like military
+army is like group
+crowd is like group
+crowd is like people
+people is human
+You are likely to find human in airport
+You are likely to find baggage in airport
+
+*** Example: 1; Choice: b; SCORE: 14.241 (total_w_sum = 694.260; total_path_len = 39; match_pair_n = 4; total_pair_n = 5)
+
+
+Example: 1; Choice: "(c) jewelry store"; From "jewelry" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "jewelry" To "drawstring" (Similarity: 0.413)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 13); [tgt->src] BFS source 1; Visited neighbors 0 (ignored 15)
+>>> >>> Depth [2] Time 5.1 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 13 (ignored 49); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> >>> Depth [3] Time 13.4 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 30 (ignored 126); [tgt->src] BFS source 0; Visited neighbors 0 (ignored 0)
+>>> Path between jewelry and drawstring does not exist or is too long (> 6).
+
+
+
+Example: 1; Choice: "(c) jewelry store"; From "jewelry" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "jewelry" To "woman" (Similarity: 0.303)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> Found 1 path(s) between "jewelry" and "woman".
+
+person wants jewelry
+person is like woman
+
+
+Example: 1; Choice: "(c) jewelry store"; From "jewelry" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "jewelry" To "bag" (Similarity: 0.337)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 12.4 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 89 (ignored 18); [tgt->src] BFS source 11; Visited neighbors 100 (ignored 12)
+>>> Found 2 path(s) between "jewelry" and "bag".
+
+person wants jewelry
+person wants clothing
+You are likely to find clothing in drawer
+You are likely to find bag in drawer
+
+
+Example: 1; Choice: "(c) jewelry store"; From "jewelry" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "jewelry" To "checked" (Similarity: 0.166)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 0)
+>>> >>> Depth [2] Time 11.0 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 101 (ignored 6); [tgt->src] BFS source 11; Visited neighbors 68 (ignored 11)
+>>> Found 1 path(s) between "jewelry" and "checked".
+
+ring is like jewelry
+call is like ring
+check call is like call
+check call is like checked
+
+
+Example: 1; Choice: "(c) jewelry store"; From "jewelry" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "jewelry" To "baggage" (Similarity: 0.353)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 3)
+>>> >>> Depth [2] Time 7.1 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 39 (ignored 23); [tgt->src] BFS source 8; Visited neighbors 48 (ignored 19)
+>>> >>> Depth [3] Time 52.1 sec (0.9 min): [src->tgt] BFS source 39; Visited neighbors 179 (ignored 109); [tgt->src] BFS source 48; Visited neighbors 259 (ignored 132)
+>>> Found 6 path(s) between "jewelry" and "baggage".
+
+jewelry is used for decoration
+carpeting is used for decoration
+You are likely to find carpeting in room
+room is like place
+city is a type of place
+You are likely to find parking lot in city
+You are likely to find parking lot in airport
+You are likely to find baggage in airport
+
+
+Example: 1; Choice: "(c) jewelry store"; From "store" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "store" To "drawstring" (Similarity: 0.211)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 18 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 20.3 sec (0.3 min): [src->tgt] BFS source 18; Visited neighbors 179 (ignored 53); [tgt->src] BFS source 5; Visited neighbors 16 (ignored 0)
+>>> >>> Depth [3] Time 153.3 sec (2.6 min): [src->tgt] BFS source 179; Visited neighbors 1136 (ignored 384); [tgt->src] BFS source 16; Visited neighbors 63 (ignored 4)
+>>> Found 6 path(s) between "store" and "drawstring".
+
+You are likely to find store in town
+city is like town
+city is a type of place
+bed is like place
+You are likely to find floor in bed
+You are likely to find cat in floor
+You are likely to find cat in bag
+bucket bag is like bag
+bucket bag is like drawstring
+
+
+Example: 1; Choice: "(c) jewelry store"; From "store" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "store" To "woman" (Similarity: 0.286)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 12.7 sec (0.2 min): [src->tgt] BFS source 17; Visited neighbors 166 (ignored 47); [tgt->src] BFS source 10; Visited neighbors 93 (ignored 3)
+>>> Found 3 path(s) between "store" and "woman".
+
+You are likely to find store in town
+You are likely to find people in town
+person is like people
+girl is like person
+girl is like female
+dress is like female
+dress is like woman
+
+
+Example: 1; Choice: "(c) jewelry store"; From "store" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "store" To "bag" (Similarity: 0.405)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 7)
+>>> >>> Depth [2] Time 11.6 sec (0.2 min): [src->tgt] BFS source 16; Visited neighbors 141 (ignored 73); [tgt->src] BFS source 10; Visited neighbors 70 (ignored 55)
+>>> Found 12 path(s) between "store" and "bag".
+
+market is like store
+You are likely to find bread in market
+bread is like food
+You are likely to find food in kitchen
+You are likely to find potato in kitchen
+You are likely to find potato in bag
+
+
+Example: 1; Choice: "(c) jewelry store"; From "store" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "store" To "checked" (Similarity: 0.269)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 14 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 8 (ignored 3)
+>>> >>> Depth [2] Time 9.6 sec (0.2 min): [src->tgt] BFS source 14; Visited neighbors 108 (ignored 80); [tgt->src] BFS source 8; Visited neighbors 50 (ignored 14)
+>>> >>> Depth [3] Time 78.2 sec (1.3 min): [src->tgt] BFS source 108; Visited neighbors 570 (ignored 604); [tgt->src] BFS source 50; Visited neighbors 172 (ignored 175)
+>>> Found 15 path(s) between "store" and "checked".
+
+You are likely to find book in store
+page is like book
+page is like paper
+card is like paper
+card is like poker
+check call is a word used in the context of poker
+check call is like checked
+
+
+Example: 1; Choice: "(c) jewelry store"; From "store" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "store" To "baggage" (Similarity: 0.373)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 13)
+>>> >>> Depth [2] Time 9.9 sec (0.2 min): [src->tgt] BFS source 16; Visited neighbors 142 (ignored 69); [tgt->src] BFS source 6; Visited neighbors 36 (ignored 25)
+>>> Found 5 path(s) between "store" and "baggage".
+
+You are likely to find store in town
+city is like town
+You are likely to find train station in city
+You are likely to find baggage in train station
+
+*** Example: 1; Choice: c; SCORE: 9.367 (total_w_sum = 530.808; total_path_len = 51; match_pair_n = 9; total_pair_n = 10)
+
+
+Example: 1; Choice: "(d) safe"; From "safe" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "safe" To "drawstring" (Similarity: 0.170)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 10.2 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 74 (ignored 3); [tgt->src] BFS source 5; Visited neighbors 16 (ignored 0)
+>>> >>> Depth [3] Time 56.7 sec (0.9 min): [src->tgt] BFS source 74; Visited neighbors 478 (ignored 73); [tgt->src] BFS source 16; Visited neighbors 65 (ignored 2)
+>>> Found 1 path(s) between "safe" and "drawstring".
+
+safe is like box
+box is like container
+drawer is a type of container
+You are likely to find bag in drawer
+bucket bag is like bag
+bucket bag is like drawstring
+
+
+Example: 1; Choice: "(d) safe"; From "safe" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "safe" To "woman" (Similarity: 0.204)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 9.2 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 77 (ignored 0); [tgt->src] BFS source 10; Visited neighbors 96 (ignored 0)
+>>> >>> Depth [3] Time 117.7 sec (2.0 min): [src->tgt] BFS source 77; Visited neighbors 503 (ignored 32); [tgt->src] BFS source 96; Visited neighbors 577 (ignored 42)
+>>> Found 23 path(s) between "safe" and "woman".
+
+bank is like safe
+bank is like money
+cent is like money
+cent is like small
+baby is like small
+baby is like human
+child is like human
+boy is like child
+boy is like young
+chick is like young
+chick is like girl
+girl is like female
+dress is like female
+dress is like woman
+
+
+Example: 1; Choice: "(d) safe"; From "safe" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "safe" To "bag" (Similarity: 0.253)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 1)
+>>> >>> Depth [2] Time 9.4 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 75 (ignored 2); [tgt->src] BFS source 11; Visited neighbors 108 (ignored 4)
+>>> Found 3 path(s) between "safe" and "bag".
+
+safe is like box
+box is like container
+drawer is a type of container
+You are likely to find bag in drawer
+
+
+Example: 1; Choice: "(d) safe"; From "safe" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "safe" To "checked" (Similarity: 0.439)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 5)
+>>> >>> Depth [2] Time 5.0 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 12 (ignored 36); [tgt->src] BFS source 6; Visited neighbors 19 (ignored 23)
+>>> >>> Depth [3] Time 12.7 sec (0.2 min): [src->tgt] BFS source 12; Visited neighbors 41 (ignored 26); [tgt->src] BFS source 19; Visited neighbors 46 (ignored 143)
+>>> Path between safe and checked does not exist or is too long (> 6).
+
+
+
+Example: 1; Choice: "(d) safe"; From "safe" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "safe" To "baggage" (Similarity: 0.206)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 8.8 sec (0.1 min): [src->tgt] BFS source 11; Visited neighbors 77 (ignored 0); [tgt->src] BFS source 10; Visited neighbors 62 (ignored 6)
+>>> Found 2 path(s) between "safe" and "baggage".
+
+bank is like safe
+bank is like place
+airports is a type of place
+You are likely to find baggage in airports
+
+*** Example: 1; Choice: d; SCORE: 13.716 (total_w_sum = 480.056; total_path_len = 28; match_pair_n = 4; total_pair_n = 5)
+
+
+Example: 1; Choice: "(e) airport"; From "airport" To "drawstring"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "airport" To "drawstring" (Similarity: 0.133)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 17 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 5 (ignored 0)
+>>> >>> Depth [2] Time 9.7 sec (0.2 min): [src->tgt] BFS source 17; Visited neighbors 144 (ignored 12); [tgt->src] BFS source 5; Visited neighbors 16 (ignored 0)
+>>> >>> Depth [3] Time 106.5 sec (1.8 min): [src->tgt] BFS source 144; Visited neighbors 723 (ignored 84); [tgt->src] BFS source 16; Visited neighbors 65 (ignored 2)
+>>> Found 6 path(s) between "airport" and "drawstring".
+
+You are likely to find traveller in airport
+traveller is a word used in the context of ireland
+You are likely to find potato in ireland
+You are likely to find potato in bag
+bucket bag is like bag
+bucket bag is like drawstring
+
+
+Example: 1; Choice: "(e) airport"; From "airport" To "woman"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "airport" To "woman" (Similarity: 0.225)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 0)
+>>> >>> Depth [2] Time 11.6 sec (0.2 min): [src->tgt] BFS source 15; Visited neighbors 110 (ignored 32); [tgt->src] BFS source 10; Visited neighbors 96 (ignored 0)
+>>> Found 5 path(s) between "airport" and "woman".
+
+You are likely to find human in airport
+baby is like human
+chick is like baby
+chick is like girl
+girl is like female
+dress is like female
+dress is like woman
+
+
+Example: 1; Choice: "(e) airport"; From "airport" To "bag"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "airport" To "bag" (Similarity: 0.393)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 12 (ignored 8); [tgt->src] BFS source 1; Visited neighbors 10 (ignored 7)
+>>> >>> Depth [2] Time 10.2 sec (0.2 min): [src->tgt] BFS source 12; Visited neighbors 84 (ignored 72); [tgt->src] BFS source 10; Visited neighbors 72 (ignored 53)
+>>> Found 2 path(s) between "airport" and "bag".
+
+You are likely to find human in airport
+people is human
+You are likely to find people in supermarket
+You are likely to find bag in supermarket
+
+
+Example: 1; Choice: "(e) airport"; From "airport" To "checked"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "airport" To "checked" (Similarity: 0.195)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 15 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 0)
+>>> >>> Depth [2] Time 12.9 sec (0.2 min): [src->tgt] BFS source 15; Visited neighbors 105 (ignored 34); [tgt->src] BFS source 11; Visited neighbors 68 (ignored 11)
+>>> >>> Depth [3] Time 76.9 sec (1.3 min): [src->tgt] BFS source 105; Visited neighbors 608 (ignored 111); [tgt->src] BFS source 68; Visited neighbors 292 (ignored 47)
+>>> Found 13 path(s) between "airport" and "checked".
+
+You are likely to find parking lot in airport
+You are likely to find car in parking lot
+You are likely to find car in city
+city is like large
+continent is like large
+continent is like north america
+checked is a word used in the context of north america
+
+
+Example: 1; Choice: "(e) airport"; From "airport" To "baggage"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "airport" To "baggage" (Similarity: 0.576)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 11); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 16)
+>>> >>> Depth [2] Time 5.5 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 31 (ignored 96); [tgt->src] BFS source 3; Visited neighbors 11 (ignored 25)
+>>> >>> Depth [3] Time 17.6 sec (0.3 min): [src->tgt] BFS source 31; Visited neighbors 27 (ignored 142); [tgt->src] BFS source 11; Visited neighbors 40 (ignored 114)
+>>> Found 1 path(s) between "airport" and "baggage".
+
+You are likely to find flight bag in airport
+You are likely to find flight bag in trunk
+You are likely to find clothing in trunk
+You are likely to find clothing in suitcase
+suitcase is used for carry clothes
+baggage is used for carry clothes
+
+*** Example: 1; Choice: e; SCORE: 8.221 (total_w_sum = 246.626; total_path_len = 30; match_pair_n = 5; total_pair_n = 5)
+
+*** DONE *** Example: 1 - Running Time: 1668.4 sec (27.8 min)
+
+Accuracy: 0.0.
+Done!
+Total Running Time: 1668.8 sec (27.8 min)

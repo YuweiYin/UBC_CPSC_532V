@@ -1,0 +1,16 @@
+// The path the concepts from "safe" to "drawstring".Path Length: 6; Weight Sum: 39.02450529563643; Average Weight: 6.504084215939405
+digraph "1_d---safe-drawstring---PLen6_WSum39.025_WAvg6.504" {
+	0 [label=safe]
+	1 [label=box]
+	2 [label=container]
+	3 [label=drawer]
+	4 [label=bag]
+	5 [label="bucket bag"]
+	6 [label=drawstring]
+	0 -> 1 [label="RelatedTo; 3.398" dir=forward weight=3.398]
+	1 -> 2 [label="RelatedTo; 11.849" dir=forward weight=11.849]
+	2 -> 3 [label="IsA; 15.313" dir=back weight=15.313]
+	3 -> 4 [label="AtLocation; 5.464" dir=back weight=5.464]
+	4 -> 5 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	5 -> 6 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

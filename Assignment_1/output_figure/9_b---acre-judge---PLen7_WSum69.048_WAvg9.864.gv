@@ -1,0 +1,18 @@
+// The path the concepts from "acre" to "judge".Path Length: 7; Weight Sum: 69.04787086980485; Average Weight: 9.863981552829264
+digraph "9_b---acre-judge---PLen7_WSum69.048_WAvg9.864" {
+	0 [label=acre]
+	1 [label="acre foot"]
+	2 [label=foot]
+	3 [label=leg]
+	4 [label=body]
+	5 [label=human]
+	6 [label=person]
+	7 [label=judge]
+	0 -> 1 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 3.000" dir=forward weight=3.000]
+	2 -> 3 [label="RelatedTo; 10.159" dir=back weight=10.159]
+	3 -> 4 [label="RelatedTo; 23.927" dir=forward weight=23.927]
+	4 -> 5 [label="RelatedTo; 17.489" dir=forward weight=17.489]
+	5 -> 6 [label="RelatedTo; 9.736" dir=back weight=9.736]
+	6 -> 7 [label="RelatedTo; 2.738" dir=back weight=2.738]
+}

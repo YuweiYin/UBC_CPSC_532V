@@ -1,0 +1,14 @@
+// The path the concepts from "read" to "harvard".Path Length: 5; Weight Sum: 48.332067993053734; Average Weight: 9.666413598610747
+digraph "5_a---read-harvard---PLen5_WSum48.332_WAvg9.666" {
+	0 [label=read]
+	1 [label=books]
+	2 [label=literature]
+	3 [label=learning]
+	4 [label=college]
+	5 [label=harvard]
+	0 -> 1 [label="ReceivesAction; 10.198" dir=back weight=10.198]
+	1 -> 2 [label="RelatedTo; 14.921" dir=back weight=14.921]
+	2 -> 3 [label="UsedFor; 17.749" dir=forward weight=17.749]
+	3 -> 4 [label="UsedFor; 4.464" dir=back weight=4.464]
+	4 -> 5 [label="IsA; 1.000" dir=back weight=1.000]
+}

@@ -1,0 +1,12 @@
+// The path the concepts from "airport" to "bag".Path Length: 4; Weight Sum: 20.521295049905223; Average Weight: 5.130323762476306
+digraph "1_e---airport-bag---PLen4_WSum20.521_WAvg5.130" {
+	0 [label=airport]
+	1 [label=human]
+	2 [label=people]
+	3 [label=supermarket]
+	4 [label=bag]
+	0 -> 1 [label="AtLocation; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="HasProperty; 7.301" dir=back weight=7.301]
+	2 -> 3 [label="AtLocation; 6.928" dir=forward weight=6.928]
+	3 -> 4 [label="AtLocation; 3.464" dir=back weight=3.464]
+}

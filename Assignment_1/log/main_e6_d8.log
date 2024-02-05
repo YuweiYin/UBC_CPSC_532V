@@ -1,0 +1,101 @@
+Namespace(verbose=False, example_id=6, choice_id=-1, max_depth=8, use_gpt=False)
+
+
+Example: 6; Choice: "(a) pipe"; From "pipe" To "eased"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pipe" To "eased" (Similarity: 0.259)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 11); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 5.0 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 22 (ignored 4); [tgt->src] BFS source 4; Visited neighbors 14 (ignored 7)
+>>> >>> Depth [3] Time 18.3 sec (0.3 min): [src->tgt] BFS source 22; Visited neighbors 72 (ignored 8); [tgt->src] BFS source 14; Visited neighbors 37 (ignored 5)
+>>> >>> Depth [4] Time 74.8 sec (1.2 min): [src->tgt] BFS source 72; Visited neighbors 211 (ignored 18); [tgt->src] BFS source 37; Visited neighbors 93 (ignored 20)
+>>> Path between pipe and eased does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(a) pipe"; From "pipe" To "pile"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pipe" To "pile" (Similarity: 0.471)
+>>> >>> Depth [1] Time 1.3 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 2)
+>>> >>> Depth [2] Time 1.4 sec (0.0 min): [src->tgt] BFS source 2; Visited neighbors 6 (ignored 2); [tgt->src] BFS source 2; Visited neighbors 8 (ignored 0)
+>>> >>> Depth [3] Time 6.7 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 9 (ignored 46); [tgt->src] BFS source 8; Visited neighbors 3 (ignored 1)
+>>> >>> Depth [4] Time 5.3 sec (0.1 min): [src->tgt] BFS source 9; Visited neighbors 28 (ignored 33); [tgt->src] BFS source 3; Visited neighbors 3 (ignored 0)
+>>> Path between pipe and pile does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(a) pipe"; From "pipe" To "burst"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pipe" To "burst" (Similarity: 0.334)
+>>> >>> Depth [1] Time 1.4 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 0)
+>>> >>> Depth [2] Time 7.5 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 33 (ignored 3); [tgt->src] BFS source 3; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [3] Time 28.5 sec (0.5 min): [src->tgt] BFS source 33; Visited neighbors 68 (ignored 7); [tgt->src] BFS source 7; Visited neighbors 21 (ignored 1)
+>>> >>> Depth [4] Time 37.0 sec (0.6 min): [src->tgt] BFS source 68; Visited neighbors 135 (ignored 19); [tgt->src] BFS source 21; Visited neighbors 46 (ignored 4)
+>>> Path between pipe and burst does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(a) pipe"; From "pipe" To "rigid"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pipe" To "rigid" (Similarity: 0.224)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 6.6 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 40 (ignored 2); [tgt->src] BFS source 7; Visited neighbors 37 (ignored 5)
+>>> >>> Depth [3] Time 53.3 sec (0.9 min): [src->tgt] BFS source 40; Visited neighbors 99 (ignored 4); [tgt->src] BFS source 37; Visited neighbors 248 (ignored 80)
+>>> >>> Depth [4] Time 284.5 sec (4.7 min): [src->tgt] BFS source 99; Visited neighbors 257 (ignored 1); [tgt->src] BFS source 248; Visited neighbors 1202 (ignored 255)
+>>> Found 7 path(s) between "pipe" and "rigid".
+
+pipe can branch off
+submenu is like branch off
+submenu is a word used in the context of computing
+computer is used for computing
+You are likely to find computer in house
+farm is like house
+farm is like animal
+fish is like animal
+fish has bones
+bones is rigid
+
+*** Example: 6; Choice: a; SCORE: 3.012 (total_w_sum = 120.488; total_path_len = 10; match_pair_n = 1; total_pair_n = 4)
+
+
+Example: 6; Choice: "(b) pile"; From "pile" To "eased"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pile" To "eased" (Similarity: 0.246)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 3.1 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 11 (ignored 0); [tgt->src] BFS source 4; Visited neighbors 14 (ignored 7)
+>>> >>> Depth [3] Time 10.3 sec (0.2 min): [src->tgt] BFS source 11; Visited neighbors 5 (ignored 1); [tgt->src] BFS source 14; Visited neighbors 38 (ignored 1)
+>>> >>> Depth [4] Time 19.6 sec (0.3 min): [src->tgt] BFS source 5; Visited neighbors 13 (ignored 0); [tgt->src] BFS source 38; Visited neighbors 95 (ignored 19)
+>>> Path between pile and eased does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(b) pile"; From "pile" To "pipe"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pile" To "pipe" (Similarity: 0.471)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 16); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 16)
+>>> >>> Depth [2] Time 0.7 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 2; Visited neighbors 6 (ignored 2)
+>>> >>> Depth [3] Time 2.5 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 6; Visited neighbors 10 (ignored 52)
+>>> >>> Depth [4] Time 5.0 sec (0.1 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 10; Visited neighbors 45 (ignored 25)
+>>> Path between pile and pipe does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(b) pile"; From "pile" To "burst"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pile" To "burst" (Similarity: 0.293)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 0)
+>>> >>> Depth [2] Time 2.9 sec (0.0 min): [src->tgt] BFS source 4; Visited neighbors 15 (ignored 0); [tgt->src] BFS source 3; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [3] Time 12.2 sec (0.2 min): [src->tgt] BFS source 15; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 22 (ignored 0)
+>>> >>> Depth [4] Time 22.0 sec (0.4 min): [src->tgt] BFS source 14; Visited neighbors 23 (ignored 1); [tgt->src] BFS source 22; Visited neighbors 50 (ignored 12)
+>>> Path between pile and burst does not exist or is too long (> 8).
+
+
+
+Example: 6; Choice: "(b) pile"; From "pile" To "rigid"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 8): From "pile" To "rigid" (Similarity: 0.280)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 7 (ignored 0)
+>>> >>> Depth [2] Time 4.2 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 15 (ignored 0); [tgt->src] BFS source 7; Visited neighbors 29 (ignored 13)
+>>> >>> Depth [3] Time 17.7 sec (0.3 min): [src->tgt] BFS source 15; Visited neighbors 14 (ignored 0); [tgt->src] BFS source 29; Visited neighbors 160 (ignored 51)
+>>> >>> Depth [4] Time 69.3 sec (1.2 min): [src->tgt] BFS source 14; Visited neighbors 24 (ignored 0); [tgt->src] BFS source 160; Visited neighbors 705 (ignored 321)
+>>> Path between pile and rigid does not exist or is too long (> 8).
+
+
+*** Example: 6; Choice: b; SCORE: 0.000 (total_w_sum = 0.000; total_path_len = 0; match_pair_n = 0; total_pair_n = 4)
+
+*** DONE *** Example: 6 - Running Time: 709.9 sec (11.8 min)
+
+Accuracy: 1.0.
+Done!
+Total Running Time: 710.3 sec (11.8 min)

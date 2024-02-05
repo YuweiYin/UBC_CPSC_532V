@@ -1,0 +1,18 @@
+// The path the concepts from "celebrated" to "mark".Path Length: 7; Weight Sum: 68.63528330332305; Average Weight: 9.805040471903293
+digraph "9_c---celebrated-mark---PLen7_WSum68.635_WAvg9.805" {
+	0 [label=celebrated]
+	1 [label=person]
+	2 [label=human]
+	3 [label=body]
+	4 [label=feet]
+	5 [label=ground]
+	6 [label=mole]
+	7 [label=mark]
+	0 -> 1 [label="Desires; 2.000" dir=back weight=2.000]
+	1 -> 2 [label="RelatedTo; 8.998" dir=forward weight=8.998]
+	2 -> 3 [label="RelatedTo; 16.751" dir=back weight=16.751]
+	3 -> 4 [label="RelatedTo; 21.135" dir=back weight=21.135]
+	4 -> 5 [label="RelatedTo; 10.325" dir=back weight=10.325]
+	5 -> 6 [label="RelatedTo; 6.524" dir=back weight=6.524]
+	6 -> 7 [label="RelatedTo; 2.903" dir=forward weight=2.903]
+}

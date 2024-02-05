@@ -1,0 +1,12 @@
+// The path the concepts from "dream" to "judge".Path Length: 4; Weight Sum: 22.01976313882303; Average Weight: 5.504940784705758
+digraph "9_e---dream-judge---PLen4_WSum22.020_WAvg5.505" {
+	0 [label=dream]
+	1 [label=sleeping]
+	2 [label=death]
+	3 [label="deciding criminal s fate"]
+	4 [label=judge]
+	0 -> 1 [label="RelatedTo; 5.449" dir=forward weight=5.449]
+	1 -> 2 [label="Causes; 8.914" dir=forward weight=8.914]
+	2 -> 3 [label="Causes; 4.828" dir=back weight=4.828]
+	3 -> 4 [label="UsedFor; 2.828" dir=forward weight=2.828]
+}

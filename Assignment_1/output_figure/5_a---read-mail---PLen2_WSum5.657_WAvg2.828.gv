@@ -1,0 +1,8 @@
+// The path the concepts from "read" to "mail".Path Length: 2; Weight Sum: 5.65685424949238; Average Weight: 2.82842712474619
+digraph "5_a---read-mail---PLen2_WSum5.657_WAvg2.828" {
+	0 [label=read]
+	1 [label=table]
+	2 [label=mail]
+	0 -> 1 [label="UsedFor; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="AtLocation; 2.828" dir=back weight=2.828]
+}

@@ -1,0 +1,101 @@
+Namespace(verbose=False, example_id=3, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 3; Choice: "(a) The man avoided his enemy."; From "avoided" To "evidence"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "avoided" To "evidence" (Similarity: 0.249)
+>>> >>> Depth [1] Time 3.7 sec (0.1 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 11.5 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 51 (ignored 8); [tgt->src] BFS source 6; Visited neighbors 37 (ignored 0)
+>>> >>> Depth [3] Time 90.4 sec (1.5 min): [src->tgt] BFS source 51; Visited neighbors 293 (ignored 56); [tgt->src] BFS source 37; Visited neighbors 54 (ignored 0)
+>>> Path between avoided and evidence does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(a) The man avoided his enemy."; From "avoided" To "uncovered"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "avoided" To "uncovered" (Similarity: 0.438)
+>>> >>> Depth [1] Time 1.2 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 14)
+>>> >>> Depth [2] Time 4.9 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 8 (ignored 52); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 9)
+>>> >>> Depth [3] Time 7.8 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 30 (ignored 51); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 5)
+>>> Path between avoided and uncovered does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(a) The man avoided his enemy."; From "avoided" To "enemy"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "avoided" To "enemy" (Similarity: 0.344)
+>>> >>> Depth [1] Time 1.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 0)
+>>> Found 1 path(s) between "avoided" and "enemy".
+
+person does not want avoided
+enemy is like person
+
+
+Example: 3; Choice: "(a) The man avoided his enemy."; From "avoided" To "incriminating"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "avoided" To "incriminating" (Similarity: 0.296)
+>>> >>> Depth [1] Time 2.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 9)
+>>> >>> Depth [2] Time 9.0 sec (0.1 min): [src->tgt] BFS source 8; Visited neighbors 39 (ignored 23); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 18)
+>>> >>> Depth [3] Time 23.7 sec (0.4 min): [src->tgt] BFS source 39; Visited neighbors 221 (ignored 127); [tgt->src] BFS source 6; Visited neighbors 19 (ignored 0)
+>>> Path between avoided and incriminating does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(a) The man avoided his enemy."; From "avoided" To "happened"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "avoided" To "happened" (Similarity: 0.212)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 0)
+>>> >>> Depth [2] Time 6.2 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 46 (ignored 11); [tgt->src] BFS source 3; Visited neighbors 9 (ignored 1)
+>>> >>> Depth [3] Time 38.9 sec (0.6 min): [src->tgt] BFS source 46; Visited neighbors 259 (ignored 33); [tgt->src] BFS source 9; Visited neighbors 39 (ignored 21)
+>>> Path between avoided and happened does not exist or is too long (> 6).
+
+
+*** Example: 3; Choice: a; SCORE: 0.402 (total_w_sum = 4.025; total_path_len = 2; match_pair_n = 1; total_pair_n = 5)
+
+
+Example: 3; Choice: "(b) The man blackmailed his enemy."; From "blackmailed" To "evidence"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "blackmailed" To "evidence" (Similarity: 0.272)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 6 (ignored 0)
+>>> >>> Depth [2] Time 4.9 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 6; Visited neighbors 37 (ignored 0)
+>>> >>> Depth [3] Time 22.4 sec (0.4 min): [src->tgt] BFS source 5; Visited neighbors 15 (ignored 0); [tgt->src] BFS source 37; Visited neighbors 52 (ignored 3)
+>>> Path between blackmailed and evidence does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(b) The man blackmailed his enemy."; From "blackmailed" To "uncovered"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "blackmailed" To "uncovered" (Similarity: 0.333)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 3 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 3 (ignored 0)
+>>> >>> Depth [2] Time 5.8 sec (0.1 min): [src->tgt] BFS source 3; Visited neighbors 1 (ignored 21); [tgt->src] BFS source 3; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [3] Time 14.6 sec (0.2 min): [src->tgt] BFS source 1; Visited neighbors 1 (ignored 1); [tgt->src] BFS source 14; Visited neighbors 39 (ignored 1)
+>>> Path between blackmailed and uncovered does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(b) The man blackmailed his enemy."; From "blackmailed" To "enemy"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "blackmailed" To "enemy" (Similarity: 0.261)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 0)
+>>> >>> Depth [2] Time 14.2 sec (0.2 min): [src->tgt] BFS source 2; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 11; Visited neighbors 79 (ignored 7)
+>>> >>> Depth [3] Time 70.4 sec (1.2 min): [src->tgt] BFS source 5; Visited neighbors 15 (ignored 0); [tgt->src] BFS source 79; Visited neighbors 489 (ignored 68)
+>>> Path between blackmailed and enemy does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(b) The man blackmailed his enemy."; From "blackmailed" To "incriminating"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "blackmailed" To "incriminating" (Similarity: 0.340)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 9)
+>>> >>> Depth [2] Time 3.0 sec (0.0 min): [src->tgt] BFS source 2; Visited neighbors 4 (ignored 0); [tgt->src] BFS source 4; Visited neighbors 5 (ignored 19)
+>>> >>> Depth [3] Time 3.7 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 10 (ignored 1); [tgt->src] BFS source 5; Visited neighbors 18 (ignored 0)
+>>> Path between blackmailed and incriminating does not exist or is too long (> 6).
+
+
+
+Example: 3; Choice: "(b) The man blackmailed his enemy."; From "blackmailed" To "happened"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "blackmailed" To "happened" (Similarity: 0.407)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 1 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 1 (ignored 2)
+>>> >>> Depth [2] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 0 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 2 (ignored 3)
+>>> >>> Depth [3] Time 1.0 sec (0.0 min): [src->tgt] BFS source 0; Visited neighbors 0 (ignored 0); [tgt->src] BFS source 2; Visited neighbors 5 (ignored 16)
+>>> Path between blackmailed and happened does not exist or is too long (> 6).
+
+
+*** Example: 3; Choice: b; SCORE: 0.000 (total_w_sum = 0.000; total_path_len = 0; match_pair_n = 0; total_pair_n = 5)
+
+*** DONE *** Example: 3 - Running Time: 350.5 sec (5.8 min)
+
+Accuracy: 0.0.
+Done!
+Total Running Time: 350.9 sec (5.8 min)

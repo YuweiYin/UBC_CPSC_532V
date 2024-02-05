@@ -1,0 +1,20 @@
+// The path the concepts from "kevin" to "crowds".Path Length: 8; Weight Sum: 104.63078713015493; Average Weight: 13.078848391269366
+digraph "7_a---kevin-crowds---PLen8_WSum104.631_WAvg13.079" {
+	0 [label=kevin]
+	1 [label=british]
+	2 [label=babygro]
+	3 [label=baby]
+	4 [label=human]
+	5 [label=person]
+	6 [label=people]
+	7 [label=crowd]
+	8 [label=crowds]
+	0 -> 1 [label="HasContext; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="HasContext; 3.000" dir=back weight=3.000]
+	2 -> 3 [label="RelatedTo; 5.000" dir=forward weight=5.000]
+	3 -> 4 [label="RelatedTo; 32.506" dir=forward weight=32.506]
+	4 -> 5 [label="RelatedTo; 27.273" dir=back weight=27.273]
+	5 -> 6 [label="RelatedTo; 20.275" dir=forward weight=20.275]
+	6 -> 7 [label="RelatedTo; 14.576" dir=back weight=14.576]
+	7 -> 8 [label="FormOf; 1.000" dir=back weight=1.000]
+}

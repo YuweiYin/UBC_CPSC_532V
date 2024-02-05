@@ -1,0 +1,14 @@
+// The path the concepts from "nice" to "judge".Path Length: 5; Weight Sum: 39.463293376772874; Average Weight: 7.892658675354575
+digraph "9_a---nice-judge---PLen5_WSum39.463_WAvg7.893" {
+	0 [label=nice]
+	1 [label=kind]
+	2 [label=people]
+	3 [label=human]
+	4 [label=person]
+	5 [label=judge]
+	0 -> 1 [label="RelatedTo; 4.240" dir=back weight=4.240]
+	1 -> 2 [label="HasProperty; 9.139" dir=back weight=9.139]
+	2 -> 3 [label="HasProperty; 13.611" dir=forward weight=13.611]
+	3 -> 4 [label="RelatedTo; 9.736" dir=back weight=9.736]
+	4 -> 5 [label="RelatedTo; 2.738" dir=back weight=2.738]
+}

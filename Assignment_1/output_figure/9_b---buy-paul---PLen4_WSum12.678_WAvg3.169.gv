@@ -1,0 +1,12 @@
+// The path the concepts from "buy" to "paul".Path Length: 4; Weight Sum: 12.677925016894381; Average Weight: 3.1694812542235953
+digraph "9_b---buy-paul---PLen4_WSum12.678_WAvg3.169" {
+	0 [label=buy]
+	1 [label="pay for"]
+	2 [label=person]
+	3 [label=name]
+	4 [label=paul]
+	0 -> 1 [label="HasLastSubevent; 2.828" dir=forward weight=2.828]
+	1 -> 2 [label="NotDesires; 3.828" dir=back weight=3.828]
+	2 -> 3 [label="RelatedTo; 4.957" dir=back weight=4.957]
+	3 -> 4 [label="RelatedTo; 1.064" dir=back weight=1.064]
+}

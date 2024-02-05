@@ -1,0 +1,18 @@
+// The path the concepts from "press" to "water".Path Length: 7; Weight Sum: 105.35744017510211; Average Weight: 15.051062882157444
+digraph "10_b---press-water---PLen7_WSum105.357_WAvg15.051" {
+	0 [label=press]
+	1 [label=push]
+	2 [label=action]
+	3 [label=wave]
+	4 [label=sea]
+	5 [label=lake]
+	6 [label=fish]
+	7 [label=water]
+	0 -> 1 [label="RelatedTo; 3.956" dir=forward weight=3.956]
+	1 -> 2 [label="RelatedTo; 7.206" dir=forward weight=7.206]
+	2 -> 3 [label="RelatedTo; 25.884" dir=back weight=25.884]
+	3 -> 4 [label="RelatedTo; 22.870" dir=forward weight=22.870]
+	4 -> 5 [label="RelatedTo; 17.990" dir=back weight=17.990]
+	5 -> 6 [label="AtLocation; 15.961" dir=back weight=15.961]
+	6 -> 7 [label="AtLocation; 11.489" dir=forward weight=11.489]
+}

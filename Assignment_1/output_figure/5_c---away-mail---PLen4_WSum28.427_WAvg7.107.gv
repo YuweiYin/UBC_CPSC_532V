@@ -1,0 +1,12 @@
+// The path the concepts from "away" to "mail".Path Length: 4; Weight Sum: 28.426542433153685; Average Weight: 7.106635608288421
+digraph "5_c---away-mail---PLen4_WSum28.427_WAvg7.107" {
+	0 [label=away]
+	1 [label=home]
+	2 [label=nest]
+	3 [label=house]
+	4 [label=mail]
+	0 -> 1 [label="Antonym; 2.136" dir=forward weight=2.136]
+	1 -> 2 [label="RelatedTo; 13.584" dir=back weight=13.584]
+	2 -> 3 [label="RelatedTo; 9.878" dir=forward weight=9.878]
+	3 -> 4 [label="AtLocation; 2.828" dir=back weight=2.828]
+}

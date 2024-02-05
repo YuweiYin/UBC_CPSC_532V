@@ -1,0 +1,16 @@
+// The path the concepts from "farm" to "bailey".Path Length: 6; Weight Sum: 82.26708758892542; Average Weight: 13.711181264820903
+digraph "9_b---farm-bailey---PLen6_WSum82.267_WAvg13.711" {
+	0 [label=farm]
+	1 [label=place]
+	2 [label=home]
+	3 [label=house]
+	4 [label=computer]
+	5 [label=apple]
+	6 [label=bailey]
+	0 -> 1 [label="RelatedTo; 7.356" dir=forward weight=7.356]
+	1 -> 2 [label="RelatedTo; 14.260" dir=back weight=14.260]
+	2 -> 3 [label="RelatedTo; 23.243" dir=forward weight=23.243]
+	3 -> 4 [label="AtLocation; 31.243" dir=back weight=31.243]
+	4 -> 5 [label="RelatedTo; 5.164" dir=back weight=5.164]
+	5 -> 6 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

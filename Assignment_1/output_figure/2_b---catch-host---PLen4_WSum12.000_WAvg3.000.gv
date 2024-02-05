@@ -1,0 +1,12 @@
+// The path the concepts from "catch" to "host".Path Length: 4; Weight Sum: 12.0; Average Weight: 3.0
+digraph "2_b---catch-host---PLen4_WSum12.000_WAvg3.000" {
+	0 [label=catch]
+	1 [label=catch]
+	2 [label=adult]
+	3 [label=host]
+	4 [label=host]
+	0 -> 1 [label="Synonym; 2.000" dir=forward weight=2.000]
+	1 -> 2 [label="IsA; 4.000" dir=forward weight=4.000]
+	2 -> 3 [label="IsA; 4.000" dir=back weight=4.000]
+	3 -> 4 [label="Synonym; 2.000" dir=back weight=2.000]
+}

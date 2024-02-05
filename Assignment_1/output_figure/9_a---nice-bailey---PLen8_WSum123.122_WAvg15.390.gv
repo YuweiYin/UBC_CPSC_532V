@@ -1,0 +1,20 @@
+// The path the concepts from "nice" to "bailey".Path Length: 8; Weight Sum: 123.12233636045272; Average Weight: 15.39029204505659
+digraph "9_a---nice-bailey---PLen8_WSum123.122_WAvg15.390" {
+	0 [label=nice]
+	1 [label=sex]
+	2 [label=fun]
+	3 [label=party]
+	4 [label=cake]
+	5 [label=eaten]
+	6 [label=fruit]
+	7 [label=apple]
+	8 [label=bailey]
+	0 -> 1 [label="HasProperty; 4.899" dir=back weight=4.899]
+	1 -> 2 [label="HasProperty; 14.697" dir=forward weight=14.697]
+	2 -> 3 [label="RelatedTo; 23.051" dir=back weight=23.051]
+	3 -> 4 [label="RelatedTo; 27.186" dir=back weight=27.186]
+	4 -> 5 [label="RelatedTo; 19.771" dir=forward weight=19.771]
+	5 -> 6 [label="ReceivesAction; 18.709" dir=back weight=18.709]
+	6 -> 7 [label="RelatedTo; 13.810" dir=back weight=13.810]
+	7 -> 8 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

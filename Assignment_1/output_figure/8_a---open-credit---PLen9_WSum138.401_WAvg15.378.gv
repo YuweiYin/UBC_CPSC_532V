@@ -1,0 +1,22 @@
+// The path the concepts from "open" to "credit".Path Length: 9; Weight Sum: 138.4014389965899; Average Weight: 15.377937666287766
+digraph "8_a---open-credit---PLen9_WSum138.401_WAvg15.378" {
+	0 [label=open]
+	1 [label=door]
+	2 [label=house]
+	3 [label=room]
+	4 [label=area]
+	5 [label=country]
+	6 [label=government]
+	7 [label=tax]
+	8 [label=charge]
+	9 [label=credit]
+	0 -> 1 [label="RelatedTo; 3.648" dir=back weight=3.648]
+	1 -> 2 [label="RelatedTo; 10.684" dir=forward weight=10.684]
+	2 -> 3 [label="RelatedTo; 19.666" dir=back weight=19.666]
+	3 -> 4 [label="RelatedTo; 23.275" dir=forward weight=23.275]
+	4 -> 5 [label="RelatedTo; 25.306" dir=back weight=25.306]
+	5 -> 6 [label="AtLocation; 30.205" dir=back weight=30.205]
+	6 -> 7 [label="RelatedTo; 16.049" dir=back weight=16.049]
+	7 -> 8 [label="RelatedTo; 6.092" dir=forward weight=6.092]
+	8 -> 9 [label="RelatedTo; 3.476" dir=forward weight=3.476]
+}

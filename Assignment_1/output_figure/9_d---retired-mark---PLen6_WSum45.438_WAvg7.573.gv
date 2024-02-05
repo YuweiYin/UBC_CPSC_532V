@@ -1,0 +1,16 @@
+// The path the concepts from "retired" to "mark".Path Length: 6; Weight Sum: 45.43816727481263; Average Weight: 7.573027879135438
+digraph "9_d---retired-mark---PLen6_WSum45.438_WAvg7.573" {
+	0 [label=retired]
+	1 [label=sunbird]
+	2 [label=bird]
+	3 [label=chicken]
+	4 [label=animal]
+	5 [label=mole]
+	6 [label=mark]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 12.768" dir=back weight=12.768]
+	3 -> 4 [label="RelatedTo; 17.183" dir=forward weight=17.183]
+	4 -> 5 [label="RelatedTo; 9.584" dir=back weight=9.584]
+	5 -> 6 [label="RelatedTo; 2.903" dir=forward weight=2.903]
+}

@@ -1,0 +1,16 @@
+// The path the concepts from "trouble" to "happen".Path Length: 6; Weight Sum: 28.594619625490985; Average Weight: 4.7657699375818305
+digraph "4_b---trouble-happen---PLen6_WSum28.595_WAvg4.766" {
+	0 [label=trouble]
+	1 [label=problem]
+	2 [label=issue]
+	3 [label=issue]
+	4 [label=fall]
+	5 [label=happen]
+	6 [label=happen]
+	0 -> 1 [label="RelatedTo; 3.258" dir=forward weight=3.258]
+	1 -> 2 [label="RelatedTo; 5.668" dir=forward weight=5.668]
+	2 -> 3 [label="Synonym; 7.668" dir=forward weight=7.668]
+	3 -> 4 [label="MannerOf; 6.000" dir=back weight=6.000]
+	4 -> 5 [label="MannerOf; 4.000" dir=forward weight=4.000]
+	5 -> 6 [label="Synonym; 2.000" dir=back weight=2.000]
+}

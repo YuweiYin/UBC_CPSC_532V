@@ -1,0 +1,20 @@
+// The path the concepts from "nice" to "st".Path Length: 8; Weight Sum: 81.3699093535597; Average Weight: 10.171238669194963
+digraph "9_a---nice-st---PLen8_WSum81.370_WAvg10.171" {
+	0 [label=nice]
+	1 [label=kind]
+	2 [label=people]
+	3 [label=apartment]
+	4 [label=town]
+	5 [label=road]
+	6 [label=street]
+	7 [label=st]
+	8 [label=st]
+	0 -> 1 [label="RelatedTo; 4.240" dir=back weight=4.240]
+	1 -> 2 [label="HasProperty; 9.139" dir=back weight=9.139]
+	2 -> 3 [label="AtLocation; 13.611" dir=forward weight=13.611]
+	3 -> 4 [label="AtLocation; 16.439" dir=forward weight=16.439]
+	4 -> 5 [label="AtLocation; 16.874" dir=back weight=16.874]
+	5 -> 6 [label="RelatedTo; 13.410" dir=back weight=13.410]
+	6 -> 7 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	7 -> 8 [label="FormOf; 2.828" dir=back weight=2.828]
+}

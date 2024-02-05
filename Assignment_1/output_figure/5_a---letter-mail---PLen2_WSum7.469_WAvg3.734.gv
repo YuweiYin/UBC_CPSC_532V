@@ -1,0 +1,8 @@
+// The path the concepts from "letter" to "mail".Path Length: 2; Weight Sum: 7.468795698019356; Average Weight: 3.734397849009678
+digraph "5_a---letter-mail---PLen2_WSum7.469_WAvg3.734" {
+	0 [label=letter]
+	1 [label=post]
+	2 [label=mail]
+	0 -> 1 [label="RelatedTo; 2.854" dir=forward weight=2.854]
+	1 -> 2 [label="RelatedTo; 4.614" dir=forward weight=4.614]
+}

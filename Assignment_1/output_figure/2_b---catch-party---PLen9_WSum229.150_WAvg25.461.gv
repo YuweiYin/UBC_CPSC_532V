@@ -1,0 +1,22 @@
+// The path the concepts from "catch" to "party".Path Length: 9; Weight Sum: 229.15019543636382; Average Weight: 25.461132826262645
+digraph "2_b---catch-party---PLen9_WSum229.150_WAvg25.461" {
+	0 [label=catch]
+	1 [label=fish]
+	2 [label=animal]
+	3 [label=dog]
+	4 [label=table]
+	5 [label=food]
+	6 [label=cake]
+	7 [label=birthday]
+	8 [label=celebration]
+	9 [label=party]
+	0 -> 1 [label="HasSubevent; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="RelatedTo; 11.766" dir=forward weight=11.766]
+	2 -> 3 [label="RelatedTo; 21.176" dir=back weight=21.176]
+	3 -> 4 [label="AtLocation; 26.833" dir=forward weight=26.833]
+	4 -> 5 [label="AtLocation; 53.909" dir=back weight=53.909]
+	5 -> 6 [label="RelatedTo; 46.698" dir=back weight=46.698]
+	6 -> 7 [label="RelatedTo; 36.032" dir=forward weight=36.032]
+	7 -> 8 [label="RelatedTo; 20.796" dir=forward weight=20.796]
+	8 -> 9 [label="RelatedTo; 9.110" dir=back weight=9.110]
+}

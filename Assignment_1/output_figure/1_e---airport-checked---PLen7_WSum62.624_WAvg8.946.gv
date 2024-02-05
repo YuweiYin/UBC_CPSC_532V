@@ -1,0 +1,18 @@
+// The path the concepts from "airport" to "checked".Path Length: 7; Weight Sum: 62.62413300039064; Average Weight: 8.94630471434152
+digraph "1_e---airport-checked---PLen7_WSum62.624_WAvg8.946" {
+	0 [label=airport]
+	1 [label="parking lot"]
+	2 [label=car]
+	3 [label=city]
+	4 [label=large]
+	5 [label=continent]
+	6 [label="north america"]
+	7 [label=checked]
+	0 -> 1 [label="AtLocation; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="AtLocation; 9.757" dir=back weight=9.757]
+	2 -> 3 [label="AtLocation; 17.240" dir=forward weight=17.240]
+	3 -> 4 [label="RelatedTo; 21.779" dir=forward weight=21.779]
+	4 -> 5 [label="RelatedTo; 6.658" dir=back weight=6.658]
+	5 -> 6 [label="RelatedTo; 3.362" dir=forward weight=3.362]
+	6 -> 7 [label="HasContext; 1.000" dir=back weight=1.000]
+}

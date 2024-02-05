@@ -1,0 +1,22 @@
+// The path the concepts from "lifts" to "yolk".Path Length: 9; Weight Sum: 177.50729106090466; Average Weight: 19.723032340100517
+digraph "10_a---lifts-yolk---PLen9_WSum177.507_WAvg19.723" {
+	0 [label=lifts]
+	1 [label=heaver]
+	2 [label=bar]
+	3 [label=human]
+	4 [label=baby]
+	5 [label=nest]
+	6 [label=bird]
+	7 [label=chicken]
+	8 [label=egg]
+	9 [label=yolk]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="AtLocation; 5.464" dir=back weight=5.464]
+	3 -> 4 [label="RelatedTo; 45.919" dir=back weight=45.919]
+	4 -> 5 [label="RelatedTo; 40.686" dir=back weight=40.686]
+	5 -> 6 [label="RelatedTo; 37.231" dir=forward weight=37.231]
+	6 -> 7 [label="RelatedTo; 25.383" dir=back weight=25.383]
+	7 -> 8 [label="RelatedTo; 14.615" dir=back weight=14.615]
+	8 -> 9 [label="RelatedTo; 5.209" dir=forward weight=5.209]
+}

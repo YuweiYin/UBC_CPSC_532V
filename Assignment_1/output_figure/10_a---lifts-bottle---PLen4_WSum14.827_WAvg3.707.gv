@@ -1,0 +1,12 @@
+// The path the concepts from "lifts" to "bottle".Path Length: 4; Weight Sum: 14.827182715841865; Average Weight: 3.706795678960466
+digraph "10_a---lifts-bottle---PLen4_WSum14.827_WAvg3.707" {
+	0 [label=lifts]
+	1 [label=heaver]
+	2 [label=bar]
+	3 [label=beer]
+	4 [label=bottle]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="AtLocation; 8.363" dir=back weight=8.363]
+	3 -> 4 [label="AtLocation; 3.464" dir=forward weight=3.464]
+}

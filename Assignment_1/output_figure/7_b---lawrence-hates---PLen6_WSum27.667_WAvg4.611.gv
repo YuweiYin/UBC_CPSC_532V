@@ -1,0 +1,16 @@
+// The path the concepts from "lawrence" to "hates".Path Length: 6; Weight Sum: 27.667042810258536; Average Weight: 4.611173801709756
+digraph "7_b---lawrence-hates---PLen6_WSum27.667_WAvg4.611" {
+	0 [label=lawrence]
+	1 [label=usa]
+	2 [label=country]
+	3 [label=land]
+	4 [label=ground]
+	5 [label=oil]
+	6 [label=hates]
+	0 -> 1 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="IsA; 4.464" dir=forward weight=4.464]
+	2 -> 3 [label="AtLocation; 9.363" dir=back weight=9.363]
+	3 -> 4 [label="RelatedTo; 8.038" dir=forward weight=8.038]
+	4 -> 5 [label="AtLocation; 4.637" dir=back weight=4.637]
+	5 -> 6 [label="RelatedTo; 0.165" dir=forward weight=0.165]
+}

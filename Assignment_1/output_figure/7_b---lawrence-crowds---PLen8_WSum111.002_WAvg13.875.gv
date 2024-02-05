@@ -1,0 +1,20 @@
+// The path the concepts from "lawrence" to "crowds".Path Length: 8; Weight Sum: 111.00198657955828; Average Weight: 13.875248322444785
+digraph "7_b---lawrence-crowds---PLen8_WSum111.002_WAvg13.875" {
+	0 [label=lawrence]
+	1 [label=usa]
+	2 [label=country]
+	3 [label=china]
+	4 [label=human]
+	5 [label=person]
+	6 [label=people]
+	7 [label=crowd]
+	8 [label=crowds]
+	0 -> 1 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="IsA; 4.464" dir=forward weight=4.464]
+	2 -> 3 [label="IsA; 11.675" dir=back weight=11.675]
+	3 -> 4 [label="AtLocation; 30.738" dir=back weight=30.738]
+	4 -> 5 [label="RelatedTo; 27.273" dir=back weight=27.273]
+	5 -> 6 [label="RelatedTo; 20.275" dir=forward weight=20.275]
+	6 -> 7 [label="RelatedTo; 14.576" dir=back weight=14.576]
+	7 -> 8 [label="FormOf; 1.000" dir=back weight=1.000]
+}

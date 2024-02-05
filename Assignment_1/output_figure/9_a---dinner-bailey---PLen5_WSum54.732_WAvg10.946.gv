@@ -1,0 +1,14 @@
+// The path the concepts from "dinner" to "bailey".Path Length: 5; Weight Sum: 54.73180632013851; Average Weight: 10.946361264027702
+digraph "9_a---dinner-bailey---PLen5_WSum54.732_WAvg10.946" {
+	0 [label=dinner]
+	1 [label=plate]
+	2 [label=table]
+	3 [label=eating]
+	4 [label=apple]
+	5 [label=bailey]
+	0 -> 1 [label="RelatedTo; 9.058" dir=back weight=9.058]
+	1 -> 2 [label="AtLocation; 16.269" dir=forward weight=16.269]
+	2 -> 3 [label="RelatedTo; 22.114" dir=forward weight=22.114]
+	3 -> 4 [label="UsedFor; 6.292" dir=back weight=6.292]
+	4 -> 5 [label="RelatedTo; 1.000" dir=back weight=1.000]
+}

@@ -1,0 +1,18 @@
+// The path the concepts from "store" to "woman".Path Length: 7; Weight Sum: 90.46613279196184; Average Weight: 12.923733255994549
+digraph "1_c---store-woman---PLen7_WSum90.466_WAvg12.924" {
+	0 [label=store]
+	1 [label=town]
+	2 [label=people]
+	3 [label=person]
+	4 [label=girl]
+	5 [label=female]
+	6 [label=dress]
+	7 [label=woman]
+	0 -> 1 [label="AtLocation; 4.472" dir=forward weight=4.472]
+	1 -> 2 [label="AtLocation; 7.936" dir=back weight=7.936]
+	2 -> 3 [label="RelatedTo; 25.404" dir=back weight=25.404]
+	3 -> 4 [label="RelatedTo; 19.705" dir=back weight=19.705]
+	4 -> 5 [label="RelatedTo; 16.928" dir=forward weight=16.928]
+	5 -> 6 [label="RelatedTo; 10.906" dir=back weight=10.906]
+	6 -> 7 [label="RelatedTo; 5.115" dir=forward weight=5.115]
+}

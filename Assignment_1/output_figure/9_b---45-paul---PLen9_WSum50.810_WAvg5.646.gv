@@ -1,0 +1,22 @@
+// The path the concepts from "45" to "paul".Path Length: 9; Weight Sum: 50.810480787894754; Average Weight: 5.645608976432751
+digraph "9_b---45-paul---PLen9_WSum50.810_WAvg5.646" {
+	0 [label=45]
+	1 [label=ep]
+	2 [label=record]
+	3 [label=music]
+	4 [label=metal]
+	5 [label=silver]
+	6 [label=pollard]
+	7 [label=paul]
+	8 [label=paulson]
+	9 [label=paul]
+	0 -> 1 [label="RelatedTo; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 10.702" dir=forward weight=10.702]
+	3 -> 4 [label="IsA; 15.174" dir=back weight=15.174]
+	4 -> 5 [label="RelatedTo; 11.934" dir=back weight=11.934]
+	5 -> 6 [label="RelatedTo; 4.000" dir=back weight=4.000]
+	6 -> 7 [label="RelatedTo; 3.000" dir=back weight=3.000]
+	7 -> 8 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	8 -> 9 [label="DerivedFrom; 1.000" dir=forward weight=1.000]
+}

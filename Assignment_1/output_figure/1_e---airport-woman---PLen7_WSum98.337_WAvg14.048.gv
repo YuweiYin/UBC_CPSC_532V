@@ -1,0 +1,18 @@
+// The path the concepts from "airport" to "woman".Path Length: 7; Weight Sum: 98.33689889231152; Average Weight: 14.04812841318736
+digraph "1_e---airport-woman---PLen7_WSum98.337_WAvg14.048" {
+	0 [label=airport]
+	1 [label=human]
+	2 [label=baby]
+	3 [label=chick]
+	4 [label=girl]
+	5 [label=female]
+	6 [label=dress]
+	7 [label=woman]
+	0 -> 1 [label="AtLocation; 2.828" dir=back weight=2.828]
+	1 -> 2 [label="RelatedTo; 8.061" dir=back weight=8.061]
+	2 -> 3 [label="RelatedTo; 31.843" dir=back weight=31.843]
+	3 -> 4 [label="RelatedTo; 22.656" dir=forward weight=22.656]
+	4 -> 5 [label="RelatedTo; 16.928" dir=forward weight=16.928]
+	5 -> 6 [label="RelatedTo; 10.906" dir=back weight=10.906]
+	6 -> 7 [label="RelatedTo; 5.115" dir=forward weight=5.115]
+}

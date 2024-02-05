@@ -1,0 +1,12 @@
+// The path the concepts from "lawrence" to "kevin".Path Length: 4; Weight Sum: 6.0; Average Weight: 1.5
+digraph "7_b---lawrence-kevin---PLen4_WSum6.000_WAvg1.500" {
+	0 [label=lawrence]
+	1 [label=lawrie]
+	2 [label="given name"]
+	3 [label=kev]
+	4 [label=kevin]
+	0 -> 1 [label="DerivedFrom; 1.000" dir=back weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 2.000" dir=back weight=2.000]
+	3 -> 4 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+}

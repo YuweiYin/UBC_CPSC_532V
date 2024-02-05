@@ -1,0 +1,18 @@
+// The path the concepts from "entry" to "excited".Path Length: 7; Weight Sum: 90.44325474104538; Average Weight: 12.920464963006483
+digraph "5_b---entry-excited---PLen7_WSum90.443_WAvg12.920" {
+	0 [label=entry]
+	1 [label=door]
+	2 [label=house]
+	3 [label=building]
+	4 [label=school]
+	5 [label=human]
+	6 [label=person]
+	7 [label=excited]
+	0 -> 1 [label="RelatedTo; 5.134" dir=back weight=5.134]
+	1 -> 2 [label="RelatedTo; 12.170" dir=forward weight=12.170]
+	2 -> 3 [label="RelatedTo; 18.894" dir=forward weight=18.894]
+	3 -> 4 [label="RelatedTo; 24.280" dir=back weight=24.280]
+	4 -> 5 [label="AtLocation; 17.310" dir=back weight=17.310]
+	5 -> 6 [label="RelatedTo; 9.826" dir=back weight=9.826]
+	6 -> 7 [label="Desires; 2.828" dir=forward weight=2.828]
+}

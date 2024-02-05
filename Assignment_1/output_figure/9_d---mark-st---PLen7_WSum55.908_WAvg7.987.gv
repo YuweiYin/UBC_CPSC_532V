@@ -1,0 +1,18 @@
+// The path the concepts from "mark" to "st".Path Length: 7; Weight Sum: 55.90817147418137; Average Weight: 7.986881639168767
+digraph "9_d---mark-st---PLen7_WSum55.908_WAvg7.987" {
+	0 [label=mark]
+	1 [label=mole]
+	2 [label=ground]
+	3 [label=surface]
+	4 [label=road]
+	5 [label=street]
+	6 [label=st]
+	7 [label=st]
+	0 -> 1 [label="RelatedTo; 2.903" dir=back weight=2.903]
+	1 -> 2 [label="RelatedTo; 6.524" dir=forward weight=6.524]
+	2 -> 3 [label="RelatedTo; 9.382" dir=forward weight=9.382]
+	3 -> 4 [label="RelatedTo; 16.033" dir=back weight=16.033]
+	4 -> 5 [label="RelatedTo; 13.410" dir=back weight=13.410]
+	5 -> 6 [label="RelatedTo; 4.828" dir=back weight=4.828]
+	6 -> 7 [label="FormOf; 2.828" dir=back weight=2.828]
+}

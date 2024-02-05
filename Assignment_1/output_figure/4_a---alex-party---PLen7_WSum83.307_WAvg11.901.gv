@@ -1,0 +1,18 @@
+// The path the concepts from "alex" to "party".Path Length: 7; Weight Sum: 83.3072847803039; Average Weight: 11.901040682900557
+digraph "4_a---alex-party---PLen7_WSum83.307_WAvg11.901" {
+	0 [label=alex]
+	1 [label=alexandra]
+	2 [label=lexie]
+	3 [label=reading]
+	4 [label=learning]
+	5 [label=playing]
+	6 [label=fun]
+	7 [label=party]
+	0 -> 1 [label="RelatedTo; 1.000" dir=forward weight=1.000]
+	1 -> 2 [label="RelatedTo; 2.000" dir=forward weight=2.000]
+	2 -> 3 [label="RelatedTo; 3.000" dir=forward weight=3.000]
+	3 -> 4 [label="Causes; 32.780" dir=forward weight=32.780]
+	4 -> 5 [label="UsedFor; 19.819" dir=back weight=19.819]
+	5 -> 6 [label="Causes; 16.354" dir=forward weight=16.354]
+	6 -> 7 [label="RelatedTo; 8.354" dir=back weight=8.354]
+}

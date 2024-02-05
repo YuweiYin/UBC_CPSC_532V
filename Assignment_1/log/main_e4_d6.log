@@ -1,0 +1,496 @@
+Namespace(verbose=False, example_id=4, choice_id=-1, max_depth=6, use_gpt=False)
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "party" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "party" To "alex" (Similarity: 0.282)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 1)
+>>> >>> Depth [2] Time 14.7 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 120 (ignored 35); [tgt->src] BFS source 12; Visited neighbors 48 (ignored 3)
+>>> >>> Depth [3] Time 266.9 sec (4.4 min): [src->tgt] BFS source 120; Visited neighbors 646 (ignored 303); [tgt->src] BFS source 48; Visited neighbors 235 (ignored 31)
+>>> Found 7 path(s) between "party" and "alex".
+
+party is like fun
+play is like fun
+game is like play
+toy is like game
+toy is like kids
+alexa has kids
+alexandra is like alexa
+alex is like alexandra
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "party" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "party" To "house" (Similarity: 0.446)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 36.3 sec (0.6 min): [src->tgt] BFS source 11; Visited neighbors 56 (ignored 108); [tgt->src] BFS source 19; Visited neighbors 133 (ignored 123)
+>>> Found 4 path(s) between "party" and "house".
+
+party is like fun
+having sex is used for fun
+bedroom is used for having sex
+You are likely to find carpet in bedroom
+You are likely to find carpet in house
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "party" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "party" To "parents" (Similarity: 0.437)
+>>> >>> Depth [1] Time 1.7 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 6); [tgt->src] BFS source 1; Visited neighbors 12 (ignored 2)
+>>> Found 1 path(s) between "party" and "parents".
+
+party is like people
+people has parents
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "party" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "party" To "happen" (Similarity: 0.295)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 16 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 10.4 sec (0.2 min): [src->tgt] BFS source 16; Visited neighbors 94 (ignored 105); [tgt->src] BFS source 4; Visited neighbors 7 (ignored 5)
+>>> >>> Depth [3] Time 58.4 sec (1.0 min): [src->tgt] BFS source 94; Visited neighbors 399 (ignored 445); [tgt->src] BFS source 7; Visited neighbors 14 (ignored 1)
+>>> Path between party and happen does not exist or is too long (> 6).
+
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "alex" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "alex" To "house" (Similarity: 0.335)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 9 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 12.5 sec (0.2 min): [src->tgt] BFS source 9; Visited neighbors 38 (ignored 8); [tgt->src] BFS source 19; Visited neighbors 197 (ignored 30)
+>>> >>> Depth [3] Time 274.3 sec (4.6 min): [src->tgt] BFS source 38; Visited neighbors 211 (ignored 26); [tgt->src] BFS source 197; Visited neighbors 1181 (ignored 339)
+>>> Found 8 path(s) between "alex" and "house".
+
+alex is like alexandra
+alexandra is like lexie
+lexie is like reading
+Something you do when you relaxing is reading
+Sometimes relaxing causes sleeping
+bed is like sleeping
+bed is like place
+nest is like place
+nest is like home
+home is like house
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "alex" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "alex" To "parents" (Similarity: 0.295)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 15.6 sec (0.3 min): [src->tgt] BFS source 11; Visited neighbors 37 (ignored 13); [tgt->src] BFS source 13; Visited neighbors 83 (ignored 11)
+>>> >>> Depth [3] Time 68.1 sec (1.1 min): [src->tgt] BFS source 37; Visited neighbors 169 (ignored 30); [tgt->src] BFS source 83; Visited neighbors 485 (ignored 68)
+>>> Found 4 path(s) between "alex" and "parents".
+
+alex is like alexandra
+alexandra is like alexa
+alexa has kids
+play is like kids
+toy is like play
+doll is like toy
+doll is like girl
+girl is like female
+mother is like female
+mother is like parent
+parent can name children
+parents can name children
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "alex" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "alex" To "party" (Similarity: 0.282)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 11.1 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 42 (ignored 7); [tgt->src] BFS source 17; Visited neighbors 164 (ignored 10)
+>>> >>> Depth [3] Time 112.4 sec (1.9 min): [src->tgt] BFS source 42; Visited neighbors 199 (ignored 29); [tgt->src] BFS source 164; Visited neighbors 1048 (ignored 148)
+>>> Found 7 path(s) between "alex" and "party".
+
+alex is like alexandra
+alexandra is like lexie
+lexie is like reading
+Sometimes reading causes learning
+playing is used for learning
+Sometimes playing causes fun
+party is like fun
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "alex" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "alex" To "happen" (Similarity: 0.194)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 5.7 sec (0.1 min): [src->tgt] BFS source 11; Visited neighbors 40 (ignored 8); [tgt->src] BFS source 4; Visited neighbors 8 (ignored 0)
+>>> >>> Depth [3] Time 22.6 sec (0.4 min): [src->tgt] BFS source 40; Visited neighbors 208 (ignored 37); [tgt->src] BFS source 8; Visited neighbors 15 (ignored 0)
+>>> Path between alex and happen does not exist or is too long (> 6).
+
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "having" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "having" To "alex" (Similarity: 0.253)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 0)
+>>> >>> Depth [2] Time 9.3 sec (0.2 min): [src->tgt] BFS source 5; Visited neighbors 38 (ignored 8); [tgt->src] BFS source 13; Visited neighbors 49 (ignored 2)
+>>> >>> Depth [3] Time 53.7 sec (0.9 min): [src->tgt] BFS source 38; Visited neighbors 282 (ignored 70); [tgt->src] BFS source 49; Visited neighbors 239 (ignored 29)
+>>> Found 7 path(s) between "having" and "alex".
+
+play is like having
+play is like fun
+toy is like fun
+doll is like toy
+doll is like child
+child is like person
+persons is a form of the word person
+al is like persons
+xan is like al
+xan is like alex
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "having" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "having" To "house" (Similarity: 0.288)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 11.0 sec (0.2 min): [src->tgt] BFS source 5; Visited neighbors 38 (ignored 8); [tgt->src] BFS source 19; Visited neighbors 208 (ignored 17)
+>>> >>> Depth [3] Time 113.8 sec (1.9 min): [src->tgt] BFS source 38; Visited neighbors 303 (ignored 44); [tgt->src] BFS source 208; Visited neighbors 1307 (ignored 267)
+>>> Found 51 path(s) between "having" and "house".
+
+play is like having
+play is like fun
+toy is like fun
+doll is like toy
+doll is like child
+child is like human
+person is like human
+person is like people
+You are likely to find people in town
+city is like town
+city is a type of place
+nest is like place
+nest is like home
+home is like house
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "having" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "having" To "parents" (Similarity: 0.332)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 7.7 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 36 (ignored 12); [tgt->src] BFS source 13; Visited neighbors 77 (ignored 18)
+>>> Found 2 path(s) between "having" and "parents".
+
+play is like having
+toy is like play
+toy is like child
+daughter is like child
+daughter is like family
+family is like parents
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "having" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "having" To "party" (Similarity: 0.300)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 1); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 9.5 sec (0.2 min): [src->tgt] BFS source 4; Visited neighbors 36 (ignored 10); [tgt->src] BFS source 17; Visited neighbors 160 (ignored 14)
+>>> Found 3 path(s) between "having" and "party".
+
+play is like having
+game is like play
+game is like fun
+party is like fun
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "having" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "having" To "happen" (Similarity: 0.256)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 3.7 sec (0.1 min): [src->tgt] BFS source 5; Visited neighbors 36 (ignored 9); [tgt->src] BFS source 4; Visited neighbors 7 (ignored 5)
+>>> >>> Depth [3] Time 19.1 sec (0.3 min): [src->tgt] BFS source 36; Visited neighbors 239 (ignored 122); [tgt->src] BFS source 7; Visited neighbors 14 (ignored 1)
+>>> Path between having and happen does not exist or is too long (> 6).
+
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "punish" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "punish" To "alex" (Similarity: 0.198)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 0)
+>>> >>> Depth [2] Time 5.6 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 15 (ignored 5); [tgt->src] BFS source 13; Visited neighbors 51 (ignored 0)
+>>> >>> Depth [3] Time 27.8 sec (0.5 min): [src->tgt] BFS source 15; Visited neighbors 49 (ignored 15); [tgt->src] BFS source 51; Visited neighbors 263 (ignored 13)
+>>> Found 1 path(s) between "punish" and "alex".
+
+You would pass sentence because you want to punish
+In order for pass sentence to happen, judge needs to happen
+judge is like person
+persons is a form of the word person
+al is like persons
+xan is like al
+xan is like alex
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "punish" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "punish" To "house" (Similarity: 0.261)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 9.6 sec (0.2 min): [src->tgt] BFS source 2; Visited neighbors 11 (ignored 9); [tgt->src] BFS source 19; Visited neighbors 212 (ignored 13)
+>>> >>> Depth [3] Time 103.8 sec (1.7 min): [src->tgt] BFS source 11; Visited neighbors 45 (ignored 14); [tgt->src] BFS source 212; Visited neighbors 1390 (ignored 204)
+>>> Found 4 path(s) between "punish" and "house".
+
+You would pass sentence because you want to punish
+crime makes people want pass sentence
+robbery is like crime
+robbery is like bank
+bank is like place
+nest is like place
+nest is like home
+home is like house
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "punish" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "punish" To "parents" (Similarity: 0.281)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 6.4 sec (0.1 min): [src->tgt] BFS source 2; Visited neighbors 13 (ignored 7); [tgt->src] BFS source 13; Visited neighbors 84 (ignored 10)
+>>> Found 1 path(s) between "punish" and "parents".
+
+You would pass sentence because you want to punish
+Something you do when you pass sentence is justice
+justice is used for all people
+all people has parents
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "punish" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "punish" To "party" (Similarity: 0.281)
+>>> >>> Depth [1] Time 1.1 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 9.5 sec (0.2 min): [src->tgt] BFS source 2; Visited neighbors 14 (ignored 6); [tgt->src] BFS source 17; Visited neighbors 165 (ignored 9)
+>>> >>> Depth [3] Time 76.3 sec (1.3 min): [src->tgt] BFS source 14; Visited neighbors 51 (ignored 8); [tgt->src] BFS source 165; Visited neighbors 1048 (ignored 148)
+>>> Path between punish and party does not exist or is too long (> 6).
+
+
+
+Example: 4; Choice: "(a) punish Alex for having a party."; From "punish" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "punish" To "happen" (Similarity: 0.244)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 2 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 2.3 sec (0.0 min): [src->tgt] BFS source 2; Visited neighbors 15 (ignored 5); [tgt->src] BFS source 4; Visited neighbors 7 (ignored 5)
+>>> >>> Depth [3] Time 8.2 sec (0.1 min): [src->tgt] BFS source 15; Visited neighbors 48 (ignored 21); [tgt->src] BFS source 7; Visited neighbors 14 (ignored 1)
+>>> Path between punish and happen does not exist or is too long (> 6).
+
+
+*** Example: 4; Choice: a; SCORE: 11.676 (total_w_sum = 1568.132; total_path_len = 97; match_pair_n = 13; total_pair_n = 18)
+
+
+Example: 4; Choice: "(b) get in trouble."; From "trouble" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "trouble" To "alex" (Similarity: 0.296)
+>>> >>> Depth [1] Time 1.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 5 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 2)
+>>> >>> Depth [2] Time 9.2 sec (0.2 min): [src->tgt] BFS source 5; Visited neighbors 22 (ignored 1); [tgt->src] BFS source 11; Visited neighbors 44 (ignored 4)
+>>> >>> Depth [3] Time 40.6 sec (0.7 min): [src->tgt] BFS source 22; Visited neighbors 124 (ignored 41); [tgt->src] BFS source 44; Visited neighbors 203 (ignored 30)
+>>> Found 1 path(s) between "trouble" and "alex".
+
+danger is like trouble
+person does not want danger
+person is like people
+people is a type of persons
+al is like persons
+al is like alex
+
+
+Example: 4; Choice: "(b) get in trouble."; From "trouble" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "trouble" To "house" (Similarity: 0.350)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 11.6 sec (0.2 min): [src->tgt] BFS source 7; Visited neighbors 33 (ignored 4); [tgt->src] BFS source 19; Visited neighbors 186 (ignored 65)
+>>> Found 1 path(s) between "trouble" and "house".
+
+danger is like trouble
+person does not want danger
+servant is like person
+servant is like house
+
+
+Example: 4; Choice: "(b) get in trouble."; From "trouble" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "trouble" To "parents" (Similarity: 0.334)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 8.2 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 35 (ignored 2); [tgt->src] BFS source 13; Visited neighbors 74 (ignored 21)
+>>> >>> Depth [3] Time 73.6 sec (1.2 min): [src->tgt] BFS source 35; Visited neighbors 209 (ignored 50); [tgt->src] BFS source 74; Visited neighbors 399 (ignored 109)
+>>> Found 7 path(s) between "trouble" and "parents".
+
+trouble is like problem
+problem is like math
+math is fun
+play is like fun
+toy is like play
+doll is like toy
+doll is like girl
+girl is like female
+mother is like female
+mother is like parent
+parent can name children
+parents can name children
+
+
+Example: 4; Choice: "(b) get in trouble."; From "trouble" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "trouble" To "party" (Similarity: 0.427)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 4); [tgt->src] BFS source 1; Visited neighbors 16 (ignored 1)
+>>> >>> Depth [2] Time 8.6 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 11 (ignored 3); [tgt->src] BFS source 16; Visited neighbors 115 (ignored 50)
+>>> >>> Depth [3] Time 54.1 sec (0.9 min): [src->tgt] BFS source 11; Visited neighbors 44 (ignored 35); [tgt->src] BFS source 115; Visited neighbors 552 (ignored 382)
+>>> Found 2 path(s) between "trouble" and "party".
+
+trouble is like problem
+problem is like math
+number is like math
+age is like number
+birthday is like age
+birthday is like celebration
+party is like celebration
+
+
+Example: 4; Choice: "(b) get in trouble."; From "trouble" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "trouble" To "happen" (Similarity: 0.343)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 2); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 4.1 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 22 (ignored 32); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 16)
+>>> >>> Depth [3] Time 13.1 sec (0.2 min): [src->tgt] BFS source 22; Visited neighbors 67 (ignored 131); [tgt->src] BFS source 6; Visited neighbors 11 (ignored 2)
+>>> Found 1 path(s) between "trouble" and "happen".
+
+trouble is like problem
+problem is like issue
+issue and issue have similar meanings
+fall is a specific way of doing issue
+fall is a specific way of doing happen
+happen and happen have similar meanings
+
+*** Example: 4; Choice: b; SCORE: 13.606 (total_w_sum = 476.201; total_path_len = 35; match_pair_n = 5; total_pair_n = 5)
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "clean" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "clean" To "alex" (Similarity: 0.356)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 7 (ignored 9); [tgt->src] BFS source 1; Visited neighbors 11 (ignored 2)
+>>> >>> Depth [2] Time 7.5 sec (0.1 min): [src->tgt] BFS source 7; Visited neighbors 41 (ignored 22); [tgt->src] BFS source 11; Visited neighbors 38 (ignored 10)
+>>> >>> Depth [3] Time 60.8 sec (1.0 min): [src->tgt] BFS source 41; Visited neighbors 200 (ignored 144); [tgt->src] BFS source 38; Visited neighbors 162 (ignored 36)
+>>> Found 3 path(s) between "clean" and "alex".
+
+cloth is used for clean
+wool is like cloth
+wool is like clothing
+person wants clothing
+persons is a form of the word person
+al is like persons
+al is like alex
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "clean" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "clean" To "house" (Similarity: 0.408)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 11 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 15.4 sec (0.3 min): [src->tgt] BFS source 11; Visited neighbors 55 (ignored 60); [tgt->src] BFS source 19; Visited neighbors 152 (ignored 102)
+>>> >>> Depth [3] Time 108.3 sec (1.8 min): [src->tgt] BFS source 55; Visited neighbors 242 (ignored 253); [tgt->src] BFS source 152; Visited neighbors 678 (ignored 834)
+>>> Found 41 path(s) between "clean" and "house".
+
+wash is like clean
+wash is like action
+reading is like action
+Something you do when you relaxing is reading
+Sometimes relaxing causes sleeping
+bed is like sleeping
+bed is like place
+nest is like place
+nest is like home
+home is like house
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "clean" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "clean" To "parents" (Similarity: 0.356)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 13 (ignored 3); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 1)
+>>> >>> Depth [2] Time 12.9 sec (0.2 min): [src->tgt] BFS source 13; Visited neighbors 67 (ignored 64); [tgt->src] BFS source 13; Visited neighbors 73 (ignored 22)
+>>> Found 1 path(s) between "clean" and "parents".
+
+cloth is used for clean
+cloth is used for clothing
+person wants clothing
+person wants parents
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "clean" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "clean" To "party" (Similarity: 0.372)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 8 (ignored 11); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 12.2 sec (0.2 min): [src->tgt] BFS source 8; Visited neighbors 51 (ignored 28); [tgt->src] BFS source 17; Visited neighbors 139 (ignored 37)
+>>> >>> Depth [3] Time 83.0 sec (1.4 min): [src->tgt] BFS source 51; Visited neighbors 259 (ignored 193); [tgt->src] BFS source 139; Visited neighbors 761 (ignored 352)
+>>> Found 26 path(s) between "clean" and "party".
+
+cloth is used for clean
+napkin is like cloth
+napkin is like table
+You are likely to find food in table
+cake is like food
+cake is like birthday
+birthday is like celebration
+party is like celebration
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "clean" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "clean" To "happen" (Similarity: 0.302)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 4 (ignored 13); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 3.2 sec (0.1 min): [src->tgt] BFS source 4; Visited neighbors 14 (ignored 27); [tgt->src] BFS source 4; Visited neighbors 6 (ignored 16)
+>>> >>> Depth [3] Time 8.1 sec (0.1 min): [src->tgt] BFS source 14; Visited neighbors 44 (ignored 27); [tgt->src] BFS source 6; Visited neighbors 11 (ignored 2)
+>>> Path between clean and happen does not exist or is too long (> 6).
+
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "mess" To "alex"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mess" To "alex" (Similarity: 0.222)
+>>> >>> Depth [1] Time 1.3 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 13 (ignored 0)
+>>> >>> Depth [2] Time 10.4 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 80 (ignored 16); [tgt->src] BFS source 13; Visited neighbors 49 (ignored 2)
+>>> >>> Depth [3] Time 70.1 sec (1.2 min): [src->tgt] BFS source 80; Visited neighbors 412 (ignored 109); [tgt->src] BFS source 49; Visited neighbors 242 (ignored 26)
+>>> Found 5 path(s) between "mess" and "alex".
+
+You are likely to find mess in desk
+You are likely to find chair in desk
+You are likely to find chair in office
+office is like work
+In order for doing housework to happen, work needs to happen
+doing housework is used for maid
+maid can cleaning house
+Something you do when you cleaning house is vacuum
+You are likely to find vacuum in space
+You are likely to find asteroid in space
+alexandra is like asteroid
+alex is like alexandra
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "mess" To "house"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mess" To "house" (Similarity: 0.293)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 19 (ignored 0)
+>>> >>> Depth [2] Time 12.5 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 85 (ignored 10); [tgt->src] BFS source 19; Visited neighbors 207 (ignored 20)
+>>> Found 8 path(s) between "mess" and "house".
+
+You are likely to find mess in desk
+desk is like table
+table is like furniture
+You are likely to find furniture in room
+room is like house
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "mess" To "parents"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mess" To "parents" (Similarity: 0.210)
+>>> >>> Depth [1] Time 0.8 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 14 (ignored 0)
+>>> >>> Depth [2] Time 9.9 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 95 (ignored 0); [tgt->src] BFS source 14; Visited neighbors 90 (ignored 4)
+>>> >>> Depth [3] Time 80.5 sec (1.3 min): [src->tgt] BFS source 95; Visited neighbors 541 (ignored 55); [tgt->src] BFS source 90; Visited neighbors 567 (ignored 32)
+>>> Found 40 path(s) between "mess" and "parents".
+
+You are likely to find mess in desk
+You are likely to find chair in desk
+You are likely to find chair in office
+office is like work
+work is like activity
+play is like activity
+toy is like play
+doll is like toy
+doll is like girl
+girl is like female
+mother is like female
+mother is like parent
+parent can name children
+parents can name children
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "mess" To "party"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mess" To "party" (Similarity: 0.366)
+>>> >>> Depth [1] Time 1.0 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 10 (ignored 0); [tgt->src] BFS source 1; Visited neighbors 17 (ignored 0)
+>>> >>> Depth [2] Time 11.7 sec (0.2 min): [src->tgt] BFS source 10; Visited neighbors 77 (ignored 19); [tgt->src] BFS source 17; Visited neighbors 142 (ignored 33)
+>>> Found 7 path(s) between "mess" and "party".
+
+Sometimes having party causes mess
+Something you do when you having party is dance
+dance is like fun
+party is like fun
+
+
+Example: 4; Choice: "(c) have to clean up the mess."; From "mess" To "happen"
+>>> dijkstra_path_search (bi-source weighted BFS; max_depth = 6): From "mess" To "happen" (Similarity: 0.252)
+>>> >>> Depth [1] Time 0.9 sec (0.0 min): [src->tgt] BFS source 1; Visited neighbors 6 (ignored 5); [tgt->src] BFS source 1; Visited neighbors 4 (ignored 0)
+>>> >>> Depth [2] Time 3.9 sec (0.1 min): [src->tgt] BFS source 6; Visited neighbors 38 (ignored 10); [tgt->src] BFS source 4; Visited neighbors 7 (ignored 5)
+>>> >>> Depth [3] Time 17.5 sec (0.3 min): [src->tgt] BFS source 38; Visited neighbors 153 (ignored 58); [tgt->src] BFS source 7; Visited neighbors 14 (ignored 1)
+>>> Path between mess and happen does not exist or is too long (> 6).
+
+
+*** Example: 4; Choice: c; SCORE: 15.938 (total_w_sum = 1275.076; total_path_len = 64; match_pair_n = 8; total_pair_n = 10)
+
+*** DONE *** Example: 4 - Running Time: 2178.5 sec (36.3 min)
+
+Accuracy: 0.0.
+Done!
+Total Running Time: 2178.8 sec (36.3 min)
