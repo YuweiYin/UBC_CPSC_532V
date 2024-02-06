@@ -1,5 +1,7 @@
 # UBC CPSC 532V (2023W2) Assignment 1
 
+- [Report](./UBC_CPSC_532V-A1-Report.pdf)
+
 ## Environment (Linux; macOS)
 
 ### Miniconda3
