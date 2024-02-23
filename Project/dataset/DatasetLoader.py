@@ -38,7 +38,7 @@ class DatasetLoader:
         #     "choices_label": List[str], (e.g., ["A", "B", "C", "D"])
         #     "choices_text": List[str],
         #     "answer": List[str], (e.g., ["A"] or ["A", "C"])
-        #     "prompt": str,  # input prompt to Causal LMs and then output answer_label
+        #     "prompt": str,  # input prompt to Causal LMs and then output answer
         #   }
 
         if ds_name == "commonsense_qa":
