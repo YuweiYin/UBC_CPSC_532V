@@ -62,7 +62,7 @@ on the [Commonsense QA](https://huggingface.co/datasets/tau/commonsense_qa) data
 including fine-tuning, generation, and evaluation.
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose
+python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose --eval_before --eval_after
 ```
 
 To specify more hyperparameters (all the following settings are default values):
@@ -72,6 +72,8 @@ python3 main.py \
   --ds_name "commonsense_qa" \
   --model_name "gpt2" \
   --verbose \
+  --eval_before \
+  --eval_after \
   --seed 42 \
   --cuda "0" \
   --n_icl 5 \

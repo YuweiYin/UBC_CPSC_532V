@@ -373,33 +373,33 @@ def run(verbose: bool = False) -> None:
     dataloader_valid = DataLoader(ds_torch_valid, batch_size=BSZ_GEN, shuffle=False)
     dataloader_test = DataLoader(ds_torch_test, batch_size=BSZ_GEN, shuffle=False)
 
-    # Evaluation on the valid set before fine-tuning
-    if verbose:
-        print("\n\nEvaluation on the valid set before fine-tuning...")
-    generate(
-        ds_name=args.ds_name,
-        model_name=args.model_name,
-        gen_model=model,
-        tokenizer=tokenizer_eval,
-        dataloader=dataloader_valid,
-        icl_prompt=icl_prompt,
-        save_dir="",  # f"{ds_name}---{model_name}"
-        save_fn=f"results_beforeFT_valid.jsonl",
-    )
-
-    # Evaluation on the test set before fine-tuning
-    if verbose:
-        print("\n\nEvaluation on the test set before fine-tuning...")
-    generate(
-        ds_name=args.ds_name,
-        model_name=args.model_name,
-        gen_model=model,
-        tokenizer=tokenizer_eval,
-        dataloader=dataloader_test,
-        icl_prompt=icl_prompt,
-        save_dir="",  # f"{ds_name}---{model_name}"
-        save_fn=f"results_beforeFT_test.jsonl",
-    )
+    if EVAL_BEFORE:
+        # Evaluation on the valid set before fine-tuning
+        if verbose:
+            print("\n\nEvaluation on the valid set before fine-tuning...")
+        generate(
+            ds_name=args.ds_name,
+            model_name=args.model_name,
+            gen_model=model,
+            tokenizer=tokenizer_eval,
+            dataloader=dataloader_valid,
+            icl_prompt=icl_prompt,
+            save_dir="",  # f"{ds_name}---{model_name}"
+            save_fn=f"results_beforeFT_valid.jsonl",
+        )
+        # Evaluation on the test set before fine-tuning
+        if verbose:
+            print("\n\nEvaluation on the test set before fine-tuning...")
+        generate(
+            ds_name=args.ds_name,
+            model_name=args.model_name,
+            gen_model=model,
+            tokenizer=tokenizer_eval,
+            dataloader=dataloader_test,
+            icl_prompt=icl_prompt,
+            save_dir="",  # f"{ds_name}---{model_name}"
+            save_fn=f"results_beforeFT_test.jsonl",
+        )
 
     # Fine-tune the model (Causal LM, next token prediction)
     if verbose:
@@ -418,33 +418,33 @@ def run(verbose: bool = False) -> None:
     # all_losses = ft_dict["all_losses"]
     # loss_logs = ft_dict["loss_logs"]
 
-    # Evaluation on the valid set after fine-tuning
-    if verbose:
-        print("\n\nEvaluation on the valid set after fine-tuning...")
-    generate(
-        ds_name=args.ds_name,
-        model_name=args.model_name,
-        gen_model=ft_model,
-        tokenizer=tokenizer_eval,
-        dataloader=dataloader_valid,
-        icl_prompt=icl_prompt,
-        save_dir="",  # f"{ds_name}---{model_name}"
-        save_fn=f"results_afterFT_valid.jsonl",
-    )
-
-    # Evaluation on the test set after fine-tuning
-    if verbose:
-        print("\n\nEvaluation on the test set after fine-tuning...")
-    generate(
-        ds_name=args.ds_name,
-        model_name=args.model_name,
-        gen_model=ft_model,
-        tokenizer=tokenizer_eval,
-        dataloader=dataloader_test,
-        icl_prompt=icl_prompt,
-        save_dir="",  # f"{ds_name}---{model_name}"
-        save_fn=f"results_afterFT_test.jsonl",
-    )
+    if EVAL_AFTER:
+        # Evaluation on the valid set after fine-tuning
+        if verbose:
+            print("\n\nEvaluation on the valid set after fine-tuning...")
+        generate(
+            ds_name=args.ds_name,
+            model_name=args.model_name,
+            gen_model=ft_model,
+            tokenizer=tokenizer_eval,
+            dataloader=dataloader_valid,
+            icl_prompt=icl_prompt,
+            save_dir="",  # f"{ds_name}---{model_name}"
+            save_fn=f"results_afterFT_valid.jsonl",
+        )
+        # Evaluation on the test set after fine-tuning
+        if verbose:
+            print("\n\nEvaluation on the test set after fine-tuning...")
+        generate(
+            ds_name=args.ds_name,
+            model_name=args.model_name,
+            gen_model=ft_model,
+            tokenizer=tokenizer_eval,
+            dataloader=dataloader_test,
+            icl_prompt=icl_prompt,
+            save_dir="",  # f"{ds_name}---{model_name}"
+            save_fn=f"results_afterFT_test.jsonl",
+        )
 
     if verbose:
         print("\n\nDone!")
@@ -457,6 +457,8 @@ if __name__ == "__main__":
     parser.add_argument("--cuda", type=str, default="0", help="CUDA device")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
     parser.add_argument("-m", "--model_name", type=str, default="", help="Model name (Causal LM), e.g., gpt2")
+    parser.add_argument("--eval_before", action="store_true", default=False, help="Run evaluation before fine-tuning")
+    parser.add_argument("--eval_after", action="store_true", default=False, help="Run evaluation after fine-tuning")
     parser.add_argument("--n_icl", type=int, default=5, help="The number of examples for in-context learning")
     parser.add_argument("--n_gen", type=int, default=1, help="The number of sentences to be generated")
     parser.add_argument("--len_gen", type=int, default=10, help="The number of max tokens to be generated")
@@ -483,6 +485,8 @@ if __name__ == "__main__":
 
     # Hyperparameters
     VERBOSE = bool(args.verbose)  # Verbose model: print logs
+    EVAL_BEFORE = bool(args.eval_before)  # Run evaluation before fine-tuning
+    EVAL_AFTER = bool(args.eval_after)  # Run evaluation after fine-tuning
     EPOCH = int(args.epoch)  # The number of epochs for training
     BSZ_TRAIN = int(args.bsz_train)  # The batch size for training
     BSZ_GEN = int(args.bsz_gen)  # The batch size for generation /  evaluation
@@ -506,7 +510,9 @@ if __name__ == "__main__":
 
     # CUDA
     HAS_CUDA = torch.cuda.is_available()
-    DEVICE = torch.device("cpu" if not HAS_CUDA else "cuda")
+    # DEVICE = torch.device("cuda" if HAS_CUDA else "cpu")
+    DEVICE = torch.device(f"cuda:{args.cuda}" if HAS_CUDA else "cpu")
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
     if VERBOSE:
         print(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}")
         print("torch.__version__:", torch.__version__)
