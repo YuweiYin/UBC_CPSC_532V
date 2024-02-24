@@ -11,25 +11,63 @@ class ModelLoader:
     def __init__(self):
         pass
 
+    def load_model(
+            self,
+            model_name: str,
+            cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
+            verbose: bool = False,
+    ) -> dict:
+        """
+        Get the model via Hugging Face API and/or init with the local checkpoint.
+        :param model_name: model name (for Hugging Face API). https://huggingface.co/models
+        :param cache_dir: The directory where data & model are cached.
+        :param verbose: Verbose model: print logs.
+        :return: the model dict.
+        """
+
+        model = self.get_model(model_name=model_name, cache_dir=cache_dir)
+        # model.to(DEVICE)
+        # model.train()
+        # model.eval()
+
+        # Show model information
+        if verbose:
+            print(f"[Model] Parameters (total): {model.num_parameters()}")
+            print(f"[Model] Parameters (trainable): {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+
+        return {
+            "model": model,
+        }
+
     def get_model(
             self,
             model_name: str = "",
+            local_dir: str = "",
             local_path: str = "",
             cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
     ):
         """
         Get the model via Hugging Face API and/or init with the local checkpoint.
         :param model_name: model name (for Hugging Face API). https://huggingface.co/models
-        :param local_path: file path of the local checkpoint.
+        :param local_dir: the directory of the local checkpoint (from model.save_pretrained(local_dir)).
+        :param local_path: file path of the local checkpoint (from torch.save(model.state_dict(), local_path)).
         :param cache_dir: The directory where data & model are cached.
         :return: the model (Causal LM). https://huggingface.co/docs/transformers/en/tasks/language_modeling
         """
+
+        if isinstance(local_dir, str) and os.path.isdir(local_dir):
+            # Try to load the local model first
+            try:
+                model = AutoModelForCausalLM.from_pretrained(local_dir)
+                return model
+            except Exception as e:
+                print(f"[get_model] >>> local_dir not effective:\n{e}")
 
         if not isinstance(model_name, str) or model_name == "":
             raise ValueError(f"[{self.__class__.__name__}] ValueError: model_name = {model_name}")
 
         model_name = model_name.strip()
-        print(f"Loading model from Hugging Face. model_name: {model_name}")
+        print(f"[get_model] >>> Loading model from Hugging Face. model_name: {model_name}")
 
         if model_name == "gpt1":
             # openai-gpt ("GPT-1") is the first transformer-based language model created and released by OpenAI
@@ -51,9 +89,9 @@ class ModelLoader:
 
         if isinstance(local_path, str) and os.path.isfile(local_path):
             try:
-                print(f"Loading local model checkpoint from: {local_path}")  # TODO: test loading local model ckpt
+                print(f"Loading local model checkpoint (state_dict) from: {local_path}")
                 model.load_state_dict(torch.load(local_path))
             except Exception as e:
-                print(e)
+                print(f"[get_model] >>> local_path not effective:\n{e}")
 
         return model

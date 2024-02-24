@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
 
-import torch
 from torch.utils.data import Dataset
 
 from transformers import AutoTokenizer
-# from datasets import arrow_dataset
 from datasets.dataset_dict import DatasetDict
 
 
@@ -17,10 +15,6 @@ class DatasetMultiChoiceQA(Dataset):
             splits: str = "train",
     ):
         super(DatasetMultiChoiceQA, self).__init__()
-
-        # ord_A = ord("A")
-        # self.idx2choice = {index: chr(ord_A + index) for index in range(26)}
-        # self.choice2idx = {chr(ord_A + index): index for index in range(26)}
 
         # Unified data item format:
         #   {

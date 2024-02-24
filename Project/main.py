@@ -24,115 +24,40 @@ from model.ModelLoader import ModelLoader
 from model.TokenizerLoader import TokenizerLoader
 
 
-def load_dataset(ds_name: str, verbose: bool = True) -> dict:
-    # Dataset
-    datasetLoader = DatasetLoader()
-    dataset_hf, test_label = datasetLoader.get_dataset(ds_name=ds_name, cache_dir=CACHE_DIR)
-
-    # Dataset split (training/validation/test sets)
-    dataset_hf = dataset_hf.shuffle(seeds=RANDOM_SEED)
-    ds_hf_train, ds_hf_valid = dataset_hf["train"], dataset_hf["validation"]
-    if test_label:
-        ds_hf_test = dataset_hf["test"]
-    else:  # split half of the validation set as the test set
-        dataset_split = ds_hf_valid.train_test_split(test_size=0.5, shuffle=False)
-        ds_hf_valid = dataset_split["train"]
-        ds_hf_test = dataset_split["test"]
-        dataset_hf["validation"] = ds_hf_valid
-        dataset_hf["test"] = ds_hf_test
-    del dataset_split
-
-    # Show dataset information
-    if verbose:
-        print(f"[Dataset] Training set shape: {ds_hf_train.shape}")
-        print(f"[Dataset] Validation set shape: {ds_hf_valid.shape}")
-        print(f"[Dataset] Test set shape: {ds_hf_test.shape}")
-        assert ds_hf_train.column_names == ds_hf_valid.column_names == ds_hf_test.column_names, \
-            "Assertion Error: column_names mismatch"
-        print(f"[Dataset] column names: {ds_hf_train.column_names}")
-        print(f"[Dataset] features: {ds_hf_train.features}\n")
-
-    # Set in-context learning examples (random choice at least 3 examples from the training set)
-    icl_indices = random.sample(range(len(ds_hf_train)), max(3, N_ICL))
-    icl_dataset = ds_hf_train.select(icl_indices)
-    icl_prompt = ""
-    for icl_item in icl_dataset:
-        icl_item = datasetLoader.map_prompt(icl_item)  # get the prompt (without answer)
-        cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set the answer for the ICL example
-        icl_prompt += cur_prompt
-    if verbose:
-        print(f"[Prompt] In-context Learning ({N_ICL} examples):\n{icl_prompt}")
-
-    return {
-        "dataset_hf": dataset_hf,
-        "icl_prompt": icl_prompt,
-    }
-
-
-def load_model(model_name: str, verbose: bool = True) -> dict:
-    # Model
-    modelLoader = ModelLoader()
-    model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
-    # model = modelLoader.get_model(model_name=model_name, cache_dir=None)
-    model.to(DEVICE)
-    # model.train()
-    # model.eval()
-
-    # Show model information
-    if verbose:
-        print(f"[Model] Parameters (total): {model.num_parameters()}")
-        print(f"[Model] Parameters (trainable): {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
-
-    return {
-        "model": model,
-    }
-
-
-def load_tokenizer(model_name: str, is_train: bool = True, verbose: bool = True) -> dict:
-    # Tokenizer
-    tokenizerLoader = TokenizerLoader()
-    if is_train:
-        tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=CACHE_DIR, padding_side="right", truncation_side="right")
-        # tokenizer = tokenizerLoader.get_tokenizer(
-        #     model_name=model_name, cache_dir=None, padding_side="right", truncation_side="right")
-    else:
-        tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=CACHE_DIR, padding_side="left", truncation_side="left")
-        # tokenizer = tokenizerLoader.get_tokenizer(
-        #     model_name=model_name, cache_dir=None, padding_side="left", truncation_side="left")
-
-    # Special tokens
-    tokenizer.pad_token = tokenizer.eos_token
-
-    # Show tokenizer information
-    if verbose:
-        print(f"[Tokenizer] (is_train: {is_train}) vocab size: {tokenizer.vocab_size}")
-        print(f"[Tokenizer] (is_train: {is_train}) all special tokens: {tokenizer.all_special_tokens}\n")
-
-    return {
-        "tokenizer": tokenizer,
-    }
-
-
-def finetune(
+def training(
         ds_name: str,
         model_name: str,
         ft_model,
-        tokenizer,
-        dataloader: DataLoader,
+        tokenizer_train,
+        tokenizer_eval,
+        dataloader_train: DataLoader,
+        dataloader_valid: DataLoader = None,
+        dataloader_test: DataLoader = None,
         icl_prompt: str = "",
+        do_eval_epoch: bool = True,
+        do_eval_batch: bool = False,
+        save_after_epoch: bool = True,
+        eval_gap: int = 1000,
+        show_loss_gap: int = 100,
         save_dir: str = "",
         verbose: bool = False,
 ):
     """
-    Model fine-tuning. Save the model checkpoints and tokenizer during/after training.
+    Model training. Save the model checkpoints and tokenizer during/after training.
     :param ds_name: the dataset name.
     :param model_name: the model name.
-    :param ft_model: the model to fine-tune.
-    :param tokenizer: the tokenizer for training (right padding).
-    :param dataloader: the dataloader (mini-batched input/output).
+    :param ft_model: the model to train.
+    :param tokenizer_train: the tokenizer for training (right padding).
+    :param tokenizer_eval: the tokenizer for generation (left padding).
+    :param dataloader_train: the dataloader of the training set (mini-batched input/output).
+    :param dataloader_valid: the dataloader of the valid set (mini-batched input/output) to pick the best model.
+    :param dataloader_test: the dataloader of the test set (mini-batched input/output) if possible.
     :param icl_prompt: the prefix prompt for in-context learning.
+    :param do_eval_epoch: whether run evaluation after each epoch or not.
+    :param do_eval_batch: whether run evaluation per `eval_gap` batches or not. (If so, we will save the best model.)
+    :param save_after_epoch: whether save the ckpt and results after each epoch.
+    :param eval_gap: run evaluation per `eval_gap` batches.
+    :param show_loss_gap: show loss per `show_loss_gap` batches.
     :param save_dir: specified directory for saving the model checkpoints and logs.
     :param verbose: verbose model: print logs.
     :return: the tuned model and used tokenizer.
@@ -148,22 +73,33 @@ def finetune(
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
 
+    save_ckpt_dir = os.path.join(CKPT_DIR, save_dir)
+    if not os.path.isdir(save_ckpt_dir):
+        os.makedirs(save_ckpt_dir, exist_ok=True)
+
+    save_log_dir = os.path.join(LOG_DIR, save_dir)
+    if not os.path.isdir(save_log_dir):
+        os.makedirs(save_log_dir, exist_ok=True)
+
     # optimizer = optim.Adam(ft_model.parameters(), lr=float(1e-3), weight_decay=float(5e-4))
     optimizer = optim.Adam(ft_model.parameters(), lr=INIT_LR, weight_decay=W_DECAY)
     if verbose:
         print(optimizer)
 
-    all_losses = []  # store the loss of each batch
-    loss_logs = []
-    batch_cnt = 0
-    # show_gap = 1000
-    show_gap = 100
+    all_losses = []  # store the loss of each batch (divided by epochs)
+    # loss_logs = []
+    all_valid_scores = []  # store the accuracy score on the valid set after evaluation (divided by epochs)
+    all_test_scores = []  # store the accuracy score on the test set after evaluation (divided by epochs)
+    best_valid_score = 0.0
+    best_test_score = 0.0
 
+    batch_cnt = 0
     for epoch in range(EPOCH):
         if verbose:
             print(f"\n\n>>> Epoch: {epoch}")
+        epoch_losses = []
 
-        for batch_idx, batch_train in enumerate(dataloader):
+        for batch_idx, batch_train in enumerate(dataloader_train):
             # Raw inputs
             answer_list = batch_train["answer"]
             prompt_list = batch_train["prompt"]
@@ -172,7 +108,7 @@ def finetune(
             input_list = [prompt + answer for prompt, answer in zip(prompt_list, answer_list)]
 
             # Tokenized inputs
-            inputs = tokenizer(input_list, return_tensors="pt", padding=True)  # padding_side="right"
+            inputs = tokenizer_train(input_list, return_tensors="pt", padding=True)  # padding_side="right"
             inputs.data["labels"] = inputs.data["input_ids"].clone()  # inputs.input_ids.clone()
             inputs = inputs.to(DEVICE)
 
@@ -189,42 +125,185 @@ def finetune(
 
             # loss_value = loss.detach().cpu().numpy().item()
             loss_value = loss.sum().detach().cpu().numpy().item()
-            all_losses.append(loss_value)
+            epoch_losses.append(loss_value)
 
             # Training log
-            if batch_cnt % show_gap == 0:
-                cur_log = f"[Total {batch_cnt + 1} batches]>>> Epoch {epoch} >>> Batch {batch_idx} >>> loss: {loss}\n"
+            if batch_cnt % show_loss_gap == 0:
+                cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
                 if verbose:
                     print(cur_log)
-                loss_logs.append(cur_log)
+                # loss_logs.append(cur_log)
+
+            # Run evaluation
+            if do_eval_batch and batch_cnt % eval_gap == 0:
+                if isinstance(dataloader_valid, DataLoader):
+                    # Evaluation on the valid set during training
+                    if verbose:
+                        print(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                              f">>> loss: {loss}")
+                    valid_score = generate(
+                        ds_name=ds_name,
+                        model_name=model_name,
+                        gen_model=ft_model,
+                        tokenizer_eval=tokenizer_eval,
+                        dataloader=dataloader_valid,
+                        icl_prompt=icl_prompt,
+                        save_dir="",  # f"{ds_name}---{model_name}"
+                        save_fn=f"results---valid---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
+                        verbose=verbose,
+                    )
+                    all_valid_scores.append(valid_score)
+                    if valid_score > best_valid_score:
+                        best_valid_score = valid_score
+
+                        # Save the best model based on the best valid score
+                        save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
+                        if not os.path.isdir(save_ckpt_hf):
+                            os.makedirs(save_ckpt_hf, exist_ok=True)
+                        if verbose:
+                            print(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                        ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
+                        # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
+                        # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
+
+                        # Save the tokenizers
+                        save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
+                        if not os.path.isdir(save_tokenizer_train_hf):
+                            os.makedirs(save_tokenizer_train_hf, exist_ok=True)
+                        tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+
+                        save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
+                        if not os.path.isdir(save_tokenizer_eval_hf):
+                            os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
+                        tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
+
+                if isinstance(dataloader_test, DataLoader):
+                    # Evaluation on the test set during training
+                    if verbose:
+                        print(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                              f">>> loss: {loss}")
+                    test_score = generate(
+                        ds_name=ds_name,
+                        model_name=model_name,
+                        gen_model=ft_model,
+                        tokenizer_eval=tokenizer_eval,
+                        dataloader=dataloader_test,
+                        icl_prompt=icl_prompt,
+                        save_dir="",  # f"{ds_name}---{model_name}"
+                        save_fn=f"results---test---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
+                        verbose=verbose,
+                    )
+                    all_test_scores.append(test_score)
+                    if test_score > best_test_score:
+                        best_test_score = test_score
+
             batch_cnt += 1
 
-        # After each epoch, save the model checkpoint
-        save_ckpt_dir = os.path.join(CKPT_DIR, save_dir)
-        if not os.path.isdir(save_ckpt_dir):
-            os.makedirs(save_ckpt_dir, exist_ok=True)
-        # save_ckpt_path = os.path.join(save_ckpt_dir, f"{ds_name}---{model_name}---Epoch_{epoch}---ckpt.pt")
-        save_ckpt_path = os.path.join(save_ckpt_dir, f"Epoch_{epoch}---ckpt.pt")
-        torch.save(ft_model.state_dict(), save_ckpt_path)
+        # After each epoch, save the losses and model checkpoint with tokenizers
+        if verbose:
+            print(f"\n\n[END of Epoch {epoch}]")
+        all_losses.append(epoch_losses)
+        avg_ep_loss = np.mean(epoch_losses)
+        save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
+        with open(save_loss_path, "w", encoding="utf-8") as fp_out:
+            for epoch_losses in all_losses:
+                fp_out.write(json.dumps(epoch_losses) + "\n")
 
-    # After fine-tuning, save the loss logs
-    save_log_dir = os.path.join(LOG_DIR, save_dir)
-    if not os.path.isdir(save_log_dir):
-        os.makedirs(save_log_dir, exist_ok=True)
-    # save_loss_path = os.path.join(save_log_dir, f"{ds_name}---{model_name}---all_losses.log")
-    save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
-    with open(save_loss_path, "w", encoding="utf-8") as fp_out:
-        fp_out.writelines(all_losses)
-    # save_log_path = os.path.join(save_log_dir, f"{ds_name}---{model_name}---loss_logs.log")
-    save_log_path = os.path.join(save_log_dir, f"loss_logs.log")
-    with open(save_log_path, "w", encoding="utf-8") as fp_out:
-        fp_out.writelines(loss_logs)
+        if save_after_epoch:
+            # Save the model at the end of this epoch
+            save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch{epoch}")  # HF model folder
+            if not os.path.isdir(save_ckpt_hf):
+                os.makedirs(save_ckpt_hf, exist_ok=True)
+            if verbose:
+                print(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
+            ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
+            # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
+            # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
+
+            # Save the tokenizers
+            save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
+            if not os.path.isdir(save_tokenizer_train_hf):
+                os.makedirs(save_tokenizer_train_hf, exist_ok=True)
+            tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+
+            save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
+            if not os.path.isdir(save_tokenizer_eval_hf):
+                os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
+            tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
+
+        # Run evaluation
+        if do_eval_epoch:
+            if isinstance(dataloader_valid, DataLoader):
+                # Evaluation on the valid set at the end of this epoch
+                if verbose:
+                    print(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                          f">>> average loss: {avg_ep_loss}")
+                valid_score = generate(
+                    ds_name=ds_name,
+                    model_name=model_name,
+                    gen_model=ft_model,
+                    tokenizer_eval=tokenizer_eval,
+                    dataloader=dataloader_valid,
+                    icl_prompt=icl_prompt,
+                    save_dir="",  # f"{ds_name}---{model_name}"
+                    save_fn=f"results---valid---batch{batch_cnt}_epoch{epoch}_END.jsonl",
+                    verbose=verbose,
+                )
+                all_valid_scores.append(valid_score)
+                if valid_score > best_valid_score:
+                    best_valid_score = valid_score
+
+                    # Save the best model based on the best valid score
+                    save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
+                    if not os.path.isdir(save_ckpt_hf):
+                        os.makedirs(save_ckpt_hf, exist_ok=True)
+                    if verbose:
+                        print(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                    ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
+                    # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
+                    # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
+
+                    # Save the tokenizers
+                    save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
+                    if not os.path.isdir(save_tokenizer_train_hf):
+                        os.makedirs(save_tokenizer_train_hf, exist_ok=True)
+                    tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+
+                    save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
+                    if not os.path.isdir(save_tokenizer_eval_hf):
+                        os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
+                    tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
+
+            if isinstance(dataloader_test, DataLoader):
+                # Evaluation on the test set at the end of this epoch
+                if verbose:
+                    print(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                          f">>> average loss: {avg_ep_loss}")
+                test_score = generate(
+                    ds_name=ds_name,
+                    model_name=model_name,
+                    gen_model=ft_model,
+                    tokenizer_eval=tokenizer_eval,
+                    dataloader=dataloader_test,
+                    icl_prompt=icl_prompt,
+                    save_dir="",  # f"{ds_name}---{model_name}"
+                    save_fn=f"results---test---batch{batch_cnt}_epoch{epoch}_END.jsonl",
+                    verbose=verbose,
+                )
+                all_test_scores.append(test_score)
+                if test_score > best_test_score:
+                    best_test_score = test_score
 
     return {
         "ft_model": ft_model,
-        "tokenizer": tokenizer,
+        "tokenizer_train": tokenizer_train,
+        "tokenizer_eval": tokenizer_eval,
         "all_losses": all_losses,
-        "loss_logs": loss_logs,
+        # "loss_logs": loss_logs,
+        "all_valid_scores": all_valid_scores,
+        "all_test_scores": all_test_scores,
+        "best_valid_score": best_valid_score,
+        "best_test_score": best_test_score,
     }
 
 
@@ -232,25 +311,25 @@ def generate(
         ds_name: str,
         model_name: str,
         gen_model,
-        tokenizer,
+        tokenizer_eval,
         dataloader: DataLoader,
         icl_prompt: str = "",
         save_dir: str = "",
         save_fn: str = "",
         verbose: bool = False,
-):
+) -> float:
     """
         Model generation for evaluation
         :param ds_name: the dataset name.
         :param model_name: the model name.
         :param gen_model: the model for generation.
-        :param tokenizer: the tokenizer for generation (left padding).
-        :param dataloader: the dataloader (mini-batched input/output).
+        :param tokenizer_eval: the tokenizer for generation (left padding).
+        :param dataloader: the dataloader for evaluation (mini-batched input/output).
         :param icl_prompt: the prefix prompt for in-context learning.
         :param save_dir: specified directory for saving the results.
         :param save_fn: specified filename for saving the results.
         :param verbose: verbose model: print logs.
-        :return: None. Save the evaluation results/scores after generation.
+        :return: Accuracy score. Save the evaluation results/scores after generation.
         """
     gen_model.eval()
     gen_model = gen_model.to(DEVICE)
@@ -277,18 +356,22 @@ def generate(
         input_list = prompt_list
 
         # Tokenized inputs
-        inputs = tokenizer(input_list, return_tensors="pt", padding=True)  # padding_side="right"
+        inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="right"
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
         inputs = inputs.to(DEVICE)
         max_input_len = int(inputs.input_ids.shape[-1])
+
+        # Forward pass
+        # outputs = gen_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
+        # loss = outputs.loss  # Language modeling loss (for next-token prediction).
 
         # Generate (beam search, sampling, temperature, etc.)
         with torch.no_grad():
             outputs = gen_model.generate(
                 inputs.input_ids,
-                pad_token_id=tokenizer.pad_token_id,
-                bos_token_id=tokenizer.bos_token_id,
-                eos_token_id=tokenizer.eos_token_id,
+                pad_token_id=tokenizer_eval.pad_token_id,
+                bos_token_id=tokenizer_eval.bos_token_id,
+                eos_token_id=tokenizer_eval.eos_token_id,
                 # max_length=512,
                 max_length=max_input_len + LEN_GEN,
                 num_beams=5,
@@ -303,7 +386,7 @@ def generate(
             )
 
         # Decoding
-        outputs_decode = tokenizer.batch_decode(
+        outputs_decode = tokenizer_eval.batch_decode(
             outputs, skip_special_tokens=True, clean_up_tokenization_spaces=False)
         raw_preds = []
         preds = []
@@ -347,9 +430,10 @@ def generate(
         }
         results.append(cur_result)
 
-    accuracy = len(correct_idx) / len(results)
+    accuracy = len(correct_idx) / len(results) if len(results) > 0 else 0.0
     if verbose:
-        print(f">>> Accuracy: {accuracy:.2f}")  # GPT-2 on Commonsense QA: valid (before FT) 0.17540983606557378
+        # print(f">>> Accuracy: {accuracy:.5f}")  # GPT-2 on Commonsense QA: (before FT) valid 0.18; test 0.16
+        print(f">>> Accuracy: {accuracy}")  # GPT-2 on Commonsense QA: valid (before FT) 0.17540983606557378
 
     # Save the evaluation results
     save_results_dir = os.path.join(OUTPUT_DIR, save_dir)
@@ -364,21 +448,32 @@ def generate(
         for result in results:
             fp_out.write(json.dumps(result) + "\n")
 
+    return accuracy
+
 
 def run(verbose: bool = False) -> None:
+    # Loaders
+    datasetLoader = DatasetLoader()
+    modelLoader = ModelLoader()
+    tokenizerLoader = TokenizerLoader()
+
     # Dataset
-    dataset_dict = load_dataset(ds_name=args.ds_name, verbose=verbose)
+    dataset_dict = datasetLoader.load_dataset(
+        ds_name=args.ds_name, n_icl=N_ICL, cache_dir=CACHE_DIR, random_seed=RANDOM_SEED, verbose=verbose)
     dataset_hf = dataset_dict["dataset_hf"]
     icl_prompt = dataset_dict["icl_prompt"]
 
     # Model
-    model_dict = load_model(model_name=args.model_name, verbose=verbose)
+    model_dict = modelLoader.load_model(model_name=args.model_name, cache_dir=CACHE_DIR, verbose=verbose)
     model = model_dict["model"]
+    model.to(DEVICE)
 
     # Tokenizer
-    tokenizer_train_dict = load_tokenizer(model_name=args.model_name, is_train=True, verbose=verbose)
+    tokenizer_train_dict = tokenizerLoader.load_tokenizer(
+        model_name=args.model_name, is_train=True, cache_dir=CACHE_DIR, verbose=verbose)
     tokenizer_train = tokenizer_train_dict["tokenizer"]
-    tokenizer_eval_dict = load_tokenizer(model_name=args.model_name, is_train=False, verbose=verbose)
+    tokenizer_eval_dict = tokenizerLoader.load_tokenizer(
+        model_name=args.model_name, is_train=False, cache_dir=CACHE_DIR, verbose=verbose)
     tokenizer_eval = tokenizer_eval_dict["tokenizer"]
 
     # Convert Hugging Face datasets to PyTorch Dataset and DataLoader (mini-batch)
@@ -390,28 +485,28 @@ def run(verbose: bool = False) -> None:
     dataloader_test = DataLoader(ds_torch_test, batch_size=BSZ_GEN, shuffle=False)
 
     if EVAL_BEFORE:
-        # Evaluation on the valid set before fine-tuning
+        # Evaluation on the valid set before training
         if verbose:
-            print("\n\nEvaluation on the valid set before fine-tuning...")
+            print("\n\nEvaluation on the valid set before training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=model,
-            tokenizer=tokenizer_eval,
+            tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_beforeFT_valid.jsonl",
             verbose=verbose,
         )
-        # Evaluation on the test set before fine-tuning
+        # Evaluation on the test set before training
         if verbose:
-            print("\n\nEvaluation on the test set before fine-tuning...")
+            print("\n\nEvaluation on the test set before training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=model,
-            tokenizer=tokenizer_eval,
+            tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
@@ -419,47 +514,60 @@ def run(verbose: bool = False) -> None:
             verbose=verbose,
         )
 
-    # Fine-tune the model (Causal LM, next token prediction)
+    # Train (fine-tune) the model (Causal LM, next token prediction)
     if verbose:
-        print("\n\nFine-tune the model (Causal LM, next token prediction)...")
-    ft_dict = finetune(
+        print("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
+    ft_dict = training(
         ds_name=args.ds_name,
         model_name=args.model_name,
         ft_model=model,
-        tokenizer=tokenizer_eval,
-        dataloader=dataloader_train,
+        tokenizer_train=tokenizer_train,
+        tokenizer_eval=tokenizer_eval,
+        dataloader_train=dataloader_train,
+        dataloader_valid=dataloader_valid,
+        dataloader_test=dataloader_test,
         icl_prompt=icl_prompt,
+        do_eval_epoch=True,
+        do_eval_batch=True,
+        save_after_epoch=True,
+        eval_gap=1000,
+        show_loss_gap=100,
         save_dir="",  # f"{ds_name}---{model_name}"
         verbose=verbose,
     )
-    ft_model = ft_dict["ft_model"]
-    # tokenizer = ft_dict["tokenizer"]
+    ft_model = ft_dict["ft_model"]  # the trained model
+    # tokenizer_train = ft_dict["tokenizer_train"]
+    # tokenizer_eval = ft_dict["tokenizer_eval"]
     # all_losses = ft_dict["all_losses"]
-    # loss_logs = ft_dict["loss_logs"]
+    # # loss_logs = ft_dict["loss_logs"]
+    # all_valid_scores = ft_dict["all_valid_scores"]
+    # all_test_scores = ft_dict["all_test_scores"]
+    # best_valid_score = ft_dict["best_valid_score"]
+    # best_test_score = ft_dict["best_test_score"]
 
     if EVAL_AFTER:
-        # Evaluation on the valid set after fine-tuning
+        # Evaluation on the valid set after training
         if verbose:
-            print("\n\nEvaluation on the valid set after fine-tuning...")
+            print("\n\nEvaluation on the valid set after training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=ft_model,
-            tokenizer=tokenizer_eval,
+            tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_afterFT_valid.jsonl",
             verbose=verbose,
         )
-        # Evaluation on the test set after fine-tuning
+        # Evaluation on the test set after training
         if verbose:
-            print("\n\nEvaluation on the test set after fine-tuning...")
+            print("\n\nEvaluation on the test set after training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=ft_model,
-            tokenizer=tokenizer_eval,
+            tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
@@ -478,8 +586,16 @@ if __name__ == "__main__":
     parser.add_argument("--cuda", type=str, default="0", help="CUDA device(s), e.g., 0 OR 0,1")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
     parser.add_argument("-m", "--model_name", type=str, default="", help="Model name (Causal LM), e.g., gpt2")
-    parser.add_argument("--eval_before", action="store_true", default=False, help="Run evaluation before fine-tuning")
-    parser.add_argument("--eval_after", action="store_true", default=False, help="Run evaluation after fine-tuning")
+    parser.add_argument("--eval_before", action="store_true", default=False, help="Run evaluation before training")
+    parser.add_argument("--eval_after", action="store_true", default=False, help="Run evaluation after training")
+    parser.add_argument("--do_eval_epoch", action="store_true", default=False,
+                        help="Whether run evaluation after each epoch or not.")
+    parser.add_argument("--do_eval_batch", action="store_true", default=False,
+                        help="Whether run evaluation per `eval_gap` batches or not. (If so, save the best model.)")
+    parser.add_argument("--save_after_epoch", action="store_true", default=False,
+                        help="Whether save the ckpt and results after each epoch.")
+    parser.add_argument("--eval_gap", type=int, default=1000, help="Run evaluation per `eval_gap` batches")
+    parser.add_argument("--show_loss_gap", type=int, default=100, help="Show loss per `show_loss_gap` batches.")
     parser.add_argument("--n_icl", type=int, default=5, help="The number of examples for in-context learning")
     parser.add_argument("--n_gen", type=int, default=1, help="The number of sentences to be generated")
     parser.add_argument("--len_gen", type=int, default=10, help="The number of max tokens to be generated")
@@ -507,8 +623,13 @@ if __name__ == "__main__":
     # Hyperparameters
     CUDA = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
     VERBOSE = bool(args.verbose)  # Verbose model: print logs
-    EVAL_BEFORE = bool(args.eval_before)  # Run evaluation before fine-tuning
-    EVAL_AFTER = bool(args.eval_after)  # Run evaluation after fine-tuning
+    EVAL_BEFORE = bool(args.eval_before)  # Run evaluation before training
+    EVAL_AFTER = bool(args.eval_after)  # Run evaluation after training
+    DO_EVAL_EPOCH = bool(args.do_eval_epoch)  # Run evaluation after each epoch
+    DO_EVAL_BATCH = bool(args.do_eval_batch)  # Run evaluation per `eval_gap` batches (If so, save the best model)
+    SAVE_AFTER_EPOCH = bool(args.save_after_epoch)  # Save the ckpt and results after each epoch
+    EVAL_GAP = int(args.eval_gap)  # Run evaluation per `EVAL_GAP` batches
+    SHOW_LOSS_GAP = int(args.show_loss_gap)  # Show loss per `SHOW_LOSS_GAP` batches
     EPOCH = int(args.epoch)  # The number of epochs for training
     BSZ_TRAIN = int(args.bsz_train)  # The batch size for training
     BSZ_GEN = int(args.bsz_gen)  # The batch size for generation /  evaluation
@@ -517,9 +638,10 @@ if __name__ == "__main__":
     N_ICL = int(args.n_icl)  # The number of examples for in-context learning
     N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each generate(...) call)
     LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
-    CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
-    if not os.path.isdir(CACHE_DIR):
-        os.makedirs(CACHE_DIR, exist_ok=True)
+    CACHE_DIR = None
+    # CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
+    # if not os.path.isdir(CACHE_DIR):
+    #     os.makedirs(CACHE_DIR, exist_ok=True)
     LOG_DIR = str(args.log_dir)  # The directory to save logs
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR, exist_ok=True)

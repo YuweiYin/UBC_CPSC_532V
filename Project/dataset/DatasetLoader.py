@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+import random
 from typing import Tuple, Optional
 
 from datasets import load_dataset
@@ -13,6 +14,66 @@ class DatasetLoader:
         # self.idx2choice = {index: chr(ord_A + index) for index in range(26)}
         # self.choice2idx = {chr(ord_A + index): index for index in range(26)}
         pass
+
+    def load_dataset(
+            self,
+            ds_name: str,
+            n_icl: int = 5,
+            cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
+            random_seed: int = 42,
+            verbose: bool = False,
+    ) -> dict:
+        """
+        Load the dataset via Hugging Face API. https://huggingface.co/datasets
+        :param ds_name: dataset name.
+        :param n_icl: The number of examples for in-context learning.
+        :param cache_dir: The directory where data & model are cached.
+        :param random_seed: Random seed of all modules.
+        :param verbose: Verbose model: print logs.
+        :return: the dataset dict.
+        """
+
+        dataset_hf, test_label = self.get_dataset(ds_name=ds_name, cache_dir=cache_dir)
+
+        # Dataset split (training/validation/test sets)
+        dataset_hf = dataset_hf.shuffle(seeds=random_seed)
+        ds_hf_train, ds_hf_valid = dataset_hf["train"], dataset_hf["validation"]
+        if test_label:
+            ds_hf_test = dataset_hf["test"]
+        else:  # split half of the validation set as the test set
+            dataset_split = ds_hf_valid.train_test_split(test_size=0.5, shuffle=False)
+            ds_hf_valid = dataset_split["train"]
+            ds_hf_test = dataset_split["test"]
+            dataset_hf["validation"] = ds_hf_valid
+            dataset_hf["test"] = ds_hf_test
+        del dataset_split
+
+        # Show dataset information
+        if verbose:
+            print(f"[Dataset] Training set shape: {ds_hf_train.shape}")
+            print(f"[Dataset] Validation set shape: {ds_hf_valid.shape}")
+            print(f"[Dataset] Test set shape: {ds_hf_test.shape}")
+            assert ds_hf_train.column_names == ds_hf_valid.column_names == ds_hf_test.column_names, \
+                "Assertion Error: column_names mismatch"
+            print(f"[Dataset] column names: {ds_hf_train.column_names}")
+            print(f"[Dataset] features: {ds_hf_train.features}\n")
+
+        # Set in-context learning examples (random choice at least 3 examples from the training set)
+        icl_indices = random.sample(range(len(ds_hf_train)), max(3, n_icl))
+        icl_dataset = ds_hf_train.select(icl_indices)
+        icl_prompt = ""
+        for icl_item in icl_dataset:
+            icl_item = self.map_prompt(icl_item)  # get the prompt (without answer)
+            cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set the answer for the ICL example
+            icl_prompt += cur_prompt
+        # icl_prompt_len = len(icl_prompt)
+        if verbose:
+            print(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
+
+        return {
+            "dataset_hf": dataset_hf,
+            "icl_prompt": icl_prompt,
+        }
 
     def get_dataset(
             self,

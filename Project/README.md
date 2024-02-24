@@ -59,10 +59,17 @@ mkdir -p output
 
 **Example**: Run the [GPT-2](https://huggingface.co/openai-community/gpt2) model (smallest: 124M parameters)
 on the [Commonsense QA](https://huggingface.co/datasets/tau/commonsense_qa) dataset,
-including fine-tuning, generation, and evaluation.
+including training (fine-tuning), generation, and evaluation.
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose --eval_before --eval_after
+python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose \
+  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch
+```
+
+Without evaluation:
+
+```bash
+python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose
 ```
 
 To specify more hyperparameters (all the following settings are default values):
@@ -74,6 +81,11 @@ python3 main.py \
   --verbose \
   --eval_before \
   --eval_after \
+  --do_eval_epoch \
+  --do_eval_batch \
+  --save_after_epoch \
+  --eval_gap 1000 \
+  --show_loss_gap 100 \
   --seed 42 \
   --cuda "0" \
   --n_icl 5 \
@@ -93,5 +105,5 @@ python3 main.py \
 ## Experimental Results
 
 - The running logs and all losses (`.log` file) will be in the folder `log/`
-- The model checkpoints info (`.pt` file) after fine-tuning will be in the folder `ckpt/`
+- The model checkpoints info (`.pt` file) after training (fine-tuning) will be in the folder `ckpt/`
 - The generation and evaluation results (`.jsonl` file) and statistics will be in the folder `output/`

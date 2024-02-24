@@ -10,10 +10,60 @@ class TokenizerLoader:
     def __init__(self):
         pass
 
+    def load_tokenizer(
+            self,
+            model_name: str,
+            is_train: bool = True,
+            cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
+            verbose: bool = False,
+    ) -> dict:
+        """
+        Get the tokenizer via Hugging Face API. https://huggingface.co/docs/transformers/main_classes/tokenizer
+        :param model_name: model name.
+        :param is_train: Whether the tokenizer is for training of not.
+        :param cache_dir: The directory where data & model are cached.
+        :param verbose: Verbose model: print logs.
+        :return: the tokenizer dict.
+        """
+
+        if is_train:
+            tokenizer = self.get_tokenizer(
+                model_name=model_name, cache_dir=cache_dir, padding_side="right", truncation_side="right")
+            # tokenizer = self.get_tokenizer(
+            #     model_name=model_name, cache_dir=None, padding_side="right", truncation_side="right")
+        else:
+            tokenizer = self.get_tokenizer(
+                model_name=model_name, cache_dir=cache_dir, padding_side="left", truncation_side="left")
+            # tokenizer = self.get_tokenizer(
+            #     model_name=model_name, cache_dir=None, padding_side="left", truncation_side="left")
+
+        # Special tokens
+        # pad_token = "<|padoftext|>"
+        # tokenizer.add_tokens([pad_token], special_tokens=True)
+        # tokenizer.pad_token = pad_token
+        # tokenizer.pad_token = tokenizer.bos_token
+        tokenizer.pad_token = tokenizer.eos_token
+        # tokenizer.add_tokens(["<bos>", "<eos>", "<unk>", "<pad>"], special_tokens=True)
+        # tokenizer.bos_token = "<bos>"
+        # tokenizer.eos_token = "<eos>"
+        # tokenizer.unk_token = "<unk>"
+        # tokenizer.pad_token = "<pad>"
+        # tokenizer.add_special_tokens({"cls_token": "[CLS]"})
+        # tokenizer.add_special_tokens({"bos_token": "[BOS]"})
+
+        # Show tokenizer information
+        if verbose:
+            print(f"[Tokenizer] (is_train: {is_train}) vocab size: {tokenizer.vocab_size}")
+            print(f"[Tokenizer] (is_train: {is_train}) all special tokens: {tokenizer.all_special_tokens}\n")
+
+        return {
+            "tokenizer": tokenizer,
+        }
+
     def get_tokenizer(
             self,
             model_name: str = "",
-            local_path: str = "",
+            local_dir: str = "",
             cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
             padding_side: str = "right",
             truncation_side: str = "right",
@@ -21,21 +71,20 @@ class TokenizerLoader:
         """
         Get the tokenizer via Hugging Face API. https://huggingface.co/docs/transformers/main_classes/tokenizer
         :param model_name: model name.
-        :param local_path: file path of the local tokenizer.
+        :param local_dir: the directory of the local tokenizer (from tokenizer.save_pretrained(local_dir)).
         :param cache_dir: The directory where data & model are cached.
         :param padding_side: padding_side of the tokenizer ("right" for training, "left" for testing).
         :param truncation_side: truncation_side of the tokenizer ("right" for training, "left" for testing).
         :return: the tokenizer.
         """
 
-        if isinstance(local_path, str) and os.path.isfile(local_path):
+        if isinstance(local_dir, str) and os.path.isdir(local_dir):
+            # Try to load the local tokenizer first
             try:
-                print(f"Loading local tokenizer from: {local_path}")  # TODO: test loading local tokenizer
-                tokenizer = AutoTokenizer.from_pretrained(
-                    local_path, cache_dir=cache_dir, padding_side=padding_side, truncation_side=truncation_side)
+                tokenizer = AutoTokenizer.from_pretrained(local_dir)
                 return tokenizer
             except Exception as e:
-                print(e)
+                print(f"[get_tokenizer] >>> local_dir not effective:\n{e}")
 
         if not isinstance(model_name, str) or model_name == "":
             raise ValueError(f"[{self.__class__.__name__}] ValueError: model_name = {model_name}")
