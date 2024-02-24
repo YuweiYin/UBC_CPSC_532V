@@ -26,7 +26,7 @@ from model.TokenizerLoader import TokenizerLoader
 def load_dataset(ds_name: str, verbose: bool = True) -> dict:
     # Dataset
     datasetLoader = DatasetLoader()
-    dataset_hf, test_label = datasetLoader.get_dataset(ds_name=ds_name)
+    dataset_hf, test_label = datasetLoader.get_dataset(ds_name=ds_name, cache_dir=CACHE_DIR)
 
     # Dataset split (training/validation/test sets)
     dataset_hf = dataset_hf.shuffle(seeds=RANDOM_SEED)
@@ -59,7 +59,6 @@ def load_dataset(ds_name: str, verbose: bool = True) -> dict:
         icl_item = datasetLoader.map_prompt(icl_item)  # get the prompt (without answer)
         cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set the answer for the ICL example
         icl_prompt += cur_prompt
-    # icl_prompt_len = len(icl_prompt)
     if verbose:
         print(f"[Prompt] In-context Learning ({N_ICL} examples):\n{icl_prompt}")
 
@@ -72,7 +71,7 @@ def load_dataset(ds_name: str, verbose: bool = True) -> dict:
 def load_model(model_name: str, verbose: bool = True) -> dict:
     # Model
     modelLoader = ModelLoader()
-    model = modelLoader.get_model(model_name=model_name)
+    model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
     model.to(DEVICE)
     # model.train()
     # model.eval()
@@ -92,24 +91,13 @@ def load_tokenizer(model_name: str, is_train: bool = True, verbose: bool = True)
     tokenizerLoader = TokenizerLoader()
     if is_train:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, padding_side="right", truncation_side="right")
+            model_name=model_name, cache_dir=CACHE_DIR, padding_side="right", truncation_side="right")
     else:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, padding_side="left", truncation_side="left")
+            model_name=model_name, cache_dir=CACHE_DIR, padding_side="left", truncation_side="left")
 
     # Special tokens
-    # pad_token = "<|padoftext|>"
-    # tokenizer.add_tokens([pad_token], special_tokens=True)
-    # tokenizer.pad_token = pad_token
-    # tokenizer.pad_token = tokenizer.bos_token
     tokenizer.pad_token = tokenizer.eos_token
-    # tokenizer.add_tokens(["<bos>", "<eos>", "<unk>", "<pad>"], special_tokens=True)
-    # tokenizer.bos_token = "<bos>"
-    # tokenizer.eos_token = "<eos>"
-    # tokenizer.unk_token = "<unk>"
-    # tokenizer.pad_token = "<pad>"
-    # tokenizer.add_special_tokens({"cls_token": "[CLS]"})
-    # tokenizer.add_special_tokens({"bos_token": "[BOS]"})
 
     # Show tokenizer information
     if verbose:
@@ -277,10 +265,6 @@ def generate(
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
         inputs = inputs.to(DEVICE)
         max_input_len = int(inputs.input_ids.shape[-1])
-
-        # Forward pass
-        # outputs = gen_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
-        # loss = outputs.loss  # Language modeling loss (for next-token prediction).
 
         # Generate (beam search, sampling, temperature, etc.)
         with torch.no_grad():
@@ -481,6 +465,8 @@ if __name__ == "__main__":
     parser.add_argument("--bsz_gen", type=int, default=32, help="The batch size for generation / evaluation")
     parser.add_argument("--init_lr", type=float, default=float(1e-3), help="The initial learning rate for training")
     parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
+    parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/datasets",
+                        help="The directory where data & model are cached")
     parser.add_argument("--log_dir", type=str, default="log", help="The directory to save logs")
     parser.add_argument("--ckpt_dir", type=str, default="ckpt", help="The directory to save model checkpoints")
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
@@ -505,7 +491,10 @@ if __name__ == "__main__":
     N_ICL = int(args.n_icl)  # The number of examples for in-context learning
     N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each generate(...) call)
     LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
-    LOG_DIR = str(args.ckpt_dir)  # The directory to save logs
+    CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
+    if not os.path.isdir(CACHE_DIR):
+        os.makedirs(CACHE_DIR, exist_ok=True)
+    LOG_DIR = str(args.log_dir)  # The directory to save logs
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR, exist_ok=True)
     CKPT_DIR = str(args.ckpt_dir)  # The directory to save model checkpoints

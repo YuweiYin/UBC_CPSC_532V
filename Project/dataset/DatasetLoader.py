@@ -14,10 +14,15 @@ class DatasetLoader:
         # self.choice2idx = {chr(ord_A + index): index for index in range(26)}
         pass
 
-    def get_dataset(self, ds_name: str = "") -> Tuple[Optional[DatasetDict], bool]:
+    def get_dataset(
+            self,
+            ds_name: str = "",
+            cache_dir: str = "~/.cache/huggingface/datasets",
+    ) -> Tuple[Optional[DatasetDict], bool]:
         """
         Get the dataset via Hugging Face API. https://huggingface.co/datasets
         :param ds_name: dataset name.
+        :param cache_dir: The directory where data & model are cached.
         :return: dataset and test_label (whether the test set has label)
         """
 
@@ -42,7 +47,7 @@ class DatasetLoader:
         #   }
 
         if ds_name == "commonsense_qa":
-            dataset = load_dataset("tau/commonsense_qa")
+            dataset = load_dataset("tau/commonsense_qa", cache_dir=cache_dir)
             """
             original_example = {
                 'id': '075e483d21c29a511267ef62bedc0461',

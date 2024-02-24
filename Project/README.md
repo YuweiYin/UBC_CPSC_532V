@@ -51,7 +51,13 @@ conda install graphviz
 
 ## Experiments
 
-Example: Run the [GPT-2](https://huggingface.co/openai-community/gpt2) model (smallest: 124M parameters)
+```bash
+mkdir -p log
+mkdir -p ckpt
+mkdir -p output
+```
+
+**Example**: Run the [GPT-2](https://huggingface.co/openai-community/gpt2) model (smallest: 124M parameters)
 on the [Commonsense QA](https://huggingface.co/datasets/tau/commonsense_qa) dataset,
 including fine-tuning, generation, and evaluation.
 
@@ -76,18 +82,13 @@ python3 main.py \
   --bsz_gen 32 \
   --init_lr "1e-3" \
   --w_decay "5e-4" \
+  --cache_dir "~/.cache/huggingface/datasets" \
   --log_dir "log" \
   --ckpt_dir "ckpt" \
   --output_dir "output"
 ```
 
 ## Experimental Results
-
-```bash
-mkdir -p log
-mkdir -p ckpt
-mkdir -p output
-```
 
 - The running logs and all losses (`.log` file) will be in the folder `log/`
 - The model checkpoints info (`.pt` file) after fine-tuning will be in the folder `ckpt/`
