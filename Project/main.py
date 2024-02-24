@@ -12,7 +12,8 @@ import argparse
 import numpy as np
 
 import torch
-import torch.optim as optim
+from torch import nn
+from torch import optim
 from torch.utils.data import DataLoader
 
 from transformers import set_seed
@@ -71,7 +72,8 @@ def load_dataset(ds_name: str, verbose: bool = True) -> dict:
 def load_model(model_name: str, verbose: bool = True) -> dict:
     # Model
     modelLoader = ModelLoader()
-    model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
+    # model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
+    model = modelLoader.get_model(model_name=model_name, cache_dir=None)
     model.to(DEVICE)
     # model.train()
     # model.eval()
@@ -91,10 +93,10 @@ def load_tokenizer(model_name: str, is_train: bool = True, verbose: bool = True)
     tokenizerLoader = TokenizerLoader()
     if is_train:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=CACHE_DIR, padding_side="right", truncation_side="right")
+            model_name=model_name, cache_dir=None, padding_side="right", truncation_side="right")
     else:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=CACHE_DIR, padding_side="left", truncation_side="left")
+            model_name=model_name, cache_dir=None, padding_side="left", truncation_side="left")
 
     # Special tokens
     tokenizer.pad_token = tokenizer.eos_token
@@ -133,6 +135,10 @@ def finetune(
     """
 
     ft_model.train()
+    ft_model = ft_model.to(DEVICE)
+
+    if HAS_CUDA and len(GPUS) > 1:
+        ft_model = nn.DataParallel(ft_model, device_ids=GPUS)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
@@ -173,11 +179,11 @@ def finetune(
 
             # Backpropagation
             optimizer.zero_grad()
-            loss.backward()
+            loss.sum().backward()
             optimizer.step()
 
-            # loss_value = loss.detach().cpu().numpy()
-            loss_value = loss.detach().cpu().numpy().item()
+            # loss_value = loss.detach().cpu().numpy().item()
+            loss_value = loss.sum().detach().cpu().numpy().item()
             all_losses.append(loss_value)
 
             # Training log
@@ -242,6 +248,10 @@ def generate(
         :return: None. Save the evaluation results/scores after generation.
         """
     gen_model.eval()
+    gen_model = gen_model.to(DEVICE)
+
+    if HAS_CUDA and len(GPUS) > 1:
+        gen_model = nn.DataParallel(gen_model, device_ids=GPUS)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
@@ -454,7 +464,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose model: print logs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of all modules")
-    parser.add_argument("--cuda", type=str, default="0", help="CUDA device")
+    parser.add_argument("--cuda", type=str, default="0", help="CUDA device(s), e.g., 0 OR 0,1")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
     parser.add_argument("-m", "--model_name", type=str, default="", help="Model name (Causal LM), e.g., gpt2")
     parser.add_argument("--eval_before", action="store_true", default=False, help="Run evaluation before fine-tuning")
@@ -467,7 +477,7 @@ if __name__ == "__main__":
     parser.add_argument("--bsz_gen", type=int, default=32, help="The batch size for generation / evaluation")
     parser.add_argument("--init_lr", type=float, default=float(1e-3), help="The initial learning rate for training")
     parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
-    parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/datasets",
+    parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/",
                         help="The directory where data & model are cached")
     parser.add_argument("--log_dir", type=str, default="log", help="The directory to save logs")
     parser.add_argument("--ckpt_dir", type=str, default="ckpt", help="The directory to save model checkpoints")
@@ -484,6 +494,7 @@ if __name__ == "__main__":
     set_seed(RANDOM_SEED)
 
     # Hyperparameters
+    CUDA = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
     VERBOSE = bool(args.verbose)  # Verbose model: print logs
     EVAL_BEFORE = bool(args.eval_before)  # Run evaluation before fine-tuning
     EVAL_AFTER = bool(args.eval_after)  # Run evaluation after fine-tuning
@@ -509,10 +520,11 @@ if __name__ == "__main__":
         os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     # CUDA
+    os.environ["CUDA_VISIBLE_DEVICES"] = CUDA
     HAS_CUDA = torch.cuda.is_available()
-    # DEVICE = torch.device("cuda" if HAS_CUDA else "cpu")
-    DEVICE = torch.device(f"cuda:{args.cuda}" if HAS_CUDA else "cpu")
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
+    DEVICE = torch.device("cuda" if HAS_CUDA else "cpu")
+    GPUS = CUDA.split(",") if "," in CUDA else [CUDA]
+    GPUS = [int(gpu_id) for gpu_id in GPUS]
     if VERBOSE:
         print(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}")
         print("torch.__version__:", torch.__version__)
@@ -522,7 +534,6 @@ if __name__ == "__main__":
         print("torch.cuda.device_count():", torch.cuda.device_count())
         print("torch.cuda.get_arch_list():", torch.cuda.get_arch_list())
         if HAS_CUDA:
-            os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
             print("torch.cuda.current_device():", torch.cuda.current_device())
             print("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
 

@@ -17,7 +17,7 @@ class DatasetLoader:
     def get_dataset(
             self,
             ds_name: str = "",
-            cache_dir: str = "~/.cache/huggingface/datasets",
+            cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
     ) -> Tuple[Optional[DatasetDict], bool]:
         """
         Get the dataset via Hugging Face API. https://huggingface.co/datasets

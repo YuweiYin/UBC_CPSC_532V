@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
-import os.path
+import os
+from typing import Optional
 
 import torch
 from transformers import AutoModelForCausalLM
@@ -14,7 +15,7 @@ class ModelLoader:
             self,
             model_name: str = "",
             local_path: str = "",
-            cache_dir: str = "~/.cache/huggingface/datasets",
+            cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
     ):
         """
         Get the model via Hugging Face API and/or init with the local checkpoint.

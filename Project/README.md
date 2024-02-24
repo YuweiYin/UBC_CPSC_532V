@@ -84,7 +84,7 @@ python3 main.py \
   --bsz_gen 32 \
   --init_lr "1e-3" \
   --w_decay "5e-4" \
-  --cache_dir "~/.cache/huggingface/datasets" \
+  --cache_dir "~/.cache/huggingface/" \
   --log_dir "log" \
   --ckpt_dir "ckpt" \
   --output_dir "output"
