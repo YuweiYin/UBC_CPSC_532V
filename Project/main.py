@@ -72,8 +72,8 @@ def load_dataset(ds_name: str, verbose: bool = True) -> dict:
 def load_model(model_name: str, verbose: bool = True) -> dict:
     # Model
     modelLoader = ModelLoader()
-    # model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
-    model = modelLoader.get_model(model_name=model_name, cache_dir=None)
+    model = modelLoader.get_model(model_name=model_name, cache_dir=CACHE_DIR)
+    # model = modelLoader.get_model(model_name=model_name, cache_dir=None)
     model.to(DEVICE)
     # model.train()
     # model.eval()
@@ -93,10 +93,14 @@ def load_tokenizer(model_name: str, is_train: bool = True, verbose: bool = True)
     tokenizerLoader = TokenizerLoader()
     if is_train:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=None, padding_side="right", truncation_side="right")
+            model_name=model_name, cache_dir=CACHE_DIR, padding_side="right", truncation_side="right")
+        # tokenizer = tokenizerLoader.get_tokenizer(
+        #     model_name=model_name, cache_dir=None, padding_side="right", truncation_side="right")
     else:
         tokenizer = tokenizerLoader.get_tokenizer(
-            model_name=model_name, cache_dir=None, padding_side="left", truncation_side="left")
+            model_name=model_name, cache_dir=CACHE_DIR, padding_side="left", truncation_side="left")
+        # tokenizer = tokenizerLoader.get_tokenizer(
+        #     model_name=model_name, cache_dir=None, padding_side="left", truncation_side="left")
 
     # Special tokens
     tokenizer.pad_token = tokenizer.eos_token
