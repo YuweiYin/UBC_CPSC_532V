@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
+
 import os
+import logging
 from typing import Optional
 
 from transformers import AutoTokenizer
@@ -8,7 +10,11 @@ from transformers import AutoTokenizer
 class TokenizerLoader:
 
     def __init__(self):
-        pass
+        logging.basicConfig(
+            format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+            datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+        )
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def load_tokenizer(
             self,
@@ -53,8 +59,9 @@ class TokenizerLoader:
 
         # Show tokenizer information
         if verbose:
-            print(f"[Tokenizer] (is_train: {is_train}) vocab size: {tokenizer.vocab_size}")
-            print(f"[Tokenizer] (is_train: {is_train}) all special tokens: {tokenizer.all_special_tokens}\n")
+            self.logger.info(f"[Tokenizer] (is_train: {is_train}) vocab size: {tokenizer.vocab_size}")
+            self.logger.info(f"[Tokenizer] (is_train: {is_train}) all special tokens: "
+                             f"{tokenizer.all_special_tokens}\n")
 
         return {
             "tokenizer": tokenizer,
@@ -84,13 +91,13 @@ class TokenizerLoader:
                 tokenizer = AutoTokenizer.from_pretrained(local_dir)
                 return tokenizer
             except Exception as e:
-                print(f"[get_tokenizer] >>> local_dir not effective:\n{e}")
+                self.logger.info(f"[get_tokenizer] >>> local_dir not effective:\n{e}")
 
         if not isinstance(model_name, str) or model_name == "":
             raise ValueError(f"[{self.__class__.__name__}] ValueError: model_name = {model_name}")
 
         model_name = model_name.strip()
-        print(f"Loading tokenizer from Hugging Face. model_name: {model_name}")
+        self.logger.info(f"Loading tokenizer from Hugging Face. model_name: {model_name}")
 
         if model_name == "gpt1":
             # openai-gpt (a.k.a. "GPT-1") is the first transformer-based language model created and released by OpenAI

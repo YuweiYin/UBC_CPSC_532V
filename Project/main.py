@@ -7,6 +7,7 @@ import sys
 import time
 import json
 import random
+import logging
 import argparse
 
 import numpy as np
@@ -84,7 +85,7 @@ def training(
     # optimizer = optim.Adam(ft_model.parameters(), lr=float(1e-3), weight_decay=float(5e-4))
     optimizer = optim.Adam(ft_model.parameters(), lr=INIT_LR, weight_decay=W_DECAY)
     if verbose:
-        print(optimizer)
+        logger.info(optimizer)
 
     all_losses = []  # store the loss of each batch (divided by epochs)
     # loss_logs = []
@@ -96,7 +97,7 @@ def training(
     batch_cnt = 0
     for epoch in range(EPOCH):
         if verbose:
-            print(f"\n\n>>> Epoch: {epoch}")
+            logger.info(f"\n\n>>> Epoch: {epoch}")
         epoch_losses = []
 
         for batch_idx, batch_train in enumerate(dataloader_train):
@@ -131,7 +132,7 @@ def training(
             if batch_cnt % show_loss_gap == 0:
                 cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
                 if verbose:
-                    print(cur_log)
+                    logger.info(cur_log)
                 # loss_logs.append(cur_log)
 
             # Run evaluation
@@ -139,8 +140,8 @@ def training(
                 if isinstance(dataloader_valid, DataLoader):
                     # Evaluation on the valid set during training
                     if verbose:
-                        print(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
-                              f">>> loss: {loss}")
+                        logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                                    f">>> loss: {loss}")
                     valid_score = generate(
                         ds_name=ds_name,
                         model_name=model_name,
@@ -161,7 +162,7 @@ def training(
                         if not os.path.isdir(save_ckpt_hf):
                             os.makedirs(save_ckpt_hf, exist_ok=True)
                         if verbose:
-                            print(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                            logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
                         ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
                         # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
                         # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -180,8 +181,8 @@ def training(
                 if isinstance(dataloader_test, DataLoader):
                     # Evaluation on the test set during training
                     if verbose:
-                        print(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
-                              f">>> loss: {loss}")
+                        logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                                    f">>> loss: {loss}")
                     test_score = generate(
                         ds_name=ds_name,
                         model_name=model_name,
@@ -201,7 +202,7 @@ def training(
 
         # After each epoch, save the losses and model checkpoint with tokenizers
         if verbose:
-            print(f"\n\n[END of Epoch {epoch}]")
+            logger.info(f"\n\n[END of Epoch {epoch}]")
         all_losses.append(epoch_losses)
         avg_ep_loss = np.mean(epoch_losses)
         save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
@@ -215,7 +216,7 @@ def training(
             if not os.path.isdir(save_ckpt_hf):
                 os.makedirs(save_ckpt_hf, exist_ok=True)
             if verbose:
-                print(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
+                logger.info(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
             ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
             # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
             # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -236,8 +237,8 @@ def training(
             if isinstance(dataloader_valid, DataLoader):
                 # Evaluation on the valid set at the end of this epoch
                 if verbose:
-                    print(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
-                          f">>> average loss: {avg_ep_loss}")
+                    logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                                f">>> average loss: {avg_ep_loss}")
                 valid_score = generate(
                     ds_name=ds_name,
                     model_name=model_name,
@@ -258,7 +259,7 @@ def training(
                     if not os.path.isdir(save_ckpt_hf):
                         os.makedirs(save_ckpt_hf, exist_ok=True)
                     if verbose:
-                        print(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                        logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
                     ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
                     # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
                     # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -277,8 +278,8 @@ def training(
             if isinstance(dataloader_test, DataLoader):
                 # Evaluation on the test set at the end of this epoch
                 if verbose:
-                    print(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
-                          f">>> average loss: {avg_ep_loss}")
+                    logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                                f">>> average loss: {avg_ep_loss}")
                 test_score = generate(
                     ds_name=ds_name,
                     model_name=model_name,
@@ -432,8 +433,8 @@ def generate(
 
     accuracy = len(correct_idx) / len(results) if len(results) > 0 else 0.0
     if verbose:
-        # print(f">>> Accuracy: {accuracy:.5f}")  # GPT-2 on Commonsense QA: (before FT) valid 0.18; test 0.16
-        print(f">>> Accuracy: {accuracy}")  # GPT-2 on Commonsense QA: valid (before FT) 0.17540983606557378
+        # logger.info(f">>> Accuracy: {accuracy:.5f}")  # GPT-2 on Commonsense QA: (before FT) valid 0.18; test 0.16
+        logger.info(f">>> Accuracy: {accuracy}")  # GPT-2 on Commonsense QA: valid (before FT) 0.17540983606557378
 
     # Save the evaluation results
     save_results_dir = os.path.join(OUTPUT_DIR, save_dir)
@@ -487,7 +488,7 @@ def run(verbose: bool = False) -> None:
     if EVAL_BEFORE:
         # Evaluation on the valid set before training
         if verbose:
-            print("\n\nEvaluation on the valid set before training...")
+            logger.info("\n\nEvaluation on the valid set before training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
@@ -501,7 +502,7 @@ def run(verbose: bool = False) -> None:
         )
         # Evaluation on the test set before training
         if verbose:
-            print("\n\nEvaluation on the test set before training...")
+            logger.info("\n\nEvaluation on the test set before training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
@@ -516,7 +517,7 @@ def run(verbose: bool = False) -> None:
 
     # Train (fine-tune) the model (Causal LM, next token prediction)
     if verbose:
-        print("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
+        logger.info("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
     ft_dict = training(
         ds_name=args.ds_name,
         model_name=args.model_name,
@@ -548,7 +549,7 @@ def run(verbose: bool = False) -> None:
     if EVAL_AFTER:
         # Evaluation on the valid set after training
         if verbose:
-            print("\n\nEvaluation on the valid set after training...")
+            logger.info("\n\nEvaluation on the valid set after training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
@@ -562,7 +563,7 @@ def run(verbose: bool = False) -> None:
         )
         # Evaluation on the test set after training
         if verbose:
-            print("\n\nEvaluation on the test set after training...")
+            logger.info("\n\nEvaluation on the test set after training...")
         generate(
             ds_name=args.ds_name,
             model_name=args.model_name,
@@ -576,10 +577,16 @@ def run(verbose: bool = False) -> None:
         )
 
     if verbose:
-        print("\n\nDone!")
+        logger.info("\n\nDone!")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+    )
+    logger = logging.getLogger(__name__)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose model: print logs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of all modules")
@@ -610,7 +617,7 @@ if __name__ == "__main__":
     parser.add_argument("--ckpt_dir", type=str, default="ckpt", help="The directory to save model checkpoints")
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
     args = parser.parse_args()
-    print(args)
+    logger.info(args)
 
     timer_start = time.perf_counter()
 
@@ -638,10 +645,9 @@ if __name__ == "__main__":
     N_ICL = int(args.n_icl)  # The number of examples for in-context learning
     N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each generate(...) call)
     LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
-    CACHE_DIR = None
-    # CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
-    # if not os.path.isdir(CACHE_DIR):
-    #     os.makedirs(CACHE_DIR, exist_ok=True)
+    CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
+    if not os.path.isdir(CACHE_DIR):
+        os.makedirs(CACHE_DIR, exist_ok=True)
     LOG_DIR = str(args.log_dir)  # The directory to save logs
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR, exist_ok=True)
@@ -659,20 +665,20 @@ if __name__ == "__main__":
     GPUS = CUDA.split(",") if "," in CUDA else [CUDA]
     GPUS = [int(gpu_id) for gpu_id in GPUS]
     if VERBOSE:
-        print(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}")
-        print("torch.__version__:", torch.__version__)
-        print("torch.version.cuda:", torch.version.cuda)
-        print("torch.backends.cudnn.version():", torch.backends.cudnn.version())
-        print("torch.cuda.is_available():", torch.cuda.is_available())
-        print("torch.cuda.device_count():", torch.cuda.device_count())
-        print("torch.cuda.get_arch_list():", torch.cuda.get_arch_list())
+        logger.info(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}")
+        logger.info("torch.__version__:", torch.__version__)
+        logger.info("torch.version.cuda:", torch.version.cuda)
+        logger.info("torch.backends.cudnn.version():", torch.backends.cudnn.version())
+        logger.info("torch.cuda.is_available():", torch.cuda.is_available())
+        logger.info("torch.cuda.device_count():", torch.cuda.device_count())
+        logger.info("torch.cuda.get_arch_list():", torch.cuda.get_arch_list())
         if HAS_CUDA:
-            print("torch.cuda.current_device():", torch.cuda.current_device())
-            print("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
+            logger.info("torch.cuda.current_device():", torch.cuda.current_device())
+            logger.info("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
 
     run(verbose=VERBOSE)
 
     timer_end = time.perf_counter()
-    print("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
+    logger.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
 
     sys.exit(0)

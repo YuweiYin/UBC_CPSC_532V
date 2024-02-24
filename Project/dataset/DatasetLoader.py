@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import random
+import logging
 from typing import Tuple, Optional
 
 from datasets import load_dataset
@@ -13,7 +14,11 @@ class DatasetLoader:
         # ord_A = ord("A")
         # self.idx2choice = {index: chr(ord_A + index) for index in range(26)}
         # self.choice2idx = {chr(ord_A + index): index for index in range(26)}
-        pass
+        logging.basicConfig(
+            format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+            datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+        )
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def load_dataset(
             self,
@@ -50,13 +55,13 @@ class DatasetLoader:
 
         # Show dataset information
         if verbose:
-            print(f"[Dataset] Training set shape: {ds_hf_train.shape}")
-            print(f"[Dataset] Validation set shape: {ds_hf_valid.shape}")
-            print(f"[Dataset] Test set shape: {ds_hf_test.shape}")
+            self.logger.info(f"[Dataset] Training set shape: {ds_hf_train.shape}")
+            self.logger.info(f"[Dataset] Validation set shape: {ds_hf_valid.shape}")
+            self.logger.info(f"[Dataset] Test set shape: {ds_hf_test.shape}")
             assert ds_hf_train.column_names == ds_hf_valid.column_names == ds_hf_test.column_names, \
                 "Assertion Error: column_names mismatch"
-            print(f"[Dataset] column names: {ds_hf_train.column_names}")
-            print(f"[Dataset] features: {ds_hf_train.features}\n")
+            self.logger.info(f"[Dataset] column names: {ds_hf_train.column_names}")
+            self.logger.info(f"[Dataset] features: {ds_hf_train.features}\n")
 
         # Set in-context learning examples (random choice at least 3 examples from the training set)
         icl_indices = random.sample(range(len(ds_hf_train)), max(3, n_icl))
@@ -68,7 +73,7 @@ class DatasetLoader:
             icl_prompt += cur_prompt
         # icl_prompt_len = len(icl_prompt)
         if verbose:
-            print(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
+            self.logger.info(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
 
         return {
             "dataset_hf": dataset_hf,

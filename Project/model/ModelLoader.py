@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
+
 import os
+import logging
 from typing import Optional
 
 import torch
@@ -9,7 +11,11 @@ from transformers import AutoModelForCausalLM
 class ModelLoader:
 
     def __init__(self):
-        pass
+        logging.basicConfig(
+            format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+            datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+        )
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def load_model(
             self,
@@ -32,8 +38,9 @@ class ModelLoader:
 
         # Show model information
         if verbose:
-            print(f"[Model] Parameters (total): {model.num_parameters()}")
-            print(f"[Model] Parameters (trainable): {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+            self.logger.info(f"[Model] Parameters (total): {model.num_parameters()}")
+            self.logger.info(f"[Model] Parameters (trainable): "
+                             f"{sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
         return {
             "model": model,
@@ -61,13 +68,13 @@ class ModelLoader:
                 model = AutoModelForCausalLM.from_pretrained(local_dir)
                 return model
             except Exception as e:
-                print(f"[get_model] >>> local_dir not effective:\n{e}")
+                self.logger.info(f"[get_model] >>> local_dir not effective:\n{e}")
 
         if not isinstance(model_name, str) or model_name == "":
             raise ValueError(f"[{self.__class__.__name__}] ValueError: model_name = {model_name}")
 
         model_name = model_name.strip()
-        print(f"[get_model] >>> Loading model from Hugging Face. model_name: {model_name}")
+        self.logger.info(f"[get_model] >>> Loading model from Hugging Face. model_name: {model_name}")
 
         if model_name == "gpt1":
             # openai-gpt ("GPT-1") is the first transformer-based language model created and released by OpenAI
@@ -89,9 +96,9 @@ class ModelLoader:
 
         if isinstance(local_path, str) and os.path.isfile(local_path):
             try:
-                print(f"Loading local model checkpoint (state_dict) from: {local_path}")
+                self.logger.info(f"Loading local model checkpoint (state_dict) from: {local_path}")
                 model.load_state_dict(torch.load(local_path))
             except Exception as e:
-                print(f"[get_model] >>> local_path not effective:\n{e}")
+                self.logger.info(f"[get_model] >>> local_path not effective:\n{e}")
 
         return model
