@@ -400,6 +400,7 @@ def run(verbose: bool = False) -> None:
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_beforeFT_valid.jsonl",
+            verbose=verbose,
         )
         # Evaluation on the test set before fine-tuning
         if verbose:
@@ -413,6 +414,7 @@ def run(verbose: bool = False) -> None:
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_beforeFT_test.jsonl",
+            verbose=verbose,
         )
 
     # Fine-tune the model (Causal LM, next token prediction)
@@ -426,6 +428,7 @@ def run(verbose: bool = False) -> None:
         dataloader=dataloader_train,
         icl_prompt=icl_prompt,
         save_dir="",  # f"{ds_name}---{model_name}"
+        verbose=verbose,
     )
     ft_model = ft_dict["ft_model"]
     # tokenizer = ft_dict["tokenizer"]
@@ -445,6 +448,7 @@ def run(verbose: bool = False) -> None:
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_afterFT_valid.jsonl",
+            verbose=verbose,
         )
         # Evaluation on the test set after fine-tuning
         if verbose:
@@ -458,6 +462,7 @@ def run(verbose: bool = False) -> None:
             icl_prompt=icl_prompt,
             save_dir="",  # f"{ds_name}---{model_name}"
             save_fn=f"results_afterFT_test.jsonl",
+            verbose=verbose,
         )
 
     if verbose:
