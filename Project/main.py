@@ -141,6 +141,7 @@ def finetune(
     ft_model.train()
     ft_model = ft_model.to(DEVICE)
 
+    # Multiple GPUs training
     if HAS_CUDA and len(GPUS) > 1:
         ft_model = nn.DataParallel(ft_model, device_ids=GPUS)
 
@@ -254,8 +255,9 @@ def generate(
     gen_model.eval()
     gen_model = gen_model.to(DEVICE)
 
-    if HAS_CUDA and len(GPUS) > 1:
-        gen_model = nn.DataParallel(gen_model, device_ids=GPUS)
+    # Multiple GPUs generation
+    # if HAS_CUDA and len(GPUS) > 1:
+    #     gen_model = nn.DataParallel(gen_model, device_ids=GPUS)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
