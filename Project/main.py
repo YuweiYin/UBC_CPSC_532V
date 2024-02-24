@@ -188,8 +188,8 @@ def finetune(
             loss.backward()
             optimizer.step()
 
-            # loss_value = loss.detach().numpy()
-            loss_value = loss.detach().numpy().item()
+            # loss_value = loss.detach().cpu().numpy()
+            loss_value = loss.detach().cpu().numpy().item()
             all_losses.append(loss_value)
 
             # Training log
