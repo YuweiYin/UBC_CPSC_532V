@@ -24,5 +24,4 @@ sentence-transformers
 openai
 transformers
 datasets
-xformers
 spacy
