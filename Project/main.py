@@ -13,7 +13,6 @@ import argparse
 import numpy as np
 
 import torch
-from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader
 
@@ -66,10 +65,6 @@ def training(
 
     ft_model.train()
     ft_model = ft_model.to(DEVICE)
-
-    # Multiple GPUs training
-    if HAS_CUDA and len(GPUS) > 1:
-        ft_model = nn.DataParallel(ft_model, device_ids=GPUS)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
@@ -335,10 +330,6 @@ def generate(
     gen_model.eval()
     gen_model = gen_model.to(DEVICE)
 
-    # Multiple GPUs generation
-    # if HAS_CUDA and len(GPUS) > 1:
-    #     gen_model = nn.DataParallel(gen_model, device_ids=GPUS)
-
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
 
@@ -457,6 +448,9 @@ def run(verbose: bool = False) -> None:
     datasetLoader = DatasetLoader()
     modelLoader = ModelLoader()
     tokenizerLoader = TokenizerLoader()
+
+    # Set the random seed of all modules (again)
+    set_seed(RANDOM_SEED)
 
     # Dataset
     dataset_dict = datasetLoader.load_dataset(
@@ -665,7 +659,7 @@ if __name__ == "__main__":
     GPUS = CUDA.split(",") if "," in CUDA else [CUDA]
     GPUS = [int(gpu_id) for gpu_id in GPUS]
     if VERBOSE:
-        logger.info(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}")
+        logger.info(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}; GPUS: {GPUS}")
         logger.info("torch.__version__:", torch.__version__)
         logger.info("torch.version.cuda:", torch.version.cuda)
         logger.info("torch.backends.cudnn.version():", torch.backends.cudnn.version())
