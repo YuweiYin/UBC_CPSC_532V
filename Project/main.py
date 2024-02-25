@@ -145,7 +145,7 @@ def training(
                         tokenizer_eval=tokenizer_eval,
                         dataloader=dataloader_valid,
                         icl_prompt=icl_prompt,
-                        save_dir="",  # f"{ds_name}---{model_name}"
+                        save_dir=save_dir,  # f"{ds_name}---{model_name}"
                         save_fn=f"results---valid---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
                         verbose=verbose,
                     )
@@ -186,7 +186,7 @@ def training(
                         tokenizer_eval=tokenizer_eval,
                         dataloader=dataloader_test,
                         icl_prompt=icl_prompt,
-                        save_dir="",  # f"{ds_name}---{model_name}"
+                        save_dir=save_dir,  # f"{ds_name}---{model_name}"
                         save_fn=f"results---test---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
                         verbose=verbose,
                     )
@@ -252,7 +252,7 @@ def training(
                     tokenizer_eval=tokenizer_eval,
                     dataloader=dataloader_valid,
                     icl_prompt=icl_prompt,
-                    save_dir="",  # f"{ds_name}---{model_name}"
+                    save_dir=save_dir,  # f"{ds_name}---{model_name}"
                     save_fn=f"results---valid---batch{batch_cnt}_epoch{epoch}_END.jsonl",
                     verbose=verbose,
                 )
@@ -293,7 +293,7 @@ def training(
                     tokenizer_eval=tokenizer_eval,
                     dataloader=dataloader_test,
                     icl_prompt=icl_prompt,
-                    save_dir="",  # f"{ds_name}---{model_name}"
+                    save_dir=save_dir,  # f"{ds_name}---{model_name}"
                     save_fn=f"results---test---batch{batch_cnt}_epoch{epoch}_END.jsonl",
                     verbose=verbose,
                 )
@@ -549,7 +549,7 @@ def run(verbose: bool = False) -> None:
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
-            save_dir="",  # f"{ds_name}---{model_name}"
+            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
             save_fn=f"results_beforeFT_valid.jsonl",
             verbose=verbose,
         )
@@ -563,7 +563,7 @@ def run(verbose: bool = False) -> None:
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
-            save_dir="",  # f"{ds_name}---{model_name}"
+            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
             save_fn=f"results_beforeFT_test.jsonl",
             verbose=verbose,
         )
@@ -591,7 +591,7 @@ def run(verbose: bool = False) -> None:
         save_after_epoch=SAVE_AFTER_EPOCH,
         eval_gap=EVAL_GAP,
         logging_gap=LOGGING_GAP,
-        save_dir="",  # f"{ds_name}---{model_name}"
+        save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
         verbose=verbose,
     )
     ft_model = ft_dict["ft_model"]  # the trained model
@@ -615,7 +615,7 @@ def run(verbose: bool = False) -> None:
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
-            save_dir="",  # f"{ds_name}---{model_name}"
+            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
             save_fn=f"results_afterFT_valid.jsonl",
             verbose=verbose,
         )
@@ -629,7 +629,7 @@ def run(verbose: bool = False) -> None:
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
-            save_dir="",  # f"{ds_name}---{model_name}"
+            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
             save_fn=f"results_afterFT_test.jsonl",
             verbose=verbose,
         )
@@ -669,6 +669,7 @@ if __name__ == "__main__":
     parser.add_argument("--bsz_gen", type=int, default=32, help="The batch size for generation / evaluation")
     parser.add_argument("--init_lr", type=float, default=float(1e-3), help="The initial learning rate for training")
     parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
+    parser.add_argument("--save_dir", type=str, default="", help="The directory of the current run")
     parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/",
                         help="The directory where data & model are cached")
     parser.add_argument("--log_dir", type=str, default="log", help="The directory to save logs")
@@ -703,6 +704,7 @@ if __name__ == "__main__":
     N_ICL = int(args.n_icl)  # The number of examples for in-context learning
     N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
     LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
+    SAVE_DIR = str(args.save_dir)  # The directory of the current run
     CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
     if not os.path.isdir(CACHE_DIR):
         os.makedirs(CACHE_DIR, exist_ok=True)
