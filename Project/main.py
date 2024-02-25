@@ -195,7 +195,7 @@ def training(
 
             batch_cnt += 1
 
-        # After each epoch, save the losses and model checkpoint with tokenizers
+        # After each epoch, save the losses and scores
         if verbose:
             logger.info(f"\n\n[END of Epoch {epoch}]")
         all_losses.append(epoch_losses)
@@ -205,8 +205,18 @@ def training(
             for epoch_losses in all_losses:
                 fp_out.write(json.dumps(epoch_losses) + "\n")
 
+        save_valid_score_path = os.path.join(save_log_dir, f"all_valid_scores.log")
+        with open(save_valid_score_path, "w", encoding="utf-8") as fp_out:
+            for valid_score in all_valid_scores:
+                fp_out.write(json.dumps(valid_score) + "\n")
+
+        save_test_score_path = os.path.join(save_log_dir, f"all_test_scores.log")
+        with open(save_test_score_path, "w", encoding="utf-8") as fp_out:
+            for test_score in all_test_scores:
+                fp_out.write(json.dumps(test_score) + "\n")
+
+        # Save the model with tokenizers at the end of this epoch
         if save_after_epoch:
-            # Save the model at the end of this epoch
             save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch{epoch}")  # HF model folder
             if not os.path.isdir(save_ckpt_hf):
                 os.makedirs(save_ckpt_hf, exist_ok=True)
@@ -394,7 +404,10 @@ def generate(
             raw_preds.append(raw_pred)
 
             find_ans = re.findall(r"Answer:\s*(\S.*)", raw_pred)
-            preds.append(find_ans[0])
+            if len(find_ans) > 0:
+                preds.append(find_ans[0])
+            else:
+                preds.append("NULL")
 
         # Store prompts, outputs, and answers
         assert len(raw_preds) == len(preds) == len(answer_list)
