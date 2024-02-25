@@ -100,7 +100,8 @@ def training(
             answer_list = batch_train["answer"]
             prompt_list = batch_train["prompt"]
             # prompt_list = [icl_prompt + prompt + "Answer: " for prompt in prompt_list]  # add ICL examples
-            prompt_list = [prompt + "Answer: " for prompt in prompt_list]  # without ICL examples
+            # prompt_list = [prompt + "Answer: " for prompt in prompt_list]  # without ICL examples
+            prompt_list = [prompt + "Answer:" for prompt in prompt_list]  # without ICL examples nor trailing space
             assert len(prompt_list) == len(answer_list), f"Assertion Error: len(prompt_list) != len(answer_list)"
             input_list = [prompt + answer for prompt, answer in zip(prompt_list, answer_list)]
 
