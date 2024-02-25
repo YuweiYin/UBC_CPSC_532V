@@ -69,7 +69,8 @@ class DatasetLoader:
         icl_prompt = ""
         for icl_item in icl_dataset:
             icl_item = self.map_prompt(icl_item)  # get the prompt (without answer)
-            cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set the answer for the ICL example
+            # cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set answers for ICL examples
+            cur_prompt = icl_item["prompt"] + f"Answer:{icl_item['answer']}\n\n"  # set answers for ICL examples
             icl_prompt += cur_prompt
         # icl_prompt_len = len(icl_prompt)
         if verbose:
