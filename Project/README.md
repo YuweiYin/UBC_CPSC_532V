@@ -33,6 +33,10 @@ pip install -r requirements.txt
 ```
 
 ```bash
+pip install accelerate -U
+```
+
+```bash
 # https://spacy.io/usage
 # pip install -U pip setuptools wheel
 pip install 'spacy[apple]'
@@ -85,7 +89,7 @@ python3 main.py \
   --do_eval_batch \
   --save_after_epoch \
   --eval_gap 1000 \
-  --show_loss_gap 100 \
+  --logging_gap 100 \
   --seed 42 \
   --cuda "0" \
   --n_icl 5 \
@@ -107,3 +111,5 @@ python3 main.py \
 - The running logs and all losses (`.log` file) will be in the folder `log/`
 - The model checkpoints info (`.pt` file) after training (fine-tuning) will be in the folder `ckpt/`
 - The generation and evaluation results (`.jsonl` file) and statistics will be in the folder `output/`
+
+---

@@ -18,10 +18,11 @@ requests
 setuptools
 wheel
 nltk
+spacy
 keybert
 graphviz
 sentence-transformers
 openai
 transformers
 datasets
-spacy
+evaluate

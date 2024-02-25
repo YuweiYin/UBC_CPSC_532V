@@ -38,7 +38,7 @@ def training(
         do_eval_batch: bool = False,
         save_after_epoch: bool = True,
         eval_gap: int = 1000,
-        show_loss_gap: int = 100,
+        logging_gap: int = 100,
         save_dir: str = "",
         verbose: bool = False,
 ):
@@ -57,7 +57,7 @@ def training(
     :param do_eval_batch: whether run evaluation per `eval_gap` batches or not. (If so, we will save the best model.)
     :param save_after_epoch: whether save the ckpt and results after each epoch.
     :param eval_gap: run evaluation per `eval_gap` batches.
-    :param show_loss_gap: show loss per `show_loss_gap` batches.
+    :param logging_gap: show loss per `logging_gap` batches.
     :param save_dir: specified directory for saving the model checkpoints and logs.
     :param verbose: verbose model: print logs.
     :return: the tuned model and used tokenizer.
@@ -99,7 +99,8 @@ def training(
             # Raw inputs
             answer_list = batch_train["answer"]
             prompt_list = batch_train["prompt"]
-            prompt_list = [icl_prompt + prompt + "Answer: " for prompt in prompt_list]  # add ICL examples
+            # prompt_list = [icl_prompt + prompt + "Answer: " for prompt in prompt_list]  # add ICL examples
+            prompt_list = [prompt + "Answer: " for prompt in prompt_list]  # without ICL examples
             assert len(prompt_list) == len(answer_list), f"Assertion Error: len(prompt_list) != len(answer_list)"
             input_list = [prompt + answer for prompt, answer in zip(prompt_list, answer_list)]
 
@@ -124,7 +125,7 @@ def training(
             epoch_losses.append(loss_value)
 
             # Training log
-            if batch_cnt % show_loss_gap == 0:
+            if batch_cnt % logging_gap == 0:
                 cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
                 if verbose:
                     logger.info(cur_log)
@@ -137,7 +138,7 @@ def training(
                     if verbose:
                         logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
                                     f">>> loss: {loss}")
-                    valid_score = generate(
+                    valid_score = evaluate(
                         ds_name=ds_name,
                         model_name=model_name,
                         gen_model=ft_model,
@@ -178,7 +179,7 @@ def training(
                     if verbose:
                         logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
                                     f">>> loss: {loss}")
-                    test_score = generate(
+                    test_score = evaluate(
                         ds_name=ds_name,
                         model_name=model_name,
                         gen_model=ft_model,
@@ -244,7 +245,7 @@ def training(
                 if verbose:
                     logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
                                 f">>> average loss: {avg_ep_loss}")
-                valid_score = generate(
+                valid_score = evaluate(
                     ds_name=ds_name,
                     model_name=model_name,
                     gen_model=ft_model,
@@ -285,7 +286,7 @@ def training(
                 if verbose:
                     logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
                                 f">>> average loss: {avg_ep_loss}")
-                test_score = generate(
+                test_score = evaluate(
                     ds_name=ds_name,
                     model_name=model_name,
                     gen_model=ft_model,
@@ -313,113 +314,158 @@ def training(
     }
 
 
-def generate(
+def evaluate(
         ds_name: str,
         model_name: str,
         gen_model,
         tokenizer_eval,
         dataloader: DataLoader,
         icl_prompt: str = "",
+        do_forward: bool = True,
+        choice_prob: bool = True,
         save_dir: str = "",
         save_fn: str = "",
         verbose: bool = False,
 ) -> float:
     """
-        Model generation for evaluation
-        :param ds_name: the dataset name.
-        :param model_name: the model name.
-        :param gen_model: the model for generation.
-        :param tokenizer_eval: the tokenizer for generation (left padding).
-        :param dataloader: the dataloader for evaluation (mini-batched input/output).
-        :param icl_prompt: the prefix prompt for in-context learning.
-        :param save_dir: specified directory for saving the results.
-        :param save_fn: specified filename for saving the results.
-        :param verbose: verbose model: print logs.
-        :return: Accuracy score. Save the evaluation results/scores after generation.
-        """
+    Model generation for evaluation
+    :param ds_name: the dataset name.
+    :param model_name: the model name.
+    :param gen_model: the model for generation.
+    :param tokenizer_eval: the tokenizer for generation (left padding).
+    :param dataloader: the dataloader for evaluation (mini-batched input/output).
+    :param icl_prompt: the prefix prompt for in-context learning.
+    :param do_forward: use forward pass to generate one next token for prediction. Otherwise, beam search OR sampling.
+    :param choice_prob: if `do_forward`, whether to only consider the probabilities of the choices, like "A" "B" "C".
+    :param save_dir: specified directory for saving the results.
+    :param save_fn: specified filename for saving the results.
+    :param verbose: verbose model: print logs.
+    :return: Accuracy score. Save the evaluation results/scores after generation.
+    """
     gen_model.eval()
     gen_model = gen_model.to(DEVICE)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
 
-    all_raw_preds = []
+    all_prompts = []
     all_preds = []
     all_answers = []
-    icl_prompt_len = len(icl_prompt)
+
+    # Two metrics when using Causal LM for classification
+    # 1. direct generation: consider all possible tokens in the vocab
+    # 2. (more reasonable) only consider the probabilities of the choices, like "A" "B" "C"
+    choice_ids = []
+    choice_labels = []
 
     for batch_idx, batch_train in enumerate(dataloader):
         # Raw inputs
         answer_list = batch_train["answer"]
         prompt_list = batch_train["prompt"]
-        prompt_list = [icl_prompt + prompt + "Answer: " for prompt in prompt_list]  # add ICL examples
+        # prompt_list = [icl_prompt + prompt + "Answer: " for prompt in prompt_list]  # add ICL examples
+        # prompt_list = [prompt + "Answer: " for prompt in prompt_list]  # without ICL examples
+        prompt_list = [prompt + "Answer:" for prompt in prompt_list]  # without ICL examples nor trailing space
+        all_prompts += prompt_list
+
         assert len(prompt_list) == len(answer_list), f"Assertion Error: len(prompt_list) != len(answer_list)"
         # input_list = [prompt + answer for prompt, answer in zip(prompt_list, answer_list)]
         input_list = prompt_list
+
+        # Get the tokenized ids of each choice, e.g., "A"/" A", "B"/" B", "C"/" C", etc.
+        if len(choice_ids) == 0:
+            c_labels = [_labels[0] for _labels in batch_train["choices_label"]]
+            c_labels = list(set(c_labels))  # remove duplication
+            c_labels.sort()
+            for c_label in c_labels:  # get the vocab id
+                c_label = c_label.strip()  # e.g., "A" or "B"
+                c_label_ids = tokenizer_eval.encode(c_label)
+                if len(c_label_ids) == 1:
+                    choice_ids.append(c_label_ids[0])
+                    choice_labels.append(c_label)
+                c_label = " " + c_label  # e.g., " A" or " B"
+                c_label_ids = tokenizer_eval.encode(c_label)
+                if len(c_label_ids) == 1:
+                    choice_ids.append(c_label_ids[0])
+                    choice_labels.append(c_label)
 
         # Tokenized inputs
         inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="right"
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
         inputs = inputs.to(DEVICE)
+
         max_input_len = int(inputs.input_ids.shape[-1])
+        input_ids = inputs["input_ids"]
+        # attention_mask = inputs["attention_mask"]
+        # seq_lengths = attention_mask.sum(-1)
+        # input_decode = tokenizer_eval.batch_decode(
+        #     input_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
-        # Forward pass
-        # outputs = gen_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
-        # loss = outputs.loss  # Language modeling loss (for next-token prediction).
+        if do_forward:
+            # Forward pass
+            with torch.no_grad():
+                outputs = gen_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
+            # loss = outputs.loss  # Language modeling loss (for next-token prediction).
+            logits = outputs.logits
+            if choice_prob:  # only consider the probabilities of the choices, like "A" "B" "C"
+                pred_logits = logits[:, -1, choice_ids]
+                pred_ids = pred_logits.argmax(-1)
+                preds = [choice_labels[int(p)] for p in pred_ids]
+            else:  # consider all possible tokens in the vocab
+                pred_logits = logits[:, -1, :]
+                pred_ids = pred_logits.argmax(-1)
+                preds = tokenizer_eval.batch_decode(
+                    pred_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
-        # Generate (beam search, sampling, temperature, etc.)
-        with torch.no_grad():
-            outputs = gen_model.generate(
-                inputs.input_ids,
-                pad_token_id=tokenizer_eval.pad_token_id,
-                bos_token_id=tokenizer_eval.bos_token_id,
-                eos_token_id=tokenizer_eval.eos_token_id,
-                # max_length=512,
-                max_length=max_input_len + LEN_GEN,
-                num_beams=5,
-                no_repeat_ngram_size=2,
-                num_return_sequences=N_GEN,
-                temperature=0.7,
-                # temperature=0.9,
-                do_sample=True,
-                top_k=50,
-                top_p=0.95,
-                early_stopping=True
-            )
+        else:
+            # Generate (beam search, sampling, temperature, etc.)
+            with torch.no_grad():
+                outputs_gen = gen_model.generate(
+                    input_ids,
+                    pad_token_id=tokenizer_eval.pad_token_id,
+                    bos_token_id=tokenizer_eval.bos_token_id,
+                    eos_token_id=tokenizer_eval.eos_token_id,
+                    # max_length=512,
+                    max_length=max_input_len + LEN_GEN,
+                    num_beams=5,
+                    repetition_penalty=1.1,
+                    no_repeat_ngram_size=2,
+                    num_return_sequences=N_GEN,
+                    temperature=0.7,
+                    # temperature=0.9,
+                    do_sample=True,
+                    top_k=50,
+                    top_p=0.95,
+                    early_stopping=True
+                )
+            # Decoding
+            outputs_decode = tokenizer_eval.batch_decode(
+                outputs_gen, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+            # Find the prediction
+            preds = []
+            for output_decode in outputs_decode:
+                if isinstance(output_decode, str):
+                    raw_pred = output_decode
+                elif isinstance(output_decode, list):
+                    raw_pred = output_decode[0]
+                else:
+                    raise ValueError(f"ValueError: type(output_decode) = {type(output_decode)}")
 
-        # Decoding
-        outputs_decode = tokenizer_eval.batch_decode(
-            outputs, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        raw_preds = []
-        preds = []
-        for output_decode in outputs_decode:
-            if isinstance(output_decode, str):
-                raw_pred = output_decode
-            elif isinstance(output_decode, list):
-                raw_pred = output_decode[0]
-            else:
-                raise ValueError(f"ValueError: type(output_decode) = {type(output_decode)}")
-
-            raw_pred = raw_pred[icl_prompt_len:]
-            raw_preds.append(raw_pred)
-
-            find_ans = re.findall(r"Answer:\s*(\S.*)", raw_pred)
-            if len(find_ans) > 0:
-                preds.append(find_ans[0])
-            else:
-                preds.append("NULL")
+                find_ans = re.findall(r"Answer:\s*(\S.*)", raw_pred)
+                if len(find_ans) > 0:
+                    preds.append(find_ans[0])
+                else:
+                    preds.append("NULL")
 
         # Store prompts, outputs, and answers
-        assert len(raw_preds) == len(preds) == len(answer_list)
-        all_raw_preds += raw_preds
+        assert len(preds) == len(answer_list)
         all_preds += preds
         all_answers += answer_list
 
     results = []
     correct_idx = []
     incorrect_idx = []
-    assert len(all_raw_preds) == len(all_preds) == len(all_answers) > 0
-    for idx, (raw_pred, pred, answer) in enumerate(zip(all_raw_preds, all_preds, all_answers)):
+    assert len(all_prompts) == len(all_preds) == len(all_answers) > 0
+    for idx, (prompt, pred, answer) in enumerate(zip(all_prompts, all_preds, all_answers)):
         if pred.strip() == answer.strip():
             correct_idx.append(idx)
             cur_score = 1
@@ -428,7 +474,7 @@ def generate(
             cur_score = 0
 
         cur_result = {
-            "prompt": raw_pred,
+            "prompt": prompt,
             "pred": pred,
             "answer": answer,
             "score": cur_score,
@@ -496,7 +542,7 @@ def run(verbose: bool = False) -> None:
         # Evaluation on the valid set before training
         if verbose:
             logger.info("\n\nEvaluation on the valid set before training...")
-        generate(
+        evaluate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=model,
@@ -510,7 +556,7 @@ def run(verbose: bool = False) -> None:
         # Evaluation on the test set before training
         if verbose:
             logger.info("\n\nEvaluation on the test set before training...")
-        generate(
+        evaluate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=model,
@@ -535,11 +581,16 @@ def run(verbose: bool = False) -> None:
         dataloader_valid=dataloader_valid,
         dataloader_test=dataloader_test,
         icl_prompt=icl_prompt,
-        do_eval_epoch=True,
-        do_eval_batch=True,
-        save_after_epoch=True,
-        eval_gap=1000,
-        show_loss_gap=100,
+        # do_eval_epoch=True,
+        # do_eval_batch=True,
+        # save_after_epoch=True,
+        # eval_gap=1000,
+        # logging_gap=100,
+        do_eval_epoch=DO_EVAL_EPOCH,
+        do_eval_batch=DO_EVAL_BATCH,
+        save_after_epoch=SAVE_AFTER_EPOCH,
+        eval_gap=EVAL_GAP,
+        logging_gap=LOGGING_GAP,
         save_dir="",  # f"{ds_name}---{model_name}"
         verbose=verbose,
     )
@@ -557,7 +608,7 @@ def run(verbose: bool = False) -> None:
         # Evaluation on the valid set after training
         if verbose:
             logger.info("\n\nEvaluation on the valid set after training...")
-        generate(
+        evaluate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=ft_model,
@@ -571,7 +622,7 @@ def run(verbose: bool = False) -> None:
         # Evaluation on the test set after training
         if verbose:
             logger.info("\n\nEvaluation on the test set after training...")
-        generate(
+        evaluate(
             ds_name=args.ds_name,
             model_name=args.model_name,
             gen_model=ft_model,
@@ -609,7 +660,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_after_epoch", action="store_true", default=False,
                         help="Whether save the ckpt and results after each epoch.")
     parser.add_argument("--eval_gap", type=int, default=1000, help="Run evaluation per `eval_gap` batches")
-    parser.add_argument("--show_loss_gap", type=int, default=100, help="Show loss per `show_loss_gap` batches.")
+    parser.add_argument("--logging_gap", type=int, default=100, help="Show loss per `logging_gap` batches.")
     parser.add_argument("--n_icl", type=int, default=5, help="The number of examples for in-context learning")
     parser.add_argument("--n_gen", type=int, default=1, help="The number of sentences to be generated")
     parser.add_argument("--len_gen", type=int, default=10, help="The number of max tokens to be generated")
@@ -643,14 +694,14 @@ if __name__ == "__main__":
     DO_EVAL_BATCH = bool(args.do_eval_batch)  # Run evaluation per `eval_gap` batches (If so, save the best model)
     SAVE_AFTER_EPOCH = bool(args.save_after_epoch)  # Save the ckpt and results after each epoch
     EVAL_GAP = int(args.eval_gap)  # Run evaluation per `EVAL_GAP` batches
-    SHOW_LOSS_GAP = int(args.show_loss_gap)  # Show loss per `SHOW_LOSS_GAP` batches
+    LOGGING_GAP = int(args.logging_gap)  # Show loss per `LOGGING_GAP` batches
     EPOCH = int(args.epoch)  # The number of epochs for training
     BSZ_TRAIN = int(args.bsz_train)  # The batch size for training
     BSZ_GEN = int(args.bsz_gen)  # The batch size for generation /  evaluation
     INIT_LR = float(args.init_lr)  # The initial learning rate for training
     W_DECAY = float(args.w_decay)  # The weight decay rate for training
     N_ICL = int(args.n_icl)  # The number of examples for in-context learning
-    N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each generate(...) call)
+    N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
     LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
     CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
     if not os.path.isdir(CACHE_DIR):
