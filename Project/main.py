@@ -7,8 +7,10 @@ import sys
 import time
 import json
 import random
+import shutil
 import logging
 import argparse
+from collections import deque
 
 import numpy as np
 
@@ -25,6 +27,7 @@ from model.TokenizerLoader import TokenizerLoader
 
 
 def training(
+        cfg,
         ds_name: str,
         model_name: str,
         ft_model,
@@ -44,6 +47,7 @@ def training(
 ):
     """
     Model training. Save the model checkpoints and tokenizer during/after training.
+    :param cfg: configuration / arguments.
     :param ds_name: the dataset name.
     :param model_name: the model name.
     :param ft_model: the model to train.
@@ -59,28 +63,28 @@ def training(
     :param eval_gap: run evaluation per `eval_gap` batches.
     :param logging_gap: show loss per `logging_gap` batches.
     :param save_dir: specified directory for saving the model checkpoints and logs.
-    :param verbose: verbose model: print logs.
+    :param verbose: verbose model: show logs.
     :return: the tuned model and used tokenizer.
     """
 
     ft_model.train()
-    ft_model = ft_model.to(DEVICE)
+    ft_model = ft_model.to(cfg.device)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
 
-    save_ckpt_dir = os.path.join(CKPT_DIR, save_dir)
+    save_ckpt_dir = os.path.join(cfg.ckpt_dir, save_dir)
     if not os.path.isdir(save_ckpt_dir):
         os.makedirs(save_ckpt_dir, exist_ok=True)
 
-    save_log_dir = os.path.join(LOG_DIR, save_dir)
+    save_log_dir = os.path.join(cfg.log_dir, save_dir)
     if not os.path.isdir(save_log_dir):
         os.makedirs(save_log_dir, exist_ok=True)
 
     # optimizer = optim.Adam(ft_model.parameters(), lr=float(1e-3), weight_decay=float(5e-4))
-    optimizer = optim.Adam(ft_model.parameters(), lr=INIT_LR, weight_decay=W_DECAY)
+    optimizer = optim.Adam(ft_model.parameters(), lr=cfg.init_lr, weight_decay=cfg.w_decay)
     if verbose:
-        logger.info(optimizer)
+        cfg.logger.info(optimizer)
 
     all_losses = []  # store the loss of each batch (divided by epochs)
     # loss_logs = []
@@ -90,9 +94,9 @@ def training(
     best_test_score = 0.0
 
     batch_cnt = 0
-    for epoch in range(EPOCH):
+    for epoch in range(cfg.epoch):
         if verbose:
-            logger.info(f"\n\n>>> Epoch: {epoch}")
+            cfg.logger.info(f"\n\n>>> Epoch: {epoch}")
         epoch_losses = []
 
         for batch_idx, batch_train in enumerate(dataloader_train):
@@ -108,7 +112,7 @@ def training(
             # Tokenized inputs
             inputs = tokenizer_train(input_list, return_tensors="pt", padding=True)  # padding_side="right"
             inputs.data["labels"] = inputs.data["input_ids"].clone()  # inputs.input_ids.clone()
-            inputs = inputs.to(DEVICE)
+            inputs = inputs.to(cfg.device)
 
             # Forward pass
             outputs = ft_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
@@ -129,7 +133,7 @@ def training(
             if batch_cnt % logging_gap == 0:
                 cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
                 if verbose:
-                    logger.info(cur_log)
+                    cfg.logger.info(cur_log)
                 # loss_logs.append(cur_log)
 
             # Run evaluation
@@ -137,16 +141,17 @@ def training(
                 if isinstance(dataloader_valid, DataLoader):
                     # Evaluation on the valid set during training
                     if verbose:
-                        logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
-                                    f">>> loss: {loss}")
+                        cfg.logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                                        f">>> loss: {loss}")
                     valid_score = evaluate(
+                        cfg=cfg,
                         ds_name=ds_name,
                         model_name=model_name,
                         gen_model=ft_model,
                         tokenizer_eval=tokenizer_eval,
                         dataloader=dataloader_valid,
                         icl_prompt=icl_prompt,
-                        save_dir=save_dir,  # f"{ds_name}---{model_name}"
+                        save_dir=save_dir,
                         save_fn=f"results---valid---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
                         verbose=verbose,
                     )
@@ -159,7 +164,7 @@ def training(
                         if not os.path.isdir(save_ckpt_hf):
                             os.makedirs(save_ckpt_hf, exist_ok=True)
                         if verbose:
-                            logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                            cfg.logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
                         ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
                         # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
                         # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -178,16 +183,17 @@ def training(
                 if isinstance(dataloader_test, DataLoader):
                     # Evaluation on the test set during training
                     if verbose:
-                        logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
-                                    f">>> loss: {loss}")
+                        cfg.logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                                        f">>> loss: {loss}")
                     test_score = evaluate(
+                        cfg=cfg,
                         ds_name=ds_name,
                         model_name=model_name,
                         gen_model=ft_model,
                         tokenizer_eval=tokenizer_eval,
                         dataloader=dataloader_test,
                         icl_prompt=icl_prompt,
-                        save_dir=save_dir,  # f"{ds_name}---{model_name}"
+                        save_dir=save_dir,
                         save_fn=f"results---test---batch{batch_cnt + 1}_epoch{epoch}.jsonl",
                         verbose=verbose,
                     )
@@ -199,7 +205,7 @@ def training(
 
         # After each epoch, save the losses and scores
         if verbose:
-            logger.info(f"\n\n[END of Epoch {epoch}]")
+            cfg.logger.info(f"\n\n[END of Epoch {epoch}]")
         all_losses.append(epoch_losses)
         avg_ep_loss = np.mean(epoch_losses)
         save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
@@ -218,12 +224,12 @@ def training(
                 fp_out.write(json.dumps(test_score) + "\n")
 
         # Save the model with tokenizers at the end of this epoch
-        if save_after_epoch:
+        if save_after_epoch and cfg.ckpt_limit > 0:
             save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch{epoch}")  # HF model folder
             if not os.path.isdir(save_ckpt_hf):
                 os.makedirs(save_ckpt_hf, exist_ok=True)
             if verbose:
-                logger.info(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
+                cfg.logger.info(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
             ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
             # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
             # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -239,21 +245,29 @@ def training(
                 os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
             tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
 
+            # Record the saving directory, delete directory if overflow
+            cfg.ckpt_queue.append(save_ckpt_hf)
+            if len(cfg.ckpt_queue) > cfg.ckpt_limit:
+                overflow_dir = cfg.ckpt_queue.popleft()
+                if os.path.isdir(overflow_dir):
+                    shutil.rmtree(overflow_dir, ignore_errors=True)
+
         # Run evaluation
         if do_eval_epoch:
             if isinstance(dataloader_valid, DataLoader):
                 # Evaluation on the valid set at the end of this epoch
                 if verbose:
-                    logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
-                                f">>> average loss: {avg_ep_loss}")
+                    cfg.logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                                    f">>> average loss: {avg_ep_loss}")
                 valid_score = evaluate(
+                    cfg=cfg,
                     ds_name=ds_name,
                     model_name=model_name,
                     gen_model=ft_model,
                     tokenizer_eval=tokenizer_eval,
                     dataloader=dataloader_valid,
                     icl_prompt=icl_prompt,
-                    save_dir=save_dir,  # f"{ds_name}---{model_name}"
+                    save_dir=save_dir,
                     save_fn=f"results---valid---batch{batch_cnt}_epoch{epoch}_END.jsonl",
                     verbose=verbose,
                 )
@@ -266,7 +280,7 @@ def training(
                     if not os.path.isdir(save_ckpt_hf):
                         os.makedirs(save_ckpt_hf, exist_ok=True)
                     if verbose:
-                        logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
+                        cfg.logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
                     ft_model.save_pretrained(save_ckpt_hf)  # config.json, generation_config.json, model.safetensors
                     # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
                     # torch.save(ft_model.state_dict(), save_ckpt_torch_fp)  # duplicated
@@ -285,16 +299,17 @@ def training(
             if isinstance(dataloader_test, DataLoader):
                 # Evaluation on the test set at the end of this epoch
                 if verbose:
-                    logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
-                                f">>> average loss: {avg_ep_loss}")
+                    cfg.logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                                    f">>> average loss: {avg_ep_loss}")
                 test_score = evaluate(
+                    cfg=cfg,
                     ds_name=ds_name,
                     model_name=model_name,
                     gen_model=ft_model,
                     tokenizer_eval=tokenizer_eval,
                     dataloader=dataloader_test,
                     icl_prompt=icl_prompt,
-                    save_dir=save_dir,  # f"{ds_name}---{model_name}"
+                    save_dir=save_dir,
                     save_fn=f"results---test---batch{batch_cnt}_epoch{epoch}_END.jsonl",
                     verbose=verbose,
                 )
@@ -316,6 +331,7 @@ def training(
 
 
 def evaluate(
+        cfg,
         ds_name: str,
         model_name: str,
         gen_model,
@@ -330,6 +346,7 @@ def evaluate(
 ) -> float:
     """
     Model generation for evaluation
+    :param cfg: configuration / arguments.
     :param ds_name: the dataset name.
     :param model_name: the model name.
     :param gen_model: the model for generation.
@@ -340,11 +357,12 @@ def evaluate(
     :param choice_prob: if `do_forward`, whether to only consider the probabilities of the choices, like "A" "B" "C".
     :param save_dir: specified directory for saving the results.
     :param save_fn: specified filename for saving the results.
-    :param verbose: verbose model: print logs.
+    :param verbose: verbose model: show logs.
     :return: Accuracy score. Save the evaluation results/scores after generation.
     """
+
     gen_model.eval()
-    gen_model = gen_model.to(DEVICE)
+    gen_model = gen_model.to(cfg.device)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
@@ -392,7 +410,7 @@ def evaluate(
         # Tokenized inputs
         inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="right"
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
-        inputs = inputs.to(DEVICE)
+        inputs = inputs.to(cfg.device)
 
         max_input_len = int(inputs.input_ids.shape[-1])
         input_ids = inputs["input_ids"]
@@ -426,11 +444,11 @@ def evaluate(
                     bos_token_id=tokenizer_eval.bos_token_id,
                     eos_token_id=tokenizer_eval.eos_token_id,
                     # max_length=512,
-                    max_length=max_input_len + LEN_GEN,
+                    max_length=max_input_len + cfg.len_gen,
                     num_beams=5,
                     repetition_penalty=1.1,
                     no_repeat_ngram_size=2,
-                    num_return_sequences=N_GEN,
+                    num_return_sequences=cfg.n_gen,
                     temperature=0.7,
                     # temperature=0.9,
                     do_sample=True,
@@ -484,11 +502,11 @@ def evaluate(
 
     accuracy = len(correct_idx) / len(results) if len(results) > 0 else 0.0
     if verbose:
-        # logger.info(f">>> Accuracy: {accuracy:.5f}")  # GPT-2 on Commonsense QA: (before FT) valid 0.18; test 0.16
-        logger.info(f">>> Accuracy: {accuracy}")  # GPT-2 on Commonsense QA: valid (before FT) 0.17540983606557378
+        # cfg.logger.info(f">>> Accuracy: {accuracy:.5f}")
+        cfg.logger.info(f">>> Accuracy: {accuracy}")
 
     # Save the evaluation results
-    save_results_dir = os.path.join(OUTPUT_DIR, save_dir)
+    save_results_dir = os.path.join(cfg.output_dir, save_dir)
     if not os.path.isdir(save_results_dir):
         os.makedirs(save_results_dir, exist_ok=True)
     if isinstance(save_fn, str) and len(save_fn) > 0:
@@ -503,78 +521,86 @@ def evaluate(
     return accuracy
 
 
-def run(verbose: bool = False) -> None:
+def run(
+        cfg
+) -> None:
     # Loaders
     datasetLoader = DatasetLoader()
     modelLoader = ModelLoader()
     tokenizerLoader = TokenizerLoader()
 
-    # Set the random seed of all modules (again)
-    set_seed(RANDOM_SEED)
+    # Set the random seed of all modules (again, before loading data/model/tokenizer)
+    set_seed(cfg.seed)
 
     # Dataset
     dataset_dict = datasetLoader.load_dataset(
-        ds_name=args.ds_name, n_icl=N_ICL, cache_dir=CACHE_DIR, random_seed=RANDOM_SEED, verbose=verbose)
+        ds_name=cfg.ds_name, n_icl=cfg.n_icl, cache_dir=cfg.cache_dir, random_seed=cfg.seed, verbose=cfg.verbose)
     dataset_hf = dataset_dict["dataset_hf"]
     icl_prompt = dataset_dict["icl_prompt"]
 
     # Model
-    model_dict = modelLoader.load_model(model_name=args.model_name, cache_dir=CACHE_DIR, verbose=verbose)
+    model_dict = modelLoader.load_model(model_name=cfg.model_name, cache_dir=cfg.cache_dir, verbose=cfg.verbose)
     model = model_dict["model"]
-    model.to(DEVICE)
+    model.to(cfg.device)
 
     # Tokenizer
     tokenizer_train_dict = tokenizerLoader.load_tokenizer(
-        model_name=args.model_name, is_train=True, cache_dir=CACHE_DIR, verbose=verbose)
+        model_name=cfg.model_name, is_train=True, cache_dir=cfg.cache_dir, verbose=cfg.verbose)
     tokenizer_train = tokenizer_train_dict["tokenizer"]
     tokenizer_eval_dict = tokenizerLoader.load_tokenizer(
-        model_name=args.model_name, is_train=False, cache_dir=CACHE_DIR, verbose=verbose)
+        model_name=cfg.model_name, is_train=False, cache_dir=cfg.cache_dir, verbose=cfg.verbose)
     tokenizer_eval = tokenizer_eval_dict["tokenizer"]
+
+    # Set the random seed of all modules (again, after loading data/model/tokenizer)
+    set_seed(cfg.seed)
 
     # Convert Hugging Face datasets to PyTorch Dataset and DataLoader (mini-batch)
     ds_torch_train = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_train, splits="train")
     ds_torch_valid = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_eval, splits="validation")
     ds_torch_test = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_eval, splits="test")
-    dataloader_train = DataLoader(ds_torch_train, batch_size=BSZ_TRAIN, shuffle=False)
-    dataloader_valid = DataLoader(ds_torch_valid, batch_size=BSZ_GEN, shuffle=False)
-    dataloader_test = DataLoader(ds_torch_test, batch_size=BSZ_GEN, shuffle=False)
+    dataloader_train = DataLoader(ds_torch_train, batch_size=cfg.bsz_train, shuffle=False)
+    dataloader_valid = DataLoader(ds_torch_valid, batch_size=cfg.bsz_gen, shuffle=False)
+    dataloader_test = DataLoader(ds_torch_test, batch_size=cfg.bsz_gen, shuffle=False)
 
-    if EVAL_BEFORE:
+    if cfg.eval_before:
         # Evaluation on the valid set before training
-        if verbose:
-            logger.info("\n\nEvaluation on the valid set before training...")
+        if cfg.verbose:
+            cfg.logger.info("\n\nEvaluation on the valid set before training...")
         evaluate(
-            ds_name=args.ds_name,
-            model_name=args.model_name,
+            cfg=cfg,
+            ds_name=cfg.ds_name,
+            model_name=cfg.model_name,
             gen_model=model,
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
-            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
+            save_dir=cfg.save_dir,
             save_fn=f"results_beforeFT_valid.jsonl",
-            verbose=verbose,
+            verbose=cfg.verbose,
         )
         # Evaluation on the test set before training
-        if verbose:
-            logger.info("\n\nEvaluation on the test set before training...")
+        if cfg.verbose:
+            cfg.logger.info("\n\nEvaluation on the test set before training...")
         evaluate(
-            ds_name=args.ds_name,
-            model_name=args.model_name,
+            cfg=cfg,
+            ds_name=cfg.ds_name,
+            model_name=cfg.model_name,
             gen_model=model,
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
-            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
+            save_dir=cfg.save_dir,
             save_fn=f"results_beforeFT_test.jsonl",
-            verbose=verbose,
+            verbose=cfg.verbose,
         )
 
     # Train (fine-tune) the model (Causal LM, next token prediction)
-    if verbose:
-        logger.info("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
+    if cfg.verbose:
+        cfg.logger.info("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
     ft_dict = training(
-        ds_name=args.ds_name,
-        model_name=args.model_name,
+        cfg=cfg,
+        ds_name=cfg.ds_name,
+        model_name=cfg.model_name,
         ft_model=model,
         tokenizer_train=tokenizer_train,
         tokenizer_eval=tokenizer_eval,
@@ -582,18 +608,13 @@ def run(verbose: bool = False) -> None:
         dataloader_valid=dataloader_valid,
         dataloader_test=dataloader_test,
         icl_prompt=icl_prompt,
-        # do_eval_epoch=True,
-        # do_eval_batch=True,
-        # save_after_epoch=True,
-        # eval_gap=1000,
-        # logging_gap=100,
-        do_eval_epoch=DO_EVAL_EPOCH,
-        do_eval_batch=DO_EVAL_BATCH,
-        save_after_epoch=SAVE_AFTER_EPOCH,
-        eval_gap=EVAL_GAP,
-        logging_gap=LOGGING_GAP,
-        save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
-        verbose=verbose,
+        do_eval_epoch=cfg.do_eval_epoch,
+        do_eval_batch=cfg.do_eval_batch,
+        save_after_epoch=cfg.save_after_epoch,
+        eval_gap=cfg.eval_gap,
+        logging_gap=cfg.logging_gap,
+        save_dir=cfg.save_dir,
+        verbose=cfg.verbose,
     )
     ft_model = ft_dict["ft_model"]  # the trained model
     # tokenizer_train = ft_dict["tokenizer_train"]
@@ -605,38 +626,40 @@ def run(verbose: bool = False) -> None:
     # best_valid_score = ft_dict["best_valid_score"]
     # best_test_score = ft_dict["best_test_score"]
 
-    if EVAL_AFTER:
+    if cfg.eval_after:
         # Evaluation on the valid set after training
-        if verbose:
-            logger.info("\n\nEvaluation on the valid set after training...")
+        if cfg.verbose:
+            cfg.logger.info("\n\nEvaluation on the valid set after training...")
         evaluate(
-            ds_name=args.ds_name,
-            model_name=args.model_name,
+            cfg=cfg,
+            ds_name=cfg.ds_name,
+            model_name=cfg.model_name,
             gen_model=ft_model,
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_valid,
             icl_prompt=icl_prompt,
-            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
+            save_dir=cfg.save_dir,
             save_fn=f"results_afterFT_valid.jsonl",
-            verbose=verbose,
+            verbose=cfg.verbose,
         )
         # Evaluation on the test set after training
-        if verbose:
-            logger.info("\n\nEvaluation on the test set after training...")
+        if cfg.verbose:
+            cfg.logger.info("\n\nEvaluation on the test set after training...")
         evaluate(
-            ds_name=args.ds_name,
-            model_name=args.model_name,
+            cfg=cfg,
+            ds_name=cfg.ds_name,
+            model_name=cfg.model_name,
             gen_model=ft_model,
             tokenizer_eval=tokenizer_eval,
             dataloader=dataloader_test,
             icl_prompt=icl_prompt,
-            save_dir=SAVE_DIR,  # f"{ds_name}---{model_name}"
+            save_dir=cfg.save_dir,
             save_fn=f"results_afterFT_test.jsonl",
-            verbose=verbose,
+            verbose=cfg.verbose,
         )
 
-    if verbose:
-        logger.info("\n\nDone!")
+    if cfg.verbose:
+        cfg.logger.info("\n\nDone!")
 
 
 if __name__ == "__main__":
@@ -647,7 +670,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose model: print logs")
+    parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose model: show logs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of all modules")
     parser.add_argument("--cuda", type=str, default="0", help="CUDA device(s), e.g., 0 OR 0,1")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
@@ -660,8 +683,9 @@ if __name__ == "__main__":
                         help="Whether run evaluation per `eval_gap` batches or not. (If so, save the best model.)")
     parser.add_argument("--save_after_epoch", action="store_true", default=False,
                         help="Whether save the ckpt and results after each epoch.")
+    parser.add_argument("--ckpt_limit", type=int, default=5, help="Limit the total amount of saved checkpoints")
     parser.add_argument("--eval_gap", type=int, default=1000, help="Run evaluation per `eval_gap` batches")
-    parser.add_argument("--logging_gap", type=int, default=100, help="Show loss per `logging_gap` batches.")
+    parser.add_argument("--logging_gap", type=int, default=100, help="Show loss per `logging_gap` batches")
     parser.add_argument("--n_icl", type=int, default=5, help="The number of examples for in-context learning")
     parser.add_argument("--n_gen", type=int, default=1, help="The number of sentences to be generated")
     parser.add_argument("--len_gen", type=int, default=10, help="The number of max tokens to be generated")
@@ -678,66 +702,71 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
     args = parser.parse_args()
     logger.info(args)
+    args.logger = logger
 
     timer_start = time.perf_counter()
 
     # Set the random seed of all modules
-    RANDOM_SEED = int(args.seed)
-    random.seed(RANDOM_SEED)
-    np.random.seed(RANDOM_SEED)
-    set_seed(RANDOM_SEED)
+    args.seed = int(args.seed)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    set_seed(args.seed)
 
     # Hyperparameters
-    CUDA = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
-    VERBOSE = bool(args.verbose)  # Verbose model: print logs
-    EVAL_BEFORE = bool(args.eval_before)  # Run evaluation before training
-    EVAL_AFTER = bool(args.eval_after)  # Run evaluation after training
-    DO_EVAL_EPOCH = bool(args.do_eval_epoch)  # Run evaluation after each epoch
-    DO_EVAL_BATCH = bool(args.do_eval_batch)  # Run evaluation per `eval_gap` batches (If so, save the best model)
-    SAVE_AFTER_EPOCH = bool(args.save_after_epoch)  # Save the ckpt and results after each epoch
-    EVAL_GAP = int(args.eval_gap)  # Run evaluation per `EVAL_GAP` batches
-    LOGGING_GAP = int(args.logging_gap)  # Show loss per `LOGGING_GAP` batches
-    EPOCH = int(args.epoch)  # The number of epochs for training
-    BSZ_TRAIN = int(args.bsz_train)  # The batch size for training
-    BSZ_GEN = int(args.bsz_gen)  # The batch size for generation /  evaluation
-    INIT_LR = float(args.init_lr)  # The initial learning rate for training
-    W_DECAY = float(args.w_decay)  # The weight decay rate for training
-    N_ICL = int(args.n_icl)  # The number of examples for in-context learning
-    N_GEN = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
-    LEN_GEN = int(args.len_gen)  # The number of max tokens to be generated
-    SAVE_DIR = str(args.save_dir)  # The directory of the current run
-    CACHE_DIR = str(args.cache_dir)  # The directory where data & model are cached
-    if not os.path.isdir(CACHE_DIR):
-        os.makedirs(CACHE_DIR, exist_ok=True)
-    LOG_DIR = str(args.log_dir)  # The directory to save logs
-    if not os.path.isdir(LOG_DIR):
-        os.makedirs(LOG_DIR, exist_ok=True)
-    CKPT_DIR = str(args.ckpt_dir)  # The directory to save model checkpoints
-    if not os.path.isdir(CKPT_DIR):
-        os.makedirs(CKPT_DIR, exist_ok=True)
-    OUTPUT_DIR = str(args.output_dir)  # The directory to outputs, e.g., results
-    if not os.path.isdir(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
+    args.cuda = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
+    args.verbose = bool(args.verbose)  # Verbose model: show logs
+    args.eval_before = bool(args.eval_before)  # Run evaluation before training
+    args.eval_after = bool(args.eval_after)  # Run evaluation after training
+    args.do_eval_epoch = bool(args.do_eval_epoch)  # Run evaluation after each epoch
+    args.do_eval_batch = bool(args.do_eval_batch)  # Run evaluation per `eval_gap` batches (If so, save the best model)
+    args.save_after_epoch = bool(args.save_after_epoch)  # Save the ckpt and results after each epoch
+    args.ckpt_limit = max(0, int(args.ckpt_limit))  # Limit the total amount of saved checkpoints
+    args.ckpt_queue = deque()  # The queue of `save_dir` of saved checkpoints (except the best model)
+    args.eval_gap = int(args.eval_gap)  # Run evaluation per `EVAL_GAP` batches
+    args.logging_gap = int(args.logging_gap)  # Show loss per `LOGGING_GAP` batches
+    args.epoch = int(args.epoch)  # The number of epochs for training
+    args.bsz_train = int(args.bsz_train)  # The batch size for training
+    args.bsz_gen = int(args.bsz_gen)  # The batch size for generation /  evaluation
+    args.init_lr = float(args.init_lr)  # The initial learning rate for training
+    args.w_decay = float(args.w_decay)  # The weight decay rate for training
+    args.n_icl = int(args.n_icl)  # The number of examples for in-context learning
+    args.n_gen = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
+    args.len_gen = int(args.len_gen)  # The number of max tokens to be generated
+    args.save_dir = str(args.save_dir)  # The directory of the current run
+    args.cache_dir = str(args.cache_dir)  # The directory where data & model are cached
+    if not os.path.isdir(args.cache_dir):
+        os.makedirs(args.cache_dir, exist_ok=True)
+    args.log_dir = str(args.log_dir)  # The directory to save logs
+    if not os.path.isdir(args.log_dir):
+        os.makedirs(args.log_dir, exist_ok=True)
+    args.ckpt_dir = str(args.ckpt_dir)  # The directory to save model checkpoints
+    if not os.path.isdir(args.ckpt_dir):
+        os.makedirs(args.ckpt_dir, exist_ok=True)
+    args.output_dir = str(args.output_dir)  # The directory to outputs, e.g., results
+    if not os.path.isdir(args.output_dir):
+        os.makedirs(args.output_dir, exist_ok=True)
 
     # CUDA
-    os.environ["CUDA_VISIBLE_DEVICES"] = CUDA
-    HAS_CUDA = torch.cuda.is_available()
-    DEVICE = torch.device("cuda" if HAS_CUDA else "cpu")
-    GPUS = CUDA.split(",") if "," in CUDA else [CUDA]
-    GPUS = [int(gpu_id) for gpu_id in GPUS]
-    if VERBOSE:
-        logger.info(f"HAS_CUDA: {HAS_CUDA}; DEVICE: {DEVICE}; GPUS: {GPUS}")
-        logger.info("torch.__version__:", torch.__version__)
-        logger.info("torch.version.cuda:", torch.version.cuda)
-        logger.info("torch.backends.cudnn.version():", torch.backends.cudnn.version())
-        logger.info("torch.cuda.is_available():", torch.cuda.is_available())
-        logger.info("torch.cuda.device_count():", torch.cuda.device_count())
-        logger.info("torch.cuda.get_arch_list():", torch.cuda.get_arch_list())
-        if HAS_CUDA:
-            logger.info("torch.cuda.current_device():", torch.cuda.current_device())
-            logger.info("torch.cuda.get_device_name(0):", torch.cuda.get_device_name(0))
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
+    args.has_cuda = torch.cuda.is_available()
+    args.device = torch.device("cuda" if args.has_cuda else "cpu")
+    args.gpus = args.cuda.split(",") if "," in args.cuda else [args.cuda]
+    args.gpus = [int(gpu_id) for gpu_id in args.gpus]
+    args.device_count = int(torch.cuda.device_count())
+    args.ddp_able = args.has_cuda and len(args.gpus) > 1 and args.device_count > 1
+    if args.verbose:
+        logger.info(f"HAS_CUDA: {args.has_cuda}; DEVICE: {args.device}; GPUS: {args.gpus}; DDP able: {args.ddp_able}")
+        logger.info(f"torch.__version__: {torch.__version__}")
+        logger.info(f"torch.version.cuda: {torch.version.cuda}")
+        logger.info(f"torch.cuda.is_available(): {torch.cuda.is_available()}")
+        logger.info(f"torch.cuda.device_count(): {torch.cuda.device_count()}")
+        logger.info(f"torch.backends.cudnn.version(): {torch.backends.cudnn.version()}")
+        logger.info(f"torch.cuda.get_arch_list(): {torch.cuda.get_arch_list()}")
+        if args.has_cuda:
+            logger.info(f"torch.cuda.current_device(): {torch.cuda.current_device()}")
+            logger.info(f"torch.cuda.get_device_name(0): {torch.cuda.get_device_name(0)}")
 
-    run(verbose=VERBOSE)
+    run(cfg=args)
 
     timer_end = time.perf_counter()
     logger.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))

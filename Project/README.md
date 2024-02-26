@@ -66,14 +66,15 @@ on the [Commonsense QA](https://huggingface.co/datasets/tau/commonsense_qa) data
 including training (fine-tuning), generation, and evaluation.
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose \
-  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch
+python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
+  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5
 ```
 
 Without evaluation:
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --verbose
+python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
+  --save_after_epoch --ckpt_limit 5
 ```
 
 To specify more hyperparameters (all the following settings are default values):
@@ -82,16 +83,17 @@ To specify more hyperparameters (all the following settings are default values):
 python3 main.py \
   --ds_name "commonsense_qa" \
   --model_name "gpt2" \
+  --cuda "0" \
+  --seed 42 \
   --verbose \
   --eval_before \
   --eval_after \
   --do_eval_epoch \
   --do_eval_batch \
   --save_after_epoch \
+  --ckpt_limit 5 \
   --eval_gap 1000 \
   --logging_gap 100 \
-  --seed 42 \
-  --cuda "0" \
   --n_icl 5 \
   --n_gen 1 \
   --len_gen 10 \
