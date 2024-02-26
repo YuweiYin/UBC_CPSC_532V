@@ -77,6 +77,13 @@ python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verb
   --save_after_epoch --ckpt_limit 5
 ```
 
+**DataParallel** (`torch.nn.parallel.data_parallel.DataParallel`) Training (at least two GPUs):
+
+```bash
+python3 main_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
+  --save_after_epoch --ckpt_limit 5 --dp
+```
+
 To specify more hyperparameters (all the following settings are default values):
 
 ```bash
