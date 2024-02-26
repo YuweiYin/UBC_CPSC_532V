@@ -9,12 +9,15 @@ from transformers import AutoTokenizer
 
 class TokenizerLoader:
 
-    def __init__(self):
-        logging.basicConfig(
-            format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
-            datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
-        )
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self, logger: logging.Logger):
+        if isinstance(logger, logging.Logger):
+            self.logger = logger
+        else:
+            logging.basicConfig(
+                format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+                datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+            )
+            self.logger = logging.getLogger(self.__class__.__name__)
 
     def load_tokenizer(
             self,

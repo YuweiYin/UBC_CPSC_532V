@@ -10,15 +10,18 @@ from datasets.dataset_dict import DatasetDict
 
 class DatasetLoader:
 
-    def __init__(self):
+    def __init__(self, logger: logging.Logger):
         # ord_A = ord("A")
         # self.idx2choice = {index: chr(ord_A + index) for index in range(26)}
         # self.choice2idx = {chr(ord_A + index): index for index in range(26)}
-        logging.basicConfig(
-            format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
-            datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
-        )
-        self.logger = logging.getLogger(self.__class__.__name__)
+        if isinstance(logger, logging.Logger):
+            self.logger = logger
+        else:
+            logging.basicConfig(
+                format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+                datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+            )
+            self.logger = logging.getLogger(self.__class__.__name__)
 
     def load_dataset(
             self,
@@ -34,7 +37,7 @@ class DatasetLoader:
         :param n_icl: The number of examples for in-context learning.
         :param cache_dir: The directory where data & model are cached.
         :param random_seed: Random seed of all modules.
-        :param verbose: Verbose model: print logs.
+        :param verbose: Verbose model: show logs.
         :return: the dataset dict.
         """
 
@@ -64,8 +67,29 @@ class DatasetLoader:
             self.logger.info(f"[Dataset] features: {ds_hf_train.features}\n")
 
         # Set in-context learning examples (random choice at least 3 examples from the training set)
-        icl_indices = random.sample(range(len(ds_hf_train)), max(3, n_icl))
-        icl_dataset = ds_hf_train.select(icl_indices)
+        icl_prompt = self.get_icl_prompts(source_dataset=ds_hf_train, n_icl=n_icl, verbose=verbose)
+
+        return {
+            "dataset_hf": dataset_hf,
+            "icl_prompt": icl_prompt,
+        }
+
+    def get_icl_prompts(
+            self,
+            source_dataset,
+            n_icl: int = 5,
+            verbose: bool = False,
+    ):
+        """
+        Set in-context learning examples (random choice at least 3 examples from the source dataset)
+        :param source_dataset: The dataset where the in-context-learning prompts come from.
+        :param n_icl: The number of examples for in-context learning.
+        :param verbose: Verbose model: show logs.
+        :return: the in-context-learning prompts.
+        """
+
+        icl_indices = random.sample(range(len(source_dataset)), max(3, n_icl))
+        icl_dataset = source_dataset.select(icl_indices)
         icl_prompt = ""
         for icl_item in icl_dataset:
             icl_item = self.map_prompt(icl_item)  # get the prompt (without answer)
@@ -76,10 +100,7 @@ class DatasetLoader:
         if verbose:
             self.logger.info(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
 
-        return {
-            "dataset_hf": dataset_hf,
-            "icl_prompt": icl_prompt,
-        }
+        return icl_prompt
 
     def get_dataset(
             self,

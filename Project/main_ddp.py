@@ -17,7 +17,9 @@ import numpy as np
 import torch
 from torch import optim
 from torch.utils.data import DataLoader
-from torch.nn.parallel.data_parallel import DataParallel
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from torch.nn.parallel.distributed import DistributedDataParallel as dDP
 
 from transformers import set_seed
 
@@ -70,15 +72,15 @@ def training(
 
     model.train()
 
-    if isinstance(model, DataParallel):  # Multiple GPUs training
+    if isinstance(model, dDP):  # DDP training
         model.module.train()
-        model = model.to(f"cuda:{cfg.gpus[0]}")
+        model = model.to(cfg.rank)
     else:  # Single GPU training
         model = model.to(cfg.device)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
-        if isinstance(model, DataParallel):
-            save_dir = f"{ds_name}---{model_name}---dp"
+        if isinstance(model, dDP):
+            save_dir = f"{ds_name}---{model_name}---ddp"
         else:
             save_dir = f"{ds_name}---{model_name}"
 
@@ -104,7 +106,7 @@ def training(
     batch_cnt = 0
     for epoch in range(cfg.epoch):
         if verbose:
-            cfg.logger.info(f">>> Start Epoch: {epoch}")
+            cfg.logger.info(f">>> Start Epoch: {epoch} (RANK={cfg.rank})")
         epoch_losses = []
 
         for batch_idx, batch_train in enumerate(dataloader_train):
@@ -120,8 +122,8 @@ def training(
             # Tokenized inputs
             inputs = tokenizer_train(input_list, return_tensors="pt", padding=True)  # padding_side="right"
             inputs.data["labels"] = inputs.data["input_ids"].clone()  # inputs.input_ids.clone()
-            if isinstance(model, DataParallel):
-                inputs = inputs.to(f"cuda:{cfg.gpus[0]}")
+            if isinstance(model, dDP):
+                inputs = inputs.to(cfg.rank)
             else:
                 inputs = inputs.to(cfg.device)
 
@@ -133,7 +135,7 @@ def training(
 
             # Backpropagation
             optimizer.zero_grad()
-            loss.sum().backward()
+            loss.sum().backward()  # DDP automatically synchronizes here
             optimizer.step()
 
             # loss_value = loss.detach().cpu().numpy().item()
@@ -148,11 +150,11 @@ def training(
                     cfg.logger.info(cur_log)
 
             # Run evaluation
-            if do_eval_batch and batch_cnt % eval_gap == 0:
+            if do_eval_batch and batch_cnt % eval_gap == 0 and cfg.rank == 0:
                 if isinstance(dataloader_valid, DataLoader):
                     # Evaluation on the valid set during training
                     if verbose:
-                        cfg.logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                        cfg.logger.info(f"[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
                                         f">>> loss: {loss}")
                     valid_score = evaluate(
                         cfg=cfg,
@@ -170,34 +172,36 @@ def training(
                     if valid_score > best_valid_score:
                         best_valid_score = valid_score
 
-                        # Save the best model based on the best valid score
-                        save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
-                        if not os.path.isdir(save_ckpt_hf):
-                            os.makedirs(save_ckpt_hf, exist_ok=True)
-                        if verbose:
-                            cfg.logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
-                        if isinstance(model, DataParallel):
-                            model.module.save_pretrained(save_ckpt_hf)
-                        else:
-                            model.save_pretrained(save_ckpt_hf)  # Save config.json and model.safetensors
-                        # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
-                        # torch.save(model.state_dict(), save_ckpt_torch_fp)  # duplicated
+                        if cfg.rank == 0:
+                            # Save the best model based on the best valid score
+                            save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
+                            if not os.path.isdir(save_ckpt_hf):
+                                os.makedirs(save_ckpt_hf, exist_ok=True)
 
-                        # Save the tokenizers
-                        save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
-                        if not os.path.isdir(save_tokenizer_train_hf):
-                            os.makedirs(save_tokenizer_train_hf, exist_ok=True)
-                        tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+                            if verbose:
+                                cfg.logger.info(f"Save the best model (valid score = {valid_score}) at {save_ckpt_hf}")
+                            if isinstance(model, dDP):
+                                model.module.save_pretrained(save_ckpt_hf)
+                            else:
+                                model.save_pretrained(save_ckpt_hf)  # Save config.json and model.safetensors
+                            # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
+                            # torch.save(model.state_dict(), save_ckpt_torch_fp)  # duplicated
 
-                        save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
-                        if not os.path.isdir(save_tokenizer_eval_hf):
-                            os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
-                        tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
+                            # Save the tokenizers
+                            save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
+                            if not os.path.isdir(save_tokenizer_train_hf):
+                                os.makedirs(save_tokenizer_train_hf, exist_ok=True)
+                            tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+
+                            save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
+                            if not os.path.isdir(save_tokenizer_eval_hf):
+                                os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
+                            tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
 
                 if isinstance(dataloader_test, DataLoader):
                     # Evaluation on the test set during training
                     if verbose:
-                        cfg.logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
+                        cfg.logger.info(f"[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} "
                                         f">>> loss: {loss}")
                     test_score = evaluate(
                         cfg=cfg,
@@ -217,34 +221,37 @@ def training(
 
             batch_cnt += 1
 
+        # dist.barrier(device_ids=cfg.gpus[:])
         # After each epoch, save the losses and scores
+        # TODO: gather the training losses from all devices and then save (AND use the nccl backend)
         if verbose:
-            cfg.logger.info(f">>> END of Epoch: {epoch}")
+            cfg.logger.info(f">>> END of Epoch: {epoch} (RANK={cfg.rank})")
         all_losses.append(epoch_losses)
         avg_ep_loss = np.mean(epoch_losses)
-        save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
+        save_loss_path = os.path.join(save_log_dir, f"all_losses-RANK_{cfg.rank}.log")
         with open(save_loss_path, "w", encoding="utf-8") as fp_out:
             for epoch_losses in all_losses:
                 fp_out.write(json.dumps(epoch_losses) + "\n")
 
-        save_valid_score_path = os.path.join(save_log_dir, f"all_valid_scores.log")
-        with open(save_valid_score_path, "w", encoding="utf-8") as fp_out:
-            for valid_score in all_valid_scores:
-                fp_out.write(json.dumps(valid_score) + "\n")
+        if cfg.rank == 0:
+            save_valid_score_path = os.path.join(save_log_dir, f"all_valid_scores-RANK_{cfg.rank}.log")
+            with open(save_valid_score_path, "w", encoding="utf-8") as fp_out:
+                for valid_score in all_valid_scores:
+                    fp_out.write(json.dumps(valid_score) + "\n")
 
-        save_test_score_path = os.path.join(save_log_dir, f"all_test_scores.log")
-        with open(save_test_score_path, "w", encoding="utf-8") as fp_out:
-            for test_score in all_test_scores:
-                fp_out.write(json.dumps(test_score) + "\n")
+            save_test_score_path = os.path.join(save_log_dir, f"all_test_scores-RANK_{cfg.rank}.log")
+            with open(save_test_score_path, "w", encoding="utf-8") as fp_out:
+                for test_score in all_test_scores:
+                    fp_out.write(json.dumps(test_score) + "\n")
 
         # Save the model with tokenizers at the end of this epoch
-        if save_after_epoch and cfg.ckpt_limit > 0:
+        if cfg.rank == 0 and save_after_epoch and cfg.ckpt_limit > 0:
             save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch_{epoch}")  # HF model folder
             if not os.path.isdir(save_ckpt_hf):
                 os.makedirs(save_ckpt_hf, exist_ok=True)
             if verbose:
                 cfg.logger.info(f"Save the model for epoch {epoch} at {save_ckpt_hf}")
-            if isinstance(model, DataParallel):
+            if isinstance(model, dDP):
                 model.module.save_pretrained(save_ckpt_hf)
             else:
                 model.save_pretrained(save_ckpt_hf)  # Save config.json and model.safetensors
@@ -270,11 +277,11 @@ def training(
                     shutil.rmtree(overflow_dir, ignore_errors=True)
 
         # Run evaluation
-        if do_eval_epoch:
+        if do_eval_epoch and cfg.rank == 0:
             if isinstance(dataloader_valid, DataLoader):
                 # Evaluation on the valid set at the end of this epoch
                 if verbose:
-                    cfg.logger.info(f"\n[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                    cfg.logger.info(f"[Evaluation - valid] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
                                     f">>> average loss: {avg_ep_loss}")
                 valid_score = evaluate(
                     cfg=cfg,
@@ -292,34 +299,35 @@ def training(
                 if valid_score > best_valid_score:
                     best_valid_score = valid_score
 
-                    # Save the best model based on the best valid score
-                    save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
-                    if not os.path.isdir(save_ckpt_hf):
-                        os.makedirs(save_ckpt_hf, exist_ok=True)
-                    if verbose:
-                        cfg.logger.info(f"Save the best model (valid score {best_valid_score}) at {save_ckpt_hf}")
-                    if isinstance(model, DataParallel):
-                        model.module.save_pretrained(save_ckpt_hf)
-                    else:
-                        model.save_pretrained(save_ckpt_hf)  # Save config.json and model.safetensors
-                    # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
-                    # torch.save(model.state_dict(), save_ckpt_torch_fp)  # duplicated
+                    if cfg.rank == 0:
+                        # Save the best model based on the best valid score
+                        save_ckpt_hf = os.path.join(save_ckpt_dir, "model_best")  # HF model folder
+                        if not os.path.isdir(save_ckpt_hf):
+                            os.makedirs(save_ckpt_hf, exist_ok=True)
+                        if verbose:
+                            cfg.logger.info(f"Save the best model (valid score = {valid_score}) at {save_ckpt_hf}")
+                        if isinstance(model, dDP):
+                            model.module.save_pretrained(save_ckpt_hf)
+                        else:
+                            model.save_pretrained(save_ckpt_hf)  # Save config.json and model.safetensors
+                        # save_ckpt_torch_fp = os.path.join(save_ckpt_hf, f"torch_ckpt.pt")  # torch.save
+                        # torch.save(model.state_dict(), save_ckpt_torch_fp)  # duplicated
 
-                    # Save the tokenizers
-                    save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
-                    if not os.path.isdir(save_tokenizer_train_hf):
-                        os.makedirs(save_tokenizer_train_hf, exist_ok=True)
-                    tokenizer_train.save_pretrained(save_tokenizer_train_hf)
+                        # Save the tokenizers
+                        save_tokenizer_train_hf = os.path.join(save_ckpt_hf, "tokenizer_train")
+                        if not os.path.isdir(save_tokenizer_train_hf):
+                            os.makedirs(save_tokenizer_train_hf, exist_ok=True)
+                        tokenizer_train.save_pretrained(save_tokenizer_train_hf)
 
-                    save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
-                    if not os.path.isdir(save_tokenizer_eval_hf):
-                        os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
-                    tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
+                        save_tokenizer_eval_hf = os.path.join(save_ckpt_hf, "tokenizer_eval")
+                        if not os.path.isdir(save_tokenizer_eval_hf):
+                            os.makedirs(save_tokenizer_eval_hf, exist_ok=True)
+                        tokenizer_train.save_pretrained(save_tokenizer_eval_hf)
 
             if isinstance(dataloader_test, DataLoader):
                 # Evaluation on the test set at the end of this epoch
                 if verbose:
-                    cfg.logger.info(f"\n[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
+                    cfg.logger.info(f"[Evaluation - test] >>> Epoch {epoch} >>> Total Batch {batch_cnt} "
                                     f">>> average loss: {avg_ep_loss}")
                 test_score = evaluate(
                     cfg=cfg,
@@ -337,6 +345,7 @@ def training(
                 if test_score > best_test_score:
                     best_test_score = test_score
 
+    # dist.barrier(device_ids=cfg.gpus[:])
     return {
         "model": model,
         "tokenizer_train": tokenizer_train,
@@ -364,7 +373,8 @@ def evaluate(
         verbose: bool = False,
 ) -> float:
     """
-    Model generation for evaluation
+    Model generation for evaluation.
+    TODO: use DDP generation with broadcast and gather/reduce ops. (Now, only RANK=0 device do generation)
     :param cfg: configuration / arguments.
     :param ds_name: the dataset name.
     :param model_name: the model name.
@@ -380,23 +390,26 @@ def evaluate(
     :return: Accuracy score. Save the evaluation results/scores after generation.
     """
 
+    if cfg.rank != 0:
+        cfg.logger.error(f"Now, evaluate() is ONLY for RANK=0. Cur rank = {cfg.rank}")
+        return 0.0
+    assert cfg.rank == 0
+
     model.eval()
 
-    if isinstance(model, DataParallel):  # Multiple GPUs generation
+    if isinstance(model, dDP):  # DDP generation
         model.module.eval()
-        model = model.to(f"cuda:{cfg.gpus[0]}")
+        model = model.to(cfg.rank)
     else:  # Single GPU generation
         model = model.to(cfg.device)
 
     if not isinstance(save_dir, str) or len(save_dir) == 0:
-        if isinstance(model, DataParallel):
-            save_dir = f"{ds_name}---{model_name}---dp"
+        if isinstance(model, dDP):
+            save_dir = f"{ds_name}---{model_name}---ddp"
         else:
             save_dir = f"{ds_name}---{model_name}"
 
-    all_prompts = []
-    all_preds = []
-    all_answers = []
+    all_prompts, all_preds, all_answers = [], [], []
 
     # Two metrics when using Causal LM for classification
     # 1. direct generation: consider all possible tokens in the vocab
@@ -437,8 +450,8 @@ def evaluate(
         # Tokenized inputs
         inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="right"
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
-        if isinstance(model, DataParallel):
-            inputs = inputs.to(f"cuda:{cfg.gpus[0]}")
+        if isinstance(model, dDP):
+            inputs = inputs.to(cfg.rank)
         else:
             inputs = inputs.to(cfg.device)
 
@@ -467,7 +480,7 @@ def evaluate(
 
         else:
             # Generate (beam search, sampling, temperature, etc.)
-            if isinstance(model, DataParallel):
+            if isinstance(model, dDP):
                 generator = model.module
             else:
                 generator = model
@@ -538,7 +551,7 @@ def evaluate(
     accuracy = len(correct_idx) / len(results) if len(results) > 0 else 0.0
     if verbose:
         # cfg.logger.info(f">>> Accuracy: {accuracy:.5f}")
-        cfg.logger.info(f">>> Accuracy: {accuracy}")
+        cfg.logger.info(f">>> Accuracy (RANK={cfg.rank}): {accuracy}")
 
     # Save the evaluation results
     save_results_dir = os.path.join(cfg.output_dir, save_dir)
@@ -548,7 +561,7 @@ def evaluate(
         save_results_path = os.path.join(save_results_dir, save_fn)
     else:
         # save_results_path = os.path.join(save_results_dir, f"{ds_name}---{model_name}---results.jsonl")
-        save_results_path = os.path.join(save_results_dir, f"results-acc_{accuracy:.5f}.jsonl")
+        save_results_path = os.path.join(save_results_dir, f"results-RANK_{cfg.rank}-acc_{accuracy:.5f}.jsonl")
     with open(save_results_path, "w", encoding="utf-8") as fp_out:
         for result in results:
             fp_out.write(json.dumps(result) + "\n")
@@ -557,8 +570,34 @@ def evaluate(
 
 
 def run(
-        cfg
+        rank,
+        world_size,
+        cfg,
 ) -> None:
+    os.environ["MASTER_ADDR"] = cfg.master_addr
+    os.environ["MASTER_PORT"] = cfg.master_port
+
+    # initialize the process group
+    dist.init_process_group(backend=cfg.backend, rank=rank, world_size=world_size)
+
+    # rank = dist.get_rank()
+    w_size = dist.get_world_size()
+    assert w_size == world_size == cfg.world_size == cfg.device_count == len(cfg.gpus) > 0
+    cfg.rank = rank
+
+    logging.basicConfig(
+        format="[%(asctime)s - %(levelname)s - %(name)s] -   %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO
+    )
+    cfg.logger = logging.getLogger(name=f"RANK_{rank}")
+    cfg.logger.info(f"Running DDP on rank {rank}: world_size={world_size}; "
+                    f"backend={cfg.backend}; master_addr={cfg.master_addr}; master_port={cfg.master_port}")
+
+    cfg.verbose = cfg.verbose_all or (cfg.verbose and rank == 0)  # if not verbose_all, only rank=0 can output logs
+
+    if cfg.verbose:
+        cfg.logger.info(cfg)
+
     # Loaders
     datasetLoader = DatasetLoader(cfg.logger)
     modelLoader = ModelLoader(cfg.logger)
@@ -576,12 +615,11 @@ def run(
     # Model
     model_dict = modelLoader.load_model(model_name=cfg.model_name, cache_dir=cfg.cache_dir, verbose=cfg.verbose)
     model = model_dict["model"]
-    if cfg.dp and cfg.ddp_able:  # Multiple GPUs training and generation
-        model = DataParallel(module=model, device_ids=cfg.gpus, output_device=cfg.gpus[0], dim=0)
-        model = model.to(f"cuda:{cfg.gpus[0]}")
-        # assert isinstance(model, DataParallel) and isinstance(model.module, torch.nn.Module)
-    else:  # Single GPU training and generation
-        model = model.to(cfg.device)
+    # model = dDP(module=model, device_ids=[rank], output_device=0, dim=0)
+    model = dDP(module=model)
+    model = model.to(rank)
+    if cfg.verbose:
+        cfg.logger.info(f"type(model) = {type(model)}")
 
     # Tokenizer
     tokenizer_train_dict = tokenizerLoader.load_tokenizer(
@@ -594,18 +632,47 @@ def run(
     # Set the random seed of all modules (again, after loading data/model/tokenizer)
     set_seed(cfg.seed)
 
-    # Convert Hugging Face datasets to PyTorch Dataset and DataLoader (mini-batch)
-    ds_torch_train = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_train, splits="train")
+    # Dataset partition for each DDP process
+    partition_ratio = 1.0 / w_size
+    partition_ratios = [(i * partition_ratio, (i + 1) * partition_ratio) for i in range(w_size)]
+    assert 0 <= rank < len(partition_ratios), f"Assertion Error: not 0 <= rank < len(partition_ratios): rank = {rank}"
+    cur_ratio_range = partition_ratios[rank]
+    if cfg.verbose:
+        cfg.logger.info(f"partition_ratio = {partition_ratio}; cur_ratio_range = {cur_ratio_range}")
+
+    # Convert Hugging Face datasets to PyTorch Dataset
+    ds_torch_train = DatasetMultiChoiceQA(
+        dataset=dataset_hf, tokenizer=tokenizer_train, splits="train", ratio_range=cur_ratio_range)
+    # ds_torch_valid = DatasetMultiChoiceQA(
+    #     dataset=dataset_hf, tokenizer=tokenizer_eval, splits="validation", ratio_range=cur_ratio_range)
+    # ds_torch_test = DatasetMultiChoiceQA(
+    #     dataset=dataset_hf, tokenizer=tokenizer_eval, splits="test", ratio_range=cur_ratio_range)
     ds_torch_valid = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_eval, splits="validation")
     ds_torch_test = DatasetMultiChoiceQA(dataset=dataset_hf, tokenizer=tokenizer_eval, splits="test")
-    dataloader_train = DataLoader(ds_torch_train, batch_size=cfg.bsz_train, shuffle=False)
-    dataloader_valid = DataLoader(ds_torch_valid, batch_size=cfg.bsz_gen, shuffle=False)
-    dataloader_test = DataLoader(ds_torch_test, batch_size=cfg.bsz_gen, shuffle=False)
 
-    if cfg.eval_before:
+    # PyTorch DataLoader (mini-batch)
+    bsz_train_per_device = int(cfg.bsz_train / float(w_size))
+    bsz_gen_per_device = int(cfg.bsz_gen / float(w_size))
+    if cfg.verbose:
+        cfg.logger.info(f"bsz_train_per_device = {bsz_train_per_device}; bsz_gen_per_device = {bsz_gen_per_device}")
+    dataloader_train = DataLoader(ds_torch_train, batch_size=bsz_train_per_device, shuffle=False)
+    dataloader_valid = DataLoader(ds_torch_valid, batch_size=bsz_gen_per_device, shuffle=False)
+    dataloader_test = DataLoader(ds_torch_test, batch_size=bsz_gen_per_device, shuffle=False)
+
+    if cfg.verbose:
+        cfg.logger.info(f"ds_torch_train: ratio_range = {ds_torch_train.ratio_range}; "
+                        f"index_range = {ds_torch_train.index_range}")
+        cfg.logger.info(f"ds_torch_valid: ratio_range = {ds_torch_valid.ratio_range}; "
+                        f"index_range = {ds_torch_valid.index_range}")
+        cfg.logger.info(f"ds_torch_test: ratio_range = {ds_torch_test.ratio_range}; "
+                        f"index_range = {ds_torch_test.index_range}")
+
+    # dist.barrier(device_ids=cfg.gpus[:])
+
+    if cfg.eval_before and cfg.rank == 0:
         # Evaluation on the valid set before training
         if cfg.verbose:
-            cfg.logger.info("\n\nEvaluation on the valid set before training...")
+            cfg.logger.info("Evaluation on the valid set before training...")
         evaluate(
             cfg=cfg,
             ds_name=cfg.ds_name,
@@ -618,9 +685,10 @@ def run(
             save_fn=f"results_beforeFT_valid.jsonl",
             verbose=cfg.verbose,
         )
+
         # Evaluation on the test set before training
         if cfg.verbose:
-            cfg.logger.info("\n\nEvaluation on the test set before training...")
+            cfg.logger.info("Evaluation on the test set before training...")
         evaluate(
             cfg=cfg,
             ds_name=cfg.ds_name,
@@ -634,9 +702,11 @@ def run(
             verbose=cfg.verbose,
         )
 
+    # dist.barrier(device_ids=cfg.gpus[1:])
+
     # Train (fine-tune) the model (Causal LM, next token prediction)
     if cfg.verbose:
-        cfg.logger.info("\n\nTrain (fine-tune) the model (Causal LM, next token prediction)...")
+        cfg.logger.info("Train (fine-tune) the model (Causal LM, next token prediction)...")
     ft_dict = training(
         cfg=cfg,
         ds_name=cfg.ds_name,
@@ -665,10 +735,12 @@ def run(
     # best_valid_score = ft_dict["best_valid_score"]
     # best_test_score = ft_dict["best_test_score"]
 
-    if cfg.eval_after:
+    # dist.barrier(device_ids=cfg.gpus[:])
+
+    if cfg.eval_after and cfg.rank == 0:
         # Evaluation on the valid set after training
         if cfg.verbose:
-            cfg.logger.info("\n\nEvaluation on the valid set after training...")
+            cfg.logger.info("Evaluation on the valid set after training...")
         evaluate(
             cfg=cfg,
             ds_name=cfg.ds_name,
@@ -681,9 +753,10 @@ def run(
             save_fn=f"results_afterFT_valid.jsonl",
             verbose=cfg.verbose,
         )
+
         # Evaluation on the test set after training
         if cfg.verbose:
-            cfg.logger.info("\n\nEvaluation on the test set after training...")
+            cfg.logger.info("Evaluation on the test set after training...")
         evaluate(
             cfg=cfg,
             ds_name=cfg.ds_name,
@@ -697,8 +770,13 @@ def run(
             verbose=cfg.verbose,
         )
 
-    if cfg.verbose:
-        cfg.logger.info("\n\nDone!")
+    # dist.barrier(device_ids=cfg.gpus[1:])
+    # if cfg.verbose:
+    #     cfg.logger.info("Done!")
+    cfg.logger.info("Done!")
+
+    # dist.barrier(device_ids=cfg.gpus[:])
+    dist.destroy_process_group()
 
 
 if __name__ == "__main__":
@@ -710,9 +788,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose mode: show logs")
+    parser.add_argument("--verbose_all", action="store_true", default=False, help="Verbose: show logs of all RANKs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of all modules")
     parser.add_argument("--cuda", type=str, default="0", help="CUDA device(s), e.g., 0 OR 0,1")
-    parser.add_argument("--dp", action="store_true", default=False, help="Multi-GPU training - DataParallel")
+    parser.add_argument("--ddp", action="store_true", default=False, help="Multi-GPU training: DistributedDataParallel")
+    parser.add_argument("--backend", type=str, default="gloo", help="The DDP backend, e.g., gloo and nccl")
+    parser.add_argument("--master_addr", type=str, default="localhost", help="The DDP communication address")
+    parser.add_argument("--master_port", type=str, default="12345", help="The DDP communication port")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
     parser.add_argument("-m", "--model_name", type=str, default="", help="Model name (Causal LM), e.g., gpt2")
     parser.add_argument("--eval_before", action="store_true", default=False, help="Run evaluation before training")
@@ -742,7 +824,6 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
     args = parser.parse_args()
     logger.info(args)
-    args.logger = logger
 
     timer_start = time.perf_counter()
 
@@ -754,8 +835,12 @@ if __name__ == "__main__":
 
     # Hyperparameters
     args.cuda = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
-    args.dp = bool(args.dp)  # Multi-GPU training - DataParallel
+    args.ddp = bool(args.ddp)  # Multi-GPU training: DistributedDataParallel
+    args.backend = str(args.backend)  # The DDP backend, e.g., nccl and gloo
+    args.master_addr = str(args.master_addr)  # The DDP communication address
+    args.master_port = str(args.master_port)  # The DDP communication port
     args.verbose = bool(args.verbose)  # Verbose mode: show logs
+    args.verbose_all = bool(args.verbose)  # Verbose mode: show logs of all RANKs
     args.eval_before = bool(args.eval_before)  # Run evaluation before training
     args.eval_after = bool(args.eval_after)  # Run evaluation after training
     args.do_eval_epoch = bool(args.do_eval_epoch)  # Run evaluation after each epoch
@@ -771,7 +856,7 @@ if __name__ == "__main__":
     args.init_lr = float(args.init_lr)  # The initial learning rate for training
     args.w_decay = float(args.w_decay)  # The weight decay rate for training
     args.n_icl = int(args.n_icl)  # The number of examples for in-context learning
-    args.n_gen = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
+    args.n_gen = int(args.n_gen)  # The number of sentences to be generated (for each evaluate() call)
     args.len_gen = int(args.len_gen)  # The number of max tokens to be generated
     args.save_dir = str(args.save_dir)  # The directory of the current run
     args.cache_dir = str(args.cache_dir)  # The directory where data & model are cached
@@ -794,10 +879,13 @@ if __name__ == "__main__":
     args.gpus = args.cuda.split(",") if "," in args.cuda else [args.cuda]
     args.gpus = [int(gpu_id) for gpu_id in args.gpus]
     args.device_count = int(torch.cuda.device_count())
-    args.ddp_able = args.has_cuda and len(args.gpus) > 1 and args.device_count > 1
+    assert len(args.gpus) == args.device_count, \
+        f"Assertion Error: len(gpus) = {len(args.gpus)}; device_count = {args.device_count}"
+    args.world_size = args.device_count
+    args.ddp_able = args.has_cuda and len(args.gpus) > 1
     if args.verbose:
         logger.info(f"HAS_CUDA: {args.has_cuda}; DEVICE: {args.device}; GPUS: {args.gpus}; "
-                    f"DDP able: {args.ddp_able}; use DataParallel: {args.dp}")
+                    f"DDP able: {args.ddp_able}; use DistributedDataParallel: {args.ddp}")
         logger.info(f"torch.__version__: {torch.__version__}")
         logger.info(f"torch.version.cuda: {torch.version.cuda}")
         logger.info(f"torch.cuda.is_available(): {torch.cuda.is_available()}")
@@ -808,7 +896,17 @@ if __name__ == "__main__":
             logger.info(f"torch.cuda.current_device(): {torch.cuda.current_device()}")
             logger.info(f"torch.cuda.get_device_name(0): {torch.cuda.get_device_name(0)}")
 
-    run(cfg=args)
+    if args.ddp and args.ddp_able:
+        # torch.nn.parallel.DistributedDataParallel
+        os.environ["MASTER_ADDR"] = args.master_addr
+        os.environ["MASTER_PORT"] = args.master_port
+        # run(cfg=args)
+        mp.spawn(run,
+                 args=(args.world_size, args),
+                 nprocs=args.world_size,
+                 join=True)
+    else:
+        logger.error(f"\n\n\nError: Please use multiple GPUs OR try `python3 main.py`")
 
     timer_end = time.perf_counter()
     logger.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))

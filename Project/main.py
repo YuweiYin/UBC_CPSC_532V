@@ -63,7 +63,7 @@ def training(
     :param eval_gap: run evaluation per `eval_gap` batches.
     :param logging_gap: show loss per `logging_gap` batches.
     :param save_dir: specified directory for saving the model checkpoints and logs.
-    :param verbose: verbose model: show logs.
+    :param verbose: Verbose mode: show logs.
     :return: the tuned model and used tokenizer.
     """
 
@@ -87,7 +87,6 @@ def training(
         cfg.logger.info(optimizer)
 
     all_losses = []  # store the loss of each batch (divided by epochs)
-    # loss_logs = []
     all_valid_scores = []  # store the accuracy score on the valid set after evaluation (divided by epochs)
     all_test_scores = []  # store the accuracy score on the test set after evaluation (divided by epochs)
     best_valid_score = 0.0
@@ -96,7 +95,7 @@ def training(
     batch_cnt = 0
     for epoch in range(cfg.epoch):
         if verbose:
-            cfg.logger.info(f"\n\n>>> Epoch: {epoch}")
+            cfg.logger.info(f">>> Start Epoch: {epoch}")
         epoch_losses = []
 
         for batch_idx, batch_train in enumerate(dataloader_train):
@@ -118,7 +117,7 @@ def training(
             outputs = ft_model(**inputs, output_hidden_states=True, output_attentions=True)  # use_cache=True
             # type(outputs) is <class 'transformers.modeling_outputs.CausalLMOutputWithCrossAttentions'>
             # last_hidden_states = outputs.hidden_states[-1]  # outputs.last_hidden_state
-            loss = outputs.loss  # Language modeling loss (for next-token prediction).
+            loss = outputs.loss  # Language modeling loss (for next-token prediction)
 
             # Backpropagation
             optimizer.zero_grad()
@@ -126,7 +125,8 @@ def training(
             optimizer.step()
 
             # loss_value = loss.detach().cpu().numpy().item()
-            loss_value = loss.sum().detach().cpu().numpy().item()
+            # loss_value = loss.sum().detach().cpu().numpy().item()
+            loss_value = loss.mean().detach().cpu().numpy().item()
             epoch_losses.append(loss_value)
 
             # Training log
@@ -134,7 +134,6 @@ def training(
                 cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
                 if verbose:
                     cfg.logger.info(cur_log)
-                # loss_logs.append(cur_log)
 
             # Run evaluation
             if do_eval_batch and batch_cnt % eval_gap == 0:
@@ -205,7 +204,7 @@ def training(
 
         # After each epoch, save the losses and scores
         if verbose:
-            cfg.logger.info(f"\n\n[END of Epoch {epoch}]")
+            cfg.logger.info(f">>> END of Epoch: {epoch}")
         all_losses.append(epoch_losses)
         avg_ep_loss = np.mean(epoch_losses)
         save_loss_path = os.path.join(save_log_dir, f"all_losses.log")
@@ -225,7 +224,7 @@ def training(
 
         # Save the model with tokenizers at the end of this epoch
         if save_after_epoch and cfg.ckpt_limit > 0:
-            save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch{epoch}")  # HF model folder
+            save_ckpt_hf = os.path.join(save_ckpt_dir, f"model_epoch_{epoch}")  # HF model folder
             if not os.path.isdir(save_ckpt_hf):
                 os.makedirs(save_ckpt_hf, exist_ok=True)
             if verbose:
@@ -322,7 +321,6 @@ def training(
         "tokenizer_train": tokenizer_train,
         "tokenizer_eval": tokenizer_eval,
         "all_losses": all_losses,
-        # "loss_logs": loss_logs,
         "all_valid_scores": all_valid_scores,
         "all_test_scores": all_test_scores,
         "best_valid_score": best_valid_score,
@@ -357,7 +355,7 @@ def evaluate(
     :param choice_prob: if `do_forward`, whether to only consider the probabilities of the choices, like "A" "B" "C".
     :param save_dir: specified directory for saving the results.
     :param save_fn: specified filename for saving the results.
-    :param verbose: verbose model: show logs.
+    :param verbose: Verbose mode: show logs.
     :return: Accuracy score. Save the evaluation results/scores after generation.
     """
 
@@ -513,7 +511,7 @@ def evaluate(
         save_results_path = os.path.join(save_results_dir, save_fn)
     else:
         # save_results_path = os.path.join(save_results_dir, f"{ds_name}---{model_name}---results.jsonl")
-        save_results_path = os.path.join(save_results_dir, f"results.jsonl")
+        save_results_path = os.path.join(save_results_dir, f"results-acc_{accuracy:.5f}.jsonl")
     with open(save_results_path, "w", encoding="utf-8") as fp_out:
         for result in results:
             fp_out.write(json.dumps(result) + "\n")
@@ -525,9 +523,9 @@ def run(
         cfg
 ) -> None:
     # Loaders
-    datasetLoader = DatasetLoader()
-    modelLoader = ModelLoader()
-    tokenizerLoader = TokenizerLoader()
+    datasetLoader = DatasetLoader(cfg.logger)
+    modelLoader = ModelLoader(cfg.logger)
+    tokenizerLoader = TokenizerLoader(cfg.logger)
 
     # Set the random seed of all modules (again, before loading data/model/tokenizer)
     set_seed(cfg.seed)
@@ -620,7 +618,6 @@ def run(
     # tokenizer_train = ft_dict["tokenizer_train"]
     # tokenizer_eval = ft_dict["tokenizer_eval"]
     # all_losses = ft_dict["all_losses"]
-    # # loss_logs = ft_dict["loss_logs"]
     # all_valid_scores = ft_dict["all_valid_scores"]
     # all_test_scores = ft_dict["all_test_scores"]
     # best_valid_score = ft_dict["best_valid_score"]
@@ -670,7 +667,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose model: show logs")
+    parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose mode: show logs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of all modules")
     parser.add_argument("--cuda", type=str, default="0", help="CUDA device(s), e.g., 0 OR 0,1")
     parser.add_argument("-d", "--ds_name", type=str, default="", help="Dataset name, e.g., commonsense_qa")
@@ -714,7 +711,7 @@ if __name__ == "__main__":
 
     # Hyperparameters
     args.cuda = str(args.cuda).strip()  # CUDA device(s), e.g., "0" OR "0,1"
-    args.verbose = bool(args.verbose)  # Verbose model: show logs
+    args.verbose = bool(args.verbose)  # Verbose mode: show logs
     args.eval_before = bool(args.eval_before)  # Run evaluation before training
     args.eval_after = bool(args.eval_after)  # Run evaluation after training
     args.do_eval_epoch = bool(args.do_eval_epoch)  # Run evaluation after each epoch
