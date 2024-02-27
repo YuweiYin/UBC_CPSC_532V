@@ -123,7 +123,7 @@ python3 main_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" 
   --backend "gloo" --master_addr "localhost" --master_port "12345" --ddp --ddp_gen
 ```
 
-* Add `--verbose_all` if you want all GPU devices show logs.
+* Add `--verbose_all` if you want all GPU devices to show logs.
 * Remove `--ddp_gen` to run generation on one GPU device (rank=0). (slower when the valid & test set is large.)
 
 **Model Parallel** ([PyTorch](https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html), 
