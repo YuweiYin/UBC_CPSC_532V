@@ -221,28 +221,16 @@ def training(
 
             batch_cnt += 1
 
-        # dist.barrier(device_ids=cfg.gpus[:])
-        # After each epoch, save the losses and scores
-        # TODO: gather the training losses from all devices and then save (AND use the nccl backend)
         if verbose:
             cfg.logger.info(f">>> END of Epoch: {epoch} (RANK={cfg.rank})")
-        all_losses.append(epoch_losses)
+        # After each epoch, gather the training losses from all devices and then store them
+        epoch_losses_tensors = [torch.zeros(len(epoch_losses), dtype=torch.float32).cuda(cfg.rank)
+                                for _ in range(cfg.world_size)]
+        epoch_losses_tensor = torch.tensor(epoch_losses, dtype=torch.float32).cuda(cfg.rank)
+        dist.all_gather(epoch_losses_tensors, epoch_losses_tensor, async_op=False)  # gather and sync
+        epoch_losses = [ep_losses.tolist() for ep_losses in epoch_losses_tensors]  # List[Tensor] -> List[list]
+        all_losses.append(epoch_losses)  # store
         avg_ep_loss = np.mean(epoch_losses)
-        save_loss_path = os.path.join(save_log_dir, f"all_losses-RANK_{cfg.rank}.log")
-        with open(save_loss_path, "w", encoding="utf-8") as fp_out:
-            for epoch_losses in all_losses:
-                fp_out.write(json.dumps(epoch_losses) + "\n")
-
-        if cfg.rank == 0:
-            save_valid_score_path = os.path.join(save_log_dir, f"all_valid_scores-RANK_{cfg.rank}.log")
-            with open(save_valid_score_path, "w", encoding="utf-8") as fp_out:
-                for valid_score in all_valid_scores:
-                    fp_out.write(json.dumps(valid_score) + "\n")
-
-            save_test_score_path = os.path.join(save_log_dir, f"all_test_scores-RANK_{cfg.rank}.log")
-            with open(save_test_score_path, "w", encoding="utf-8") as fp_out:
-                for test_score in all_test_scores:
-                    fp_out.write(json.dumps(test_score) + "\n")
 
         # Save the model with tokenizers at the end of this epoch
         if cfg.rank == 0 and save_after_epoch and cfg.ckpt_limit > 0:
@@ -276,7 +264,7 @@ def training(
                 if os.path.isdir(overflow_dir):
                     shutil.rmtree(overflow_dir, ignore_errors=True)
 
-        # Run evaluation
+        # Run evaluation at the end of this epoch
         if do_eval_epoch and cfg.rank == 0:
             if isinstance(dataloader_valid, DataLoader):
                 # Evaluation on the valid set at the end of this epoch
@@ -345,7 +333,23 @@ def training(
                 if test_score > best_test_score:
                     best_test_score = test_score
 
-    # dist.barrier(device_ids=cfg.gpus[:])
+    # Store all the training losses and scores at the end of the training session
+    if cfg.rank == 0:
+        save_loss_path = os.path.join(save_log_dir, f"all_losses-RANK_{cfg.rank}.log")
+        with open(save_loss_path, "w", encoding="utf-8") as fp_out:
+            for epoch_losses in all_losses:
+                fp_out.write(json.dumps(epoch_losses) + "\n")
+
+        save_valid_score_path = os.path.join(save_log_dir, f"all_valid_scores-RANK_{cfg.rank}.log")
+        with open(save_valid_score_path, "w", encoding="utf-8") as fp_out:
+            for valid_score in all_valid_scores:
+                fp_out.write(json.dumps(valid_score) + "\n")
+
+        save_test_score_path = os.path.join(save_log_dir, f"all_test_scores-RANK_{cfg.rank}.log")
+        with open(save_test_score_path, "w", encoding="utf-8") as fp_out:
+            for test_score in all_test_scores:
+                fp_out.write(json.dumps(test_score) + "\n")
+
     return {
         "model": model,
         "tokenizer_train": tokenizer_train,
@@ -373,8 +377,7 @@ def evaluate(
         verbose: bool = False,
 ) -> float:
     """
-    Model generation for evaluation.
-    TODO: use DDP generation with broadcast and gather/reduce ops. (Now, only RANK=0 device do generation)
+    Model generation for evaluation. (Now, only RANK=0 device do generation.)
     :param cfg: configuration / arguments.
     :param ds_name: the dataset name.
     :param model_name: the model name.
@@ -561,7 +564,7 @@ def evaluate(
         save_results_path = os.path.join(save_results_dir, save_fn)
     else:
         # save_results_path = os.path.join(save_results_dir, f"{ds_name}---{model_name}---results.jsonl")
-        save_results_path = os.path.join(save_results_dir, f"results-RANK_{cfg.rank}-acc_{accuracy:.5f}.jsonl")
+        save_results_path = os.path.join(save_results_dir, f"eval_results-acc_{accuracy:.5f}-RANK_{cfg.rank}.jsonl")
     with open(save_results_path, "w", encoding="utf-8") as fp_out:
         for result in results:
             fp_out.write(json.dumps(result) + "\n")
@@ -667,8 +670,6 @@ def run(
         cfg.logger.info(f"ds_torch_test: ratio_range = {ds_torch_test.ratio_range}; "
                         f"index_range = {ds_torch_test.index_range}")
 
-    # dist.barrier(device_ids=cfg.gpus[:])
-
     if cfg.eval_before and cfg.rank == 0:
         # Evaluation on the valid set before training
         if cfg.verbose:
@@ -702,8 +703,6 @@ def run(
             verbose=cfg.verbose,
         )
 
-    # dist.barrier(device_ids=cfg.gpus[1:])
-
     # Train (fine-tune) the model (Causal LM, next token prediction)
     if cfg.verbose:
         cfg.logger.info("Train (fine-tune) the model (Causal LM, next token prediction)...")
@@ -735,10 +734,8 @@ def run(
     # best_valid_score = ft_dict["best_valid_score"]
     # best_test_score = ft_dict["best_test_score"]
 
-    # dist.barrier(device_ids=cfg.gpus[:])
-
     if cfg.eval_after and cfg.rank == 0:
-        # Evaluation on the valid set after training
+        # Evaluation on the valid set before training
         if cfg.verbose:
             cfg.logger.info("Evaluation on the valid set after training...")
         evaluate(
@@ -754,7 +751,7 @@ def run(
             verbose=cfg.verbose,
         )
 
-        # Evaluation on the test set after training
+        # Evaluation on the test set before training
         if cfg.verbose:
             cfg.logger.info("Evaluation on the test set after training...")
         evaluate(
@@ -770,12 +767,46 @@ def run(
             verbose=cfg.verbose,
         )
 
-    # dist.barrier(device_ids=cfg.gpus[1:])
     # if cfg.verbose:
     #     cfg.logger.info("Done!")
-    cfg.logger.info("Done!")
+    cfg.logger.info(f"Done! [RANK={rank}]")
 
-    # dist.barrier(device_ids=cfg.gpus[:])
+    # Do a dump forward pass for synchronizing all processes
+    dump_inputs = tokenizer_train(icl_prompt.strip(), return_tensors="pt", padding=True)
+    dump_inputs.data["labels"] = dump_inputs.data["input_ids"].clone()
+    if isinstance(model, dDP):
+        dump_inputs = dump_inputs.to(cfg.rank)
+    else:
+        dump_inputs = dump_inputs.to(cfg.device)
+    outputs = model(**dump_inputs, output_hidden_states=False, output_attentions=False)
+    loss = outputs.loss  # Language modeling loss (for next-token prediction)
+    loss.sum().backward()  # Backpropagation (DDP automatically synchronizes here)
+
+    """
+    # broadcast
+    to_broadcast = torch.tensor([rank]).cuda(rank)
+    cfg.logger.info(f"(before dist.broadcast) to_broadcast = {to_broadcast}")
+    dist.broadcast(to_broadcast, src=2, async_op=False)  # will synchronize here
+    # handle = dist.broadcast(to_broadcast, src=0, async_op=True)
+    # handle.wait()  # will synchronize here
+    cfg.logger.info(f"(after dist.broadcast) to_broadcast = {to_broadcast}")
+
+    # all_reduce
+    to_sync = torch.tensor([rank]).cuda(rank)
+    cfg.logger.info(f"(before dist.all_reduce) to_sync = {to_sync}")
+    dist.all_reduce(to_sync, async_op=False)  # will synchronize here
+    # handle = dist.all_reduce(to_sync, async_op=True)
+    # handle.wait()  # will synchronize here
+    cfg.logger.info(f"(after dist.all_reduce) to_sync = {to_sync}")
+
+    # all_gather
+    tensor_list = [torch.zeros(2, dtype=torch.int64) for _ in range(2)]
+    tensor = torch.arange(2, dtype=torch.int64) + 1 + 2 * rank
+    dist.all_gather(tensor_list, tensor)
+    """
+
+    time.sleep(3.0)
+    # dist.barrier()
     dist.destroy_process_group()
 
 
