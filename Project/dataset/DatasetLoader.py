@@ -10,7 +10,7 @@ from datasets.dataset_dict import DatasetDict
 
 class DatasetLoader:
 
-    def __init__(self, logger: logging.Logger):
+    def __init__(self, logger: logging.Logger = None):
         # ord_A = ord("A")
         # self.idx2choice = {index: chr(ord_A + index) for index in range(26)}
         # self.choice2idx = {chr(ord_A + index): index for index in range(26)}

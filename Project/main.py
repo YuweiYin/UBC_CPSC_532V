@@ -73,11 +73,11 @@ def training(
     if not isinstance(save_dir, str) or len(save_dir) == 0:
         save_dir = f"{ds_name}---{model_name}"
 
-    save_ckpt_dir = os.path.join(cfg.ckpt_dir, save_dir)
+    save_ckpt_dir = os.path.join("runs", save_dir, cfg.ckpt_dir)
     if not os.path.isdir(save_ckpt_dir):
         os.makedirs(save_ckpt_dir, exist_ok=True)
 
-    save_log_dir = os.path.join(cfg.log_dir, save_dir)
+    save_log_dir = os.path.join("runs", save_dir, cfg.log_dir)
     if not os.path.isdir(save_log_dir):
         os.makedirs(save_log_dir, exist_ok=True)
 
@@ -406,7 +406,7 @@ def evaluate(
                     choice_labels.append(c_label)
 
         # Tokenized inputs
-        inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="right"
+        inputs = tokenizer_eval(input_list, return_tensors="pt", padding=True)  # padding_side="left"
         # inputs.data["labels"] = inputs.data["input_ids"].clone()
         inputs = inputs.to(cfg.device)
 
@@ -478,6 +478,7 @@ def evaluate(
         all_preds += preds
         all_answers += answer_list
 
+    # Compute the accuracy
     results = []
     correct_idx = []
     incorrect_idx = []
@@ -504,14 +505,13 @@ def evaluate(
         cfg.logger.info(f">>> Accuracy: {accuracy}")
 
     # Save the evaluation results
-    save_results_dir = os.path.join(cfg.output_dir, save_dir)
+    save_results_dir = os.path.join("runs", save_dir, cfg.output_dir)
     if not os.path.isdir(save_results_dir):
         os.makedirs(save_results_dir, exist_ok=True)
     if isinstance(save_fn, str) and len(save_fn) > 0:
         save_results_path = os.path.join(save_results_dir, save_fn)
     else:
-        # save_results_path = os.path.join(save_results_dir, f"{ds_name}---{model_name}---results.jsonl")
-        save_results_path = os.path.join(save_results_dir, f"results-acc_{accuracy:.5f}.jsonl")
+        save_results_path = os.path.join(save_results_dir, f"eval_results-accuracy_{accuracy:.5f}.jsonl")
     with open(save_results_path, "w", encoding="utf-8") as fp_out:
         for result in results:
             fp_out.write(json.dumps(result) + "\n")
@@ -734,14 +734,8 @@ if __name__ == "__main__":
     if not os.path.isdir(args.cache_dir):
         os.makedirs(args.cache_dir, exist_ok=True)
     args.log_dir = str(args.log_dir)  # The directory to save logs
-    if not os.path.isdir(args.log_dir):
-        os.makedirs(args.log_dir, exist_ok=True)
     args.ckpt_dir = str(args.ckpt_dir)  # The directory to save model checkpoints
-    if not os.path.isdir(args.ckpt_dir):
-        os.makedirs(args.ckpt_dir, exist_ok=True)
     args.output_dir = str(args.output_dir)  # The directory to outputs, e.g., results
-    if not os.path.isdir(args.output_dir):
-        os.makedirs(args.output_dir, exist_ok=True)
 
     # CUDA
     os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda

@@ -10,7 +10,7 @@ from transformers import AutoModelForCausalLM
 
 class ModelLoader:
 
-    def __init__(self, logger: logging.Logger):
+    def __init__(self, logger: logging.Logger = None):
         if isinstance(logger, logging.Logger):
             self.logger = logger
         else:

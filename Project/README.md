@@ -55,12 +55,6 @@ conda install graphviz
 
 ## Experiments
 
-```bash
-mkdir -p log
-mkdir -p ckpt
-mkdir -p output
-```
-
 ### Run the code (on a CPU or a single GPU)
 
 **Example**: Run the [GPT-2](https://huggingface.co/openai-community/gpt2) model (smallest: 124M parameters)
@@ -126,16 +120,19 @@ python3 main_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" -
 ```bash
 python3 main_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
   --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 \
-  --backend "gloo" --master_addr "localhost" --master_port "12345" --ddp
+  --backend "gloo" --master_addr "localhost" --master_port "12345" --ddp --ddp_gen
 ```
+
+* Add `--verbose_all` if you want all GPU devices show logs.
+* Remove `--ddp_gen` to run generation on one GPU device (rank=0). (slower when the valid & test set is large.)
 
 **Model Parallel** ([PyTorch](https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html), 
 [Transformers](https://huggingface.co/transformers/v4.9.2/parallelism.html)) is also recommended.
 
 ## Experimental Results
 
-- The running logs and all training losses will be in the folder `log/`
-- The model checkpoints with tokenizers info after training will be in the folder `ckpt/`
-- The generation and evaluation results with statistics will be in the folder `output/`
+- The running logs and all training losses will be in the folder `f"runs/{save_dir}/log/""`
+- The model checkpoints with tokenizers info after training will be in the folder `f"runs/{save_dir}/ckpt/"`
+- The generation and evaluation results with statistics will be in the folder `f"runs/{save_dir}/output/"`
 
 ---

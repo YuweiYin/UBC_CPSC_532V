@@ -9,7 +9,7 @@ from transformers import AutoTokenizer
 
 class TokenizerLoader:
 
-    def __init__(self, logger: logging.Logger):
+    def __init__(self, logger: logging.Logger = None):
         if isinstance(logger, logging.Logger):
             self.logger = logger
         else:
