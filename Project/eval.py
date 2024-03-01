@@ -1,9 +1,10 @@
-import argparse
-import json
-import logging
 import os
 import re
 import sys
+import time
+import json
+import logging
+import argparse
 from functools import partial
 from pathlib import Path
 from typing import Union
@@ -101,7 +102,8 @@ def parse_eval_args() -> argparse.Namespace:
         default=None,
         type=str,
         metavar="DIR|DIR/file.json",
-        help="The path to the output file where the result metrics will be saved. If the path is a directory and log_samples is true, the results will be saved in the directory. Else the parent directory will be used.",
+        help="The path to the output file where the result metrics will be saved. If the path is a directory and "
+             "log_samples is true, the results will be saved in the directory. Else the parent directory will be used.",
     )
     parser.add_argument(
         "--limit",
@@ -145,7 +147,8 @@ def parse_eval_args() -> argparse.Namespace:
         "-s",
         action="store_true",
         default=False,
-        help="If True, write out all model outputs and documents for per-sample measurement and post-hoc analysis. Use with --output_path.",
+        help="If True, write out all model outputs and documents for per-sample measurement and post-hoc analysis. "
+             "Use with --output_path.",
     )
     parser.add_argument(
         "--show_config",
@@ -174,7 +177,8 @@ def parse_eval_args() -> argparse.Namespace:
         type=str.upper,
         default="INFO",
         metavar="CRITICAL|ERROR|WARNING|INFO|DEBUG",
-        help="Controls the reported logging error level. Set to DEBUG when testing + adding new task configurations for comprehensive log output.",
+        help="Controls the reported logging error level. Set to DEBUG when testing + adding new task configurations "
+             "for comprehensive log output.",
     )
     parser.add_argument(
         "--wandb_args",
@@ -196,8 +200,10 @@ def parse_eval_args() -> argparse.Namespace:
             "Set seed for python's random, numpy and torch.\n"
             "Accepts a comma-separated list of 3 values for python's random, numpy, and torch seeds, respectively, "
             "or a single integer to set the same seed for all three.\n"
-            "The values are either an integer or 'None' to not set the seed. Default is `0,1234,1234` (for backward compatibility).\n"
-            "E.g. `--seed 0,None,8` sets `random.seed(0)` and `torch.manual_seed(8)`. Here numpy's seed is not set since the second value is `None`.\n"
+            "The values are either an integer or 'None' to not set the seed. Default is `0,1234,1234` "
+            "(for backward compatibility).\n"
+            "E.g. `--seed 0,None,8` sets `random.seed(0)` and `torch.manual_seed(8)`. "
+            "Here, the seed of numpy is not set since the second value is `None`.\n"
             "E.g, `--seed 42` sets all three seeds to 42."
         ),
     )
@@ -277,7 +283,8 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
                     f"{utils.SPACING}Try `lm-eval --tasks list` for list of available tasks",
                 )
                 raise ValueError(
-                    f"Tasks not found: {missing}. Try `lm-eval --tasks list` for list of available tasks, or '--verbosity DEBUG' to troubleshoot task registration issues."
+                    f"Tasks not found: {missing}. Try `lm-eval --tasks list` for list of available tasks, "
+                    f"or '--verbosity DEBUG' to troubleshoot task registration issues."
                 )
 
     if args.output_path:
@@ -368,7 +375,8 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
                     filename.write_text(samples_dumped, encoding="utf-8")
 
         print(
-            f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
+            f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
+            f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
             f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
         )
         print(make_table(results))
@@ -381,4 +389,11 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
 
 
 if __name__ == "__main__":
+    timer_start = time.perf_counter()
+
     cli_evaluate()
+
+    timer_end = time.perf_counter()
+    logging.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
+
+    sys.exit(0)

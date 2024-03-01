@@ -132,9 +132,21 @@ class HFLM(TemplateLM):
                 self.tokenizer = tokenizer
             else:
                 # Get tokenizer
-                model_name = self._model.name_or_path
+                # model_name = self._model.name_or_path
+                # self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+                #     model_name,
+                #     revision=revision,
+                #     trust_remote_code=trust_remote_code,
+                #     use_fast=use_fast_tokenizer,
+                #     cache_dir=cache_dir,
+                # )
+                tokenizer_path = self._model.name_or_path
+                assert isinstance(tokenizer_path, str)
+                if tokenizer_path.startswith("runs/"):
+                    # tokenizer_path = os.path.join(tokenizer_path, "tokenizer_train")
+                    tokenizer_path = os.path.join(tokenizer_path, "tokenizer_eval")
                 self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-                    model_name,
+                    tokenizer_path,
                     revision=revision,
                     trust_remote_code=trust_remote_code,
                     use_fast=use_fast_tokenizer,
@@ -603,13 +615,29 @@ class HFLM(TemplateLM):
                 self.tokenizer = tokenizer
         else:
             # Get tokenizer based on 'pretrained'
+            # if isinstance(pretrained, str):
+            #     model_name = pretrained
+            # else:
+            #     # get the HF hub name via accessor on model
+            #     model_name = self.model.name_or_path
+            # self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+            #     model_name,
+            #     revision=revision,
+            #     trust_remote_code=trust_remote_code,
+            #     use_fast=use_fast_tokenizer,
+            #     cache_dir=cache_dir,
+            # )
             if isinstance(pretrained, str):
-                model_name = pretrained
+                tokenizer_path = pretrained
             else:
                 # get the HF hub name via accessor on model
-                model_name = self.model.name_or_path
+                tokenizer_path = self.model.name_or_path
+            assert isinstance(tokenizer_path, str)
+            if tokenizer_path.startswith("runs/"):
+                # tokenizer_path = os.path.join(tokenizer_path, "tokenizer_train")
+                tokenizer_path = os.path.join(tokenizer_path, "tokenizer_eval")
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-                model_name,
+                tokenizer_path,
                 revision=revision,
                 trust_remote_code=trust_remote_code,
                 use_fast=use_fast_tokenizer,
