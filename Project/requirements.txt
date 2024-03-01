@@ -11,17 +11,10 @@ tqdm
 wandb
 six
 wget
-submitit
-beautifulsoup4
 Pillow
 requests
 setuptools
 wheel
-nltk
-spacy
-keybert
-graphviz
-sentence-transformers
 openai
 transformers
 datasets

@@ -151,7 +151,7 @@ lm_eval --model hf \
 ```
 
 However, it does not support setting `cache_dir` for loading models or tokenizers.
-Hence, we clone it to the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval) to
+Hence, we clone the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval) to
 the local module `./lm_eval`, add some new features, and use it as our evaluation codebase.
 
 ---
