@@ -44,7 +44,7 @@ Comparison between validation split score on T5x and LM-Eval (T5x models convert
 
 
 * `super-glue-lm-eval-v1`
-    -  `boolq`
+    - `boolq`
     - `cb`
     - `copa`
     - `multirc`

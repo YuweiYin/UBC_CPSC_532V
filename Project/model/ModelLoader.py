@@ -35,9 +35,6 @@ class ModelLoader:
         """
 
         model = self.get_model(model_name=model_name, cache_dir=cache_dir)
-        # model.to(DEVICE)
-        # model.train()
-        # model.eval()
 
         # Show model information
         if verbose:

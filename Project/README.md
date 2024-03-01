@@ -35,6 +35,11 @@ pip install -r requirements.txt
 
 ```bash
 pip install accelerate -U
+pip install deepspeed
+pip install mamba-ssm
+pip install causal-conv1d
+#pip install promptsource
+pip install vllm
 ```
 
 ## Experiments
@@ -119,9 +124,10 @@ python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1"
 
 - The running logs and all training losses will be in the folder `f"runs/{save_dir}/log/"`
 - The model checkpoints with tokenizers info after training will be in the folder `f"runs/{save_dir}/ckpt/"`
-- The generation and evaluation results with statistics will be in the folder `f"runs/{save_dir}/output/"`
+- The generation and evaluation results during training will be in the folder `f"runs/{save_dir}/output/"`
+- The final generation and evaluation results with statistics will be in the folder `f"/results/"`
 
-### Generation and Evaluation
+### Generation and Evaluation Method
 
 Use [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness):
 
@@ -131,11 +137,6 @@ cd lm-evaluation-harness
 pip install -e .
 #pip install vllm
 ```
-
-* [Basic Usage](https://github.com/EleutherAI/lm-evaluation-harness?tab=readme-ov-file#basic-usage);
-* [Command-line Interface](https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md);
-* [Supported Models](https://docs.vllm.ai/en/latest/models/supported_models.html);
-* [Supported Tasks](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks) (Or try `lm-eval --tasks list`).
 
 Command line tool `lm-eval` usage (basic example):
 
@@ -150,8 +151,30 @@ lm_eval --model hf \
   --seed 42
 ```
 
-However, it does not support setting `cache_dir` for loading models or tokenizers.
-Hence, we clone the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval) to
-the local module `./lm_eval`, add some new features, and use it as our evaluation codebase.
+* [Basic Usage](https://github.com/EleutherAI/lm-evaluation-harness?tab=readme-ov-file#basic-usage);
+* [Command-line Interface](https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md);
+* [Supported Models](https://docs.vllm.ai/en/latest/models/supported_models.html);
+* [Supported Tasks](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks)
+  * Or try `lm-eval --tasks list`
+
+We clone the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval) to
+the local [module](./lm_eval/) `./lm_eval`, add some new features, and use it as our evaluation codebase.
+For example, we support passing the `cache_dir` parameter when loading datasets, models, and tokenizers.
+
+Hence, we recommend using the following evaluation script:
+
+```bash
+python3 eval.py --model hf \
+  --model_args pretrained=gpt2,dtype="float" \
+  --tasks copa \
+  --device cuda:0 \
+  --batch_size auto:8 \
+  --use_cache "~/.cache/huggingface/" \
+  --cache_requests "true" \
+  --cache_dir "~/.cache/huggingface/" \
+  --seed 42 \
+  --log_samples \
+  --output_path "results/copa---gpt2---eval"
+```
 
 ---
