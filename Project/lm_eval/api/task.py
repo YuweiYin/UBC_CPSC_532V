@@ -220,6 +220,7 @@ class Task(abc.ABC):
         self._training_docs = None
         self._fewshot_docs = None
         self._instances = None
+        self.cache_dir = cache_dir
 
         self._config = TaskConfig({**config}) if config else TaskConfig()
 
@@ -254,7 +255,7 @@ class Task(abc.ABC):
             path=self.DATASET_PATH,
             name=self.DATASET_NAME,
             data_dir=data_dir,
-            cache_dir=cache_dir,
+            cache_dir=self.cache_dir if cache_dir is None else cache_dir,
             download_mode=download_mode,
         )
 
@@ -653,6 +654,7 @@ class ConfigurableTask(Task):
     ) -> None:  # TODO no super() call here
         # Get pre-configured attributes
         self._config = self.CONFIG
+        self.cache_dir = cache_dir
 
         # Use new configurations if there was no preconfiguration
         if self.config is None:
@@ -848,6 +850,7 @@ class ConfigurableTask(Task):
         self.dataset = datasets.load_dataset(
             path=self.DATASET_PATH,
             name=self.DATASET_NAME,
+            cache_dir=self.cache_dir,
             **dataset_kwargs if dataset_kwargs is not None else {},
         )
 

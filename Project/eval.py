@@ -201,6 +201,14 @@ def parse_eval_args() -> argparse.Namespace:
             "E.g, `--seed 42` sets all three seeds to 42."
         ),
     )
+
+    parser.add_argument(
+        "--cache_dir",
+        type=str,
+        default="~/.cache/huggingface/",
+        help="The directory where data & model are cached"
+    )
+
     return parser.parse_args()
 
 
@@ -223,7 +231,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
         assert args.output_path, "Specify --output_path"
 
     initialize_tasks(args.verbosity)
-    task_manager = TaskManager(args.verbosity, include_path=args.include_path)
+    task_manager = TaskManager(args.verbosity, include_path=args.include_path, cache_dir=args.cache_dir)
 
     if args.limit:
         eval_logger.warning(
@@ -318,6 +326,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
         random_seed=args.seed[0],
         numpy_random_seed=args.seed[1],
         torch_random_seed=args.seed[2],
+        cache_dir=args.cache_dir,
     )
 
     if results is not None:

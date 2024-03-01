@@ -60,6 +60,7 @@ def simple_evaluate(
     random_seed: int = 0,
     numpy_random_seed: int = 1234,
     torch_random_seed: int = 1234,
+    cache_dir: Optional[str] = None,
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -92,6 +93,8 @@ def simple_evaluate(
         Number of iterations for bootstrap statistics
     :param check_integrity: bool
         Whether to run the relevant part of the test suite for the tasks
+    :param decontamination_ngrams_path:
+        decontamination_ngrams_path
     :param write_out: bool
         If True, write out an example document and model input for checking task integrity
     :param log_samples: bool
@@ -99,6 +102,10 @@ def simple_evaluate(
     :param gen_kwargs: str
         String arguments for model generation
         Ignored for all tasks with loglikelihood output_type
+    :param task_manager: TaskManager
+        task_manager
+    :param verbosity: str
+        verbosity
     :param predict_only: bool
         If true only model outputs will be generated and returned. Metrics will not be evaluated
     :param random_seed: int
@@ -107,6 +114,8 @@ def simple_evaluate(
         Random seed for numpy. If set to None, the seed will not be set.
     :param torch_random_seed: int
         Random seed for torch. If set to None, the seed will not be set.
+    :param cache_dir: Optional[str] = None
+        Directory to save Hugging Face datasets, models, and tokenizers. None: ~/.cache/huggingface/
 
     :return
         Dictionary of results
@@ -159,6 +168,7 @@ def simple_evaluate(
                     "batch_size": batch_size,
                     "max_batch_size": max_batch_size,
                     "device": device,
+                    "cache_dir": cache_dir,
                 },
             )
 
@@ -169,6 +179,7 @@ def simple_evaluate(
                     "batch_size": batch_size,
                     "max_batch_size": max_batch_size,
                     "device": device,
+                    "cache_dir": cache_dir,
                 },
             )
     else:
@@ -194,7 +205,7 @@ def simple_evaluate(
         "get_task_dict has been updated to accept an optional argument, `task_manager`"
         "Read more here:https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md#external-library-usage"
     )
-    task_dict = get_task_dict(tasks, task_manager)
+    task_dict = get_task_dict(tasks, task_manager, cache_dir=cache_dir)
     for task_name in task_dict.keys():
         task_obj = task_dict[task_name]
         if isinstance(task_obj, tuple):
@@ -264,6 +275,7 @@ def simple_evaluate(
             "limit": limit,
             "bootstrap_iters": bootstrap_iters,
             "gen_kwargs": gen_kwargs,
+            "cache_dir": cache_dir,
         }
         results["git_hash"] = get_git_commit_hash()
         add_env_info(results)  # additional environment info to results

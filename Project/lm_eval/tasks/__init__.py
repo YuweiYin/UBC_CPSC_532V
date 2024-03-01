@@ -3,7 +3,7 @@ import collections
 import logging
 import os
 from functools import partial
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from lm_eval import utils
 from lm_eval.api.task import ConfigurableTask, Task
@@ -15,9 +15,15 @@ class TaskManager:
 
     """
 
-    def __init__(self, verbosity="INFO", include_path=None) -> None:
+    def __init__(
+            self,
+            verbosity="INFO",
+            include_path=None,
+            cache_dir: Optional[str] = None,
+    ) -> None:
         self.verbosity = verbosity
         self.include_path = include_path
+        self.cache_dir = cache_dir
         self.logger = utils.eval_logger
         self.logger.setLevel(getattr(logging, f"{verbosity}"))
 
@@ -26,7 +32,10 @@ class TaskManager:
 
         self.task_group_map = collections.defaultdict(list)
 
-    def initialize_tasks(self, include_path: str = None):
+    def initialize_tasks(
+            self,
+            include_path: str = None,
+    ):
         """Creates an dictionary of tasks index.
 
         :param include_path: str = None
@@ -144,7 +153,7 @@ class TaskManager:
                 task_object = config["class"]()
             else:
                 config = self._process_alias(config, group=group)
-                task_object = ConfigurableTask(config=config)
+                task_object = ConfigurableTask(config=config, cache_dir=self.cache_dir)  # load HF dataset
             if group is not None:
                 task_object = (group, task_object)
             return {task: task_object}
@@ -271,8 +280,11 @@ class TaskManager:
     def load_config(self, config: Dict):
         return self._load_individual_task_or_group(config)
 
-    def _get_task_and_group(self, task_dir: str):
-        """Creates an dictionary of tasks index with the following metadata,
+    def _get_task_and_group(
+            self,
+            task_dir: str,
+    ):
+        """Creates a dictionary of tasks index with the following metadata,
         - `type`, that can be either `task`, `python_task`, or `group`.
             `task` refer to regular task configs, `python_task` are special
             yaml files that only consists of `task` and `class` parameters.
@@ -298,6 +310,7 @@ class TaskManager:
                 if f.endswith(".yaml"):
                     yaml_path = os.path.join(root, f)
                     config = utils.load_yaml_config(yaml_path, mode="simple")
+                    config["cache_dir"] = self.cache_dir
                     if self._config_is_python_task(config):
                         # This is a python class config
                         tasks_and_groups[config["task"]] = {
@@ -397,7 +410,9 @@ def get_task_name_from_object(task_object):
 
 
 def get_task_dict(
-    task_name_list: List[Union[str, Dict, Task]], task_manager: TaskManager = None
+        task_name_list: List[Union[str, Dict, Task]],
+        task_manager: TaskManager = None,
+        cache_dir: Optional[str] = None,
 ):
     """Creates a dictionary of task objects from either a name of task, config, or prepared Task object.
 
@@ -408,6 +423,8 @@ def get_task_dict(
         task_manager will load one. This should be set by the user
         if there are additional paths that want to be included
         via `include_path`
+    :param cache_dir: Optional[str] = None
+        Directory to save Hugging Face datasets, models, and tokenizers. None: ~/.cache/huggingface/
 
     :return
         Dictionary of task objects

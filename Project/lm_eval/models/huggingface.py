@@ -109,6 +109,7 @@ class HFLM(TemplateLM):
         # PEFT and quantization options
         peft: Optional[str] = None,
         autogptq: Optional[Union[bool, str]] = False,
+        cache_dir: Optional[str] = None,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -137,6 +138,7 @@ class HFLM(TemplateLM):
                     revision=revision,
                     trust_remote_code=trust_remote_code,
                     use_fast=use_fast_tokenizer,
+                    cache_dir=cache_dir,
                 )
 
         else:
@@ -189,6 +191,7 @@ class HFLM(TemplateLM):
                 pretrained,
                 revision=revision,
                 trust_remote_code=trust_remote_code,
+                cache_dir=cache_dir,
             )
 
         # determine which of 'causal' and 'seq2seq' backends to use
@@ -210,6 +213,7 @@ class HFLM(TemplateLM):
                 offload_folder=offload_folder,
                 peft=peft,
                 autogptq=autogptq,
+                cache_dir=cache_dir,
                 **kwargs,
             )
 
@@ -237,6 +241,7 @@ class HFLM(TemplateLM):
             revision=revision,
             trust_remote_code=trust_remote_code,
             use_fast_tokenizer=use_fast_tokenizer,
+            cache_dir=cache_dir,
         )
 
         self.truncation = truncation
@@ -449,11 +454,13 @@ class HFLM(TemplateLM):
         pretrained: str,
         revision: str = "main",
         trust_remote_code: bool = False,
+        cache_dir: Optional[str] = None,
     ) -> None:
         self._config = transformers.AutoConfig.from_pretrained(
             pretrained,
             revision=revision,
             trust_remote_code=trust_remote_code,
+            cache_dir=cache_dir,
         )
 
     def _create_model(
@@ -473,6 +480,7 @@ class HFLM(TemplateLM):
         # PEFT and quantization options
         peft: Optional[str] = None,
         autogptq: Optional[Union[bool, str]] = False,
+        cache_dir: Optional[str] = None,
         **kwargs,
     ) -> None:
         """
@@ -526,6 +534,7 @@ class HFLM(TemplateLM):
                 revision=revision,
                 torch_dtype=get_dtype(dtype),
                 trust_remote_code=trust_remote_code,
+                cache_dir=cache_dir,
                 **model_kwargs,
             )
         else:
@@ -569,6 +578,7 @@ class HFLM(TemplateLM):
         revision: Optional[str] = "main",
         trust_remote_code: Optional[bool] = False,
         use_fast_tokenizer: Optional[bool] = True,
+        cache_dir: Optional[str] = None,
     ) -> None:
         """
         Helper method during initialization.
@@ -584,6 +594,7 @@ class HFLM(TemplateLM):
                     revision=revision,
                     trust_remote_code=trust_remote_code,
                     use_fast=use_fast_tokenizer,
+                    cache_dir=cache_dir,
                 )
             else:
                 assert isinstance(
@@ -602,6 +613,7 @@ class HFLM(TemplateLM):
                 revision=revision,
                 trust_remote_code=trust_remote_code,
                 use_fast=use_fast_tokenizer,
+                cache_dir=cache_dir,
             )
         return None
 
