@@ -7,7 +7,8 @@
 ```bash
 # https://docs.conda.io/projects/miniconda/en/latest/
 mkdir -p ~/miniconda3
-curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/miniconda3/miniconda.sh
+#curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/miniconda3/miniconda.sh
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
 bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 rm -rf ~/miniconda3/miniconda.sh
 
@@ -36,23 +37,6 @@ pip install -r requirements.txt
 pip install accelerate -U
 ```
 
-```bash
-# https://spacy.io/usage
-# pip install -U pip setuptools wheel
-pip install 'spacy[apple]'
-python -m spacy download en_core_web_sm
-python -m spacy download en_core_web_trf
-python -m spacy download en_core_web_md
-python -m spacy download en_core_web_lg
-```
-
-For macOS, `pip install graphviz` is not enough, run either of the following scripts:
-
-```bash
-brew graphviz
-conda install graphviz
-```
-
 ## Experiments
 
 ### Run the code (on a CPU or a single GPU)
@@ -62,21 +46,21 @@ on the [Commonsense QA](https://huggingface.co/datasets/tau/commonsense_qa) data
 including training (fine-tuning), generation, and evaluation.
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
+python3 train.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
   --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5
 ```
 
 Without evaluation:
 
 ```bash
-python3 main.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
+python3 train.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
   --save_after_epoch --ckpt_limit 5
 ```
 
 To specify more hyperparameters (all the following settings are default values):
 
 ```bash
-python3 main.py \
+python3 train.py \
   --ds_name "commonsense_qa" \
   --model_name "gpt2" \
   --cuda "0" \
@@ -110,7 +94,7 @@ python3 main.py \
 **DataParallel** (`torch.nn.parallel.data_parallel.DataParallel`) Training (at least two GPUs):
 
 ```bash
-python3 main_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
+python3 train_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
   --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 \
   --dp
 ```
@@ -118,7 +102,7 @@ python3 main_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" -
 **DistributedDataParallel** (`torch.nn.parallel.distributed.DistributedDataParallel`) Training (at least two GPUs):
 
 ```bash
-python3 main_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
+python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
   --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 \
   --backend "gloo" --master_addr "localhost" --master_port "12345" --ddp --ddp_gen
 ```
@@ -131,8 +115,43 @@ python3 main_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" 
 
 ## Experimental Results
 
-- The running logs and all training losses will be in the folder `f"runs/{save_dir}/log/""`
+### Training Results
+
+- The running logs and all training losses will be in the folder `f"runs/{save_dir}/log/"`
 - The model checkpoints with tokenizers info after training will be in the folder `f"runs/{save_dir}/ckpt/"`
 - The generation and evaluation results with statistics will be in the folder `f"runs/{save_dir}/output/"`
+
+### Generation and Evaluation
+
+Use [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness):
+
+```bash
+git clone https://github.com/EleutherAI/lm-evaluation-harness
+cd lm-evaluation-harness
+pip install -e .
+#pip install vllm
+```
+
+* [Basic Usage](https://github.com/EleutherAI/lm-evaluation-harness?tab=readme-ov-file#basic-usage);
+* [Command-line Interface](https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md);
+* [Supported Models](https://docs.vllm.ai/en/latest/models/supported_models.html);
+* [Supported Tasks](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks) (Or try `lm-eval --tasks list`).
+
+Command line tool `lm-eval` usage (basic example):
+
+```bash
+lm_eval --model hf \
+  --model_args pretrained=EleutherAI/pythia-160m,revision=step100000,dtype="float" \
+  --tasks lambada_openai,hellaswag \
+  --device cuda:0 \
+  --batch_size auto:4 \
+  --use_cache "~/.cache/huggingface/" \
+  --cache_requests "true" \
+  --seed 42
+```
+
+However, it does not support setting `cache_dir` for loading models or tokenizers.
+Hence, we clone it to the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval) to
+the local module `./lm_eval`, add some new features, and use it as our evaluation codebase.
 
 ---

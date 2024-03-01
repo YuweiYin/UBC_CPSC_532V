@@ -50,7 +50,6 @@ def training(
 ):
     """
     Model training. Save the model checkpoints and tokenizer during/after training.
-    TODO: Test loading the trained model (saved via `save_pretrained()`) and continue training.
     :param cfg: configuration / arguments.
     :param ds_name: the dataset name.
     :param model_name: the model name.
