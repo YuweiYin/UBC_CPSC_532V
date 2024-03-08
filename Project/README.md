@@ -1,5 +1,8 @@
 # UBC CPSC 532V (2023W2) Project
 
+* [Project Proposal Document](./docs/Project_Proposal_Document.pdf)
+* [Project Proposal Slides](./docs/Project_Proposal_Slides.pdf)
+
 ## Environment (Linux; macOS)
 
 ### Miniconda3
