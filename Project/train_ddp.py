@@ -165,7 +165,9 @@ def training(
                     cfg.log_dict["training/train_loss_current"] = loss_value
                     avg_period_losses = sum(period_losses) / len(period_losses) if len(period_losses) > 0 else 0.0
                     cfg.log_dict["training/train_loss_avg_period"] = avg_period_losses
-                    cfg.log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
+                    cfg.log_dict["training/train_lr_optimizer"] = optimizer.param_groups[-1]["lr"]
+                    if cfg.use_lr_scheduler and lr_scheduler is not None:
+                        cfg.log_dict["training/train_lr_scheduler"] = lr_scheduler.get_last_lr()[-1]
                     # cfg.log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
                     wandb.log(cfg.log_dict)
 
