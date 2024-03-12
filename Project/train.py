@@ -19,6 +19,7 @@ from torch import optim
 from torch.utils.data import DataLoader
 
 from transformers import set_seed
+import wandb
 
 from dataset.DatasetLoader import DatasetLoader
 from dataset.DatasetTorch import DatasetMultiChoiceQA
@@ -67,6 +68,16 @@ def training(
     :return: the tuned model and used tokenizer.
     """
 
+    if cfg.use_wandb:
+        wandb.init(
+            name=f"532V_runs",
+            group=f"{ds_name}---{model_name}---training",
+            project="532V",
+            config=vars(cfg)
+        )
+        # wandb.watch(model)
+    log_dict = dict()  # for wandb logging
+
     ft_model.train()
     ft_model = ft_model.to(cfg.device)
 
@@ -86,6 +97,13 @@ def training(
     if verbose:
         cfg.logger.info(optimizer)
 
+    if cfg.use_lr_scheduler:
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
+        if verbose:
+            cfg.logger.info(lr_scheduler)
+    else:
+        lr_scheduler = None
+
     all_losses = []  # store the loss of each batch (divided by epochs)
     all_valid_scores = []  # store the accuracy score on the valid set after evaluation (divided by epochs)
     all_test_scores = []  # store the accuracy score on the test set after evaluation (divided by epochs)
@@ -97,6 +115,8 @@ def training(
         if verbose:
             cfg.logger.info(f">>> Start Epoch: {epoch}")
         epoch_losses = []
+        period_losses = []
+        period_start_time = time.perf_counter()
 
         for batch_idx, batch_train in enumerate(dataloader_train):
             # Raw inputs
@@ -131,9 +151,19 @@ def training(
 
             # Training log
             if batch_cnt % logging_gap == 0:
-                cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss}"
+                cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss_value}"
                 if verbose:
                     cfg.logger.info(cur_log)
+                if cfg.use_wandb:
+                    period_end_time = time.perf_counter()
+                    period_duration = period_end_time - period_start_time
+                    log_dict["time/train_period_duration"] = period_duration
+                    log_dict["training/train_loss_current"] = loss_value
+                    avg_period_losses = sum(period_losses) / len(period_losses) if len(period_losses) > 0 else 0.0
+                    log_dict["training/train_loss_avg_period"] = avg_period_losses
+                    log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
+                    # log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
+                    wandb.log(log_dict)
 
             # Run evaluation
             if do_eval_batch and batch_cnt % eval_gap == 0:
@@ -201,6 +231,9 @@ def training(
                         best_test_score = test_score
 
             batch_cnt += 1
+
+        if cfg.use_lr_scheduler and lr_scheduler is not None:
+            lr_scheduler.step()
 
         # After each epoch, save the losses and scores
         if verbose:
@@ -316,6 +349,7 @@ def training(
                 if test_score > best_test_score:
                     best_test_score = test_score
 
+    # wandb.finish()
     return {
         "ft_model": ft_model,
         "tokenizer_train": tokenizer_train,
@@ -690,13 +724,16 @@ if __name__ == "__main__":
     parser.add_argument("--bsz_train", type=int, default=32, help="The batch size for training")
     parser.add_argument("--bsz_gen", type=int, default=32, help="The batch size for generation / evaluation")
     parser.add_argument("--init_lr", type=float, default=float(1e-3), help="The initial learning rate for training")
-    parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
+    parser.add_argument("--use_lr_scheduler", action="store_true", default=False, help="Use lr scheduler")
+    # parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
+    parser.add_argument("--w_decay", type=float, default=0.0, help="The weight decay rate for training")
     parser.add_argument("--save_dir", type=str, default="", help="The directory of the current run")
     parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/",
                         help="The directory where data & model are cached")
     parser.add_argument("--log_dir", type=str, default="log", help="The directory to save logs")
     parser.add_argument("--ckpt_dir", type=str, default="ckpt", help="The directory to save model checkpoints")
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
+    parser.add_argument("--use_wandb", action="store_true", default=False, help="Use wandb to save & show logs")
     args = parser.parse_args()
     logger.info(args)
     args.logger = logger
@@ -725,6 +762,7 @@ if __name__ == "__main__":
     args.bsz_train = int(args.bsz_train)  # The batch size for training
     args.bsz_gen = int(args.bsz_gen)  # The batch size for generation /  evaluation
     args.init_lr = float(args.init_lr)  # The initial learning rate for training
+    args.use_lr_scheduler = bool(args.use_lr_scheduler)  # Use learning rate scheduler (default: StepLR)
     args.w_decay = float(args.w_decay)  # The weight decay rate for training
     args.n_icl = int(args.n_icl)  # The number of examples for in-context learning
     args.n_gen = int(args.n_gen)  # The number of sentences to be generated (for each evaluate(...) call)
@@ -736,6 +774,7 @@ if __name__ == "__main__":
     args.log_dir = str(args.log_dir)  # The directory to save logs
     args.ckpt_dir = str(args.ckpt_dir)  # The directory to save model checkpoints
     args.output_dir = str(args.output_dir)  # The directory to outputs, e.g., results
+    args.use_wandb = bool(args.use_wandb)  # Use wandb to save & show logs
 
     # CUDA
     os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda

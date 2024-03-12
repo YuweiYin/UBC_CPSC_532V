@@ -39,10 +39,10 @@ pip install -r requirements.txt
 ```bash
 pip install accelerate -U
 pip install deepspeed
-pip install mamba-ssm
-pip install causal-conv1d
-#pip install promptsource
 pip install vllm
+#pip install mamba-ssm
+#pip install causal-conv1d
+#pip install promptsource
 ```
 
 ## Experiments
@@ -55,14 +55,21 @@ including training (fine-tuning), generation, and evaluation.
 
 ```bash
 python3 train.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
-  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5
+  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 --use_lr_scheduler
 ```
 
 Without evaluation:
 
 ```bash
 python3 train.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
-  --save_after_epoch --ckpt_limit 5
+  --save_after_epoch --ckpt_limit 5 --use_lr_scheduler
+```
+
+To show the training/evaluation logs and save logs to [wandb](https://wandb.ai/):
+
+```bash
+python3 train.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0" --verbose \
+  --save_after_epoch --ckpt_limit 5 --use_lr_scheduler --use_wandb
 ```
 
 To specify more hyperparameters (all the following settings are default values):
@@ -89,6 +96,7 @@ python3 train.py \
   --bsz_train 32 \
   --bsz_gen 32 \
   --init_lr "1e-3" \
+  --use_lr_scheduler \
   --w_decay "5e-4" \
   --save_dir "" \
   --cache_dir "~/.cache/huggingface/" \
@@ -103,7 +111,7 @@ python3 train.py \
 
 ```bash
 python3 train_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
-  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 \
+  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 --use_lr_scheduler \
   --dp
 ```
 
@@ -111,7 +119,7 @@ python3 train_dp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" 
 
 ```bash
 python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1" --verbose \
-  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 \
+  --eval_before --eval_after --do_eval_epoch --do_eval_batch --save_after_epoch --ckpt_limit 5 --use_lr_scheduler \
   --backend "gloo" --master_addr "localhost" --master_port "12345" --ddp --ddp_gen
 ```
 
