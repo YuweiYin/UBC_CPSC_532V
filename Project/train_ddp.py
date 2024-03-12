@@ -689,7 +689,7 @@ def run(
             name=f"532V_runs-ddp-rank{rank}",
             group=f"{cfg.ds_name}---{cfg.model_name}---training",
             project="532V",
-            config=vars(args)
+            config=vars(cfg)
         )
         # wandb.watch(model)
     cfg.log_dict = dict()  # for wandb logging
