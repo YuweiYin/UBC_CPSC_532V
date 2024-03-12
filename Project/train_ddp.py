@@ -99,7 +99,7 @@ def training(
         cfg.logger.info(optimizer)
 
     if cfg.use_lr_scheduler:
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
+        lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
         if verbose:
             cfg.logger.info(lr_scheduler)
     else:
@@ -158,16 +158,16 @@ def training(
                 cur_log = f"[LOG] >>> Epoch {epoch} >>> Total Batch {batch_cnt + 1} >>> loss: {loss_value}"
                 if verbose:
                     cfg.logger.info(cur_log)
-                if cfg.use_wandb:
+                if cfg.use_wandb and cfg.rank == 0:
                     period_end_time = time.perf_counter()
                     period_duration = period_end_time - period_start_time
-                    log_dict["time/train_period_duration"] = period_duration
-                    log_dict["training/train_loss_current"] = loss_value
+                    cfg.log_dict["time/train_period_duration"] = period_duration
+                    cfg.log_dict["training/train_loss_current"] = loss_value
                     avg_period_losses = sum(period_losses) / len(period_losses) if len(period_losses) > 0 else 0.0
-                    log_dict["training/train_loss_avg_period"] = avg_period_losses
-                    log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
-                    # log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
-                    wandb.log(log_dict)
+                    cfg.log_dict["training/train_loss_avg_period"] = avg_period_losses
+                    cfg.log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
+                    # cfg.log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
+                    wandb.log(cfg.log_dict)
 
             # Run evaluation
             if do_eval_batch and batch_cnt % eval_gap == 0:
@@ -373,7 +373,6 @@ def training(
             for test_score in all_test_scores:
                 fp_out.write(json.dumps(test_score) + "\n")
 
-    # wandb.finish()
     return {
         "model": model,
         "tokenizer_train": tokenizer_train,
@@ -685,6 +684,16 @@ def run(
     if cfg.verbose:
         cfg.logger.info(cfg)
 
+    if cfg.use_wandb and rank == 0:
+        wandb.init(
+            name=f"532V_runs-ddp-rank{rank}",
+            group=f"{cfg.ds_name}---{cfg.model_name}---training",
+            project="532V",
+            config=vars(args)
+        )
+        # wandb.watch(model)
+    cfg.log_dict = dict()  # for wandb logging
+
     # Loaders
     datasetLoader = DatasetLoader(cfg.logger)
     modelLoader = ModelLoader(cfg.logger)
@@ -855,6 +864,8 @@ def run(
 
     # if cfg.verbose:
     #     cfg.logger.info("Done!")
+    # if cfg.use_wandb and rank == 0:
+    #     wandb.finish()
     cfg.logger.info(f"Done! [RANK={rank}]")
 
     # Do a dump forward pass for synchronizing all processes

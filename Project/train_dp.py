@@ -69,16 +69,6 @@ def training(
     :return: the tuned model and used tokenizer.
     """
 
-    if cfg.use_wandb:
-        wandb.init(
-            name=f"532V_runs",
-            group=f"{ds_name}---{model_name}---training",
-            project="532V",
-            config=vars(cfg)
-        )
-        # wandb.watch(model)
-    log_dict = dict()  # for wandb logging
-
     model.train()
 
     if isinstance(model, DataParallel):  # Multiple GPUs training
@@ -107,7 +97,7 @@ def training(
         cfg.logger.info(optimizer)
 
     if cfg.use_lr_scheduler:
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
+        lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
         if verbose:
             cfg.logger.info(lr_scheduler)
     else:
@@ -169,13 +159,13 @@ def training(
                 if cfg.use_wandb:
                     period_end_time = time.perf_counter()
                     period_duration = period_end_time - period_start_time
-                    log_dict["time/train_period_duration"] = period_duration
-                    log_dict["training/train_loss_current"] = loss_value
+                    cfg.log_dict["time/train_period_duration"] = period_duration
+                    cfg.log_dict["training/train_loss_current"] = loss_value
                     avg_period_losses = sum(period_losses) / len(period_losses) if len(period_losses) > 0 else 0.0
-                    log_dict["training/train_loss_avg_period"] = avg_period_losses
-                    log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
-                    # log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
-                    wandb.log(log_dict)
+                    cfg.log_dict["training/train_loss_avg_period"] = avg_period_losses
+                    cfg.log_dict["training/train_lr"] = optimizer.param_groups[0]["lr"]
+                    # cfg.log_dict["training/weight_decay"] = optimizer.param_groups[0]["weight_decay"]
+                    wandb.log(cfg.log_dict)
 
             # Run evaluation
             if do_eval_batch and batch_cnt % eval_gap == 0:
@@ -370,7 +360,6 @@ def training(
                 if test_score > best_test_score:
                     best_test_score = test_score
 
-    # wandb.finish()
     return {
         "model": model,
         "tokenizer_train": tokenizer_train,
@@ -841,7 +830,20 @@ if __name__ == "__main__":
             logger.info(f"torch.cuda.current_device(): {torch.cuda.current_device()}")
             logger.info(f"torch.cuda.get_device_name(0): {torch.cuda.get_device_name(0)}")
 
+    if args.use_wandb:
+        wandb.init(
+            name=f"532V_runs-dp",
+            group=f"{args.ds_name}---{args.model_name}---training",
+            project="532V",
+            config=vars(args)
+        )
+        # wandb.watch(model)
+    args.log_dict = dict()  # for wandb logging
+
     run(cfg=args)
+
+    # if args.use_wandb:
+    #     wandb.finish()
 
     timer_end = time.perf_counter()
     logger.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
