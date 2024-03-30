@@ -2,6 +2,7 @@ import os
 import json
 import requests
 import wikipediaapi
+import arxiv
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -31,6 +32,7 @@ class AtomicRetriever(Retriever):
         tokenizer = AutoTokenizer.from_pretrained("mismayil/comet-gpt2-ai2")
         model = AutoModelForCausalLM.from_pretrained("mismayil/comet-gpt2-ai2").to(device)
 
+        # query = "I enjoy walking with my cute dog"
         inputs = tokenizer(query, return_tensors="pt").to(device)
 
         generated_ids = model.generate(**inputs, max_length=100, num_beams=5, early_stopping=True)
@@ -131,5 +133,24 @@ class ConceptNetRetriever(Retriever):
                 rel = edge["rel"]["label"]
                 descriptions.append(REL_TO_TEMPLATE[rel.lower()].replace("[w1]", start_word).replace("[w2]", end_word))
         retrieved = ". ".join(descriptions)
+
+        return retrieved
+
+
+class ArxivRetriever(Retriever):
+
+    def __init__(self):
+        super().__init__()
+        self.client = arxiv.Client()
+
+    def retrieve(self, query: str, max_results: int = 10, **kwargs):
+        search = arxiv.Search(
+            query=query,
+            max_results=max_results,
+            sort_by=arxiv.SortCriterion.Relevance
+        )
+        retrieved = ""
+        for r in self.client.results(search):
+            retrieved = retrieved + r.summary + "\n\n"
 
         return retrieved

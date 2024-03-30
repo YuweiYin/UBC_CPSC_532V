@@ -26,6 +26,9 @@ from lm_eval.utils import (
     simple_parse_args_string,
 )
 
+import copy
+from util.TextParser import TextParser
+
 
 if TYPE_CHECKING:
     from lm_eval.api.model import LM
@@ -372,7 +375,7 @@ def evaluate(
         # create `K` copies of each request `req` based off `K = req.repeats`
         cloned_reqs = []
         for req in reqs:
-            cloned_reqs.extend([req] * req.repeats)
+            cloned_reqs.extend([req_rag] * req.repeats)
 
         if (lm.world_size > 1) and (padding_requests[reqtype] > 0):
             for _ in range(padding_requests[reqtype]):

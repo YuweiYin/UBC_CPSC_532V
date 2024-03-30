@@ -927,8 +927,7 @@ if __name__ == "__main__":
     # parser.add_argument("--w_decay", type=float, default=float(5e-4), help="The weight decay rate for training")
     parser.add_argument("--w_decay", type=float, default=0.0, help="The weight decay rate for training")
     parser.add_argument("--save_dir", type=str, default="", help="The directory of the current run")
-    parser.add_argument("--cache_dir", type=str, default="~/.cache/huggingface/",
-                        help="The directory where data & model are cached")
+    parser.add_argument("--cache_dir", type=str, default="", help="The directory where data & model are cached")
     parser.add_argument("--log_dir", type=str, default="log", help="The directory to save logs")
     parser.add_argument("--ckpt_dir", type=str, default="ckpt", help="The directory to save model checkpoints")
     parser.add_argument("--output_dir", type=str, default="output", help="The directory to outputs, e.g., results")
@@ -973,8 +972,11 @@ if __name__ == "__main__":
     args.len_gen = int(args.len_gen)  # The number of max tokens to be generated
     args.save_dir = str(args.save_dir)  # The directory of the current run
     args.cache_dir = str(args.cache_dir)  # The directory where data & model are cached
-    if not os.path.isdir(args.cache_dir):
-        os.makedirs(args.cache_dir, exist_ok=True)
+    if args.cache_dir == "":
+        args.cache_dir = None
+    else:
+        if not os.path.isdir(args.cache_dir):
+            os.makedirs(args.cache_dir, exist_ok=True)
     args.log_dir = str(args.log_dir)  # The directory to save logs
     args.ckpt_dir = str(args.ckpt_dir)  # The directory to save model checkpoints
     args.output_dir = str(args.output_dir)  # The directory to outputs, e.g., results

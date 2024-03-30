@@ -39,7 +39,7 @@ pip install -r requirements.txt
 ```bash
 pip install accelerate -U
 pip install deepspeed
-pip install vllm
+#pip install vllm
 #pip install mamba-ssm
 #pip install causal-conv1d
 #pip install promptsource
@@ -99,7 +99,7 @@ python3 train.py \
   --use_lr_scheduler \
   --w_decay "5e-4" \
   --save_dir "" \
-  --cache_dir "~/.cache/huggingface/" \
+  --cache_dir "/path/to/.cache/huggingface/" \
   --log_dir "log" \
   --ckpt_dir "ckpt" \
   --output_dir "output"
@@ -157,7 +157,7 @@ lm_eval --model "hf" \
   --tasks "lambada_openai,hellaswag" \
   --device "cuda:0" \
   --batch_size "auto:4" \
-  --use_cache "~/.cache/huggingface/" \
+  --use_cache "/path/to/.cache/huggingface/" \
   --cache_requests "true" \
   --seed 42
 ```
@@ -180,12 +180,30 @@ python3 eval.py --model "hf" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
-  --use_cache "~/.cache/huggingface/" \
+  --use_cache "/path/to/.cache/huggingface/" \
   --cache_requests "true" \
-  --cache_dir "~/.cache/huggingface/" \
+  --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
   --output_path "results/copa---gpt2---eval"
+```
+
+### Evaluate the Fine-tuned Models
+
+Suppose the fine-tuned checkpoint under the `"runs/commonsense_qa---gpt2/ckpt/model_epoch_9/"` folder:
+
+```bash
+python3 eval.py --model "hf" \
+  --model_args "pretrained=runs/commonsense_qa---gpt2/ckpt/model_epoch_9,dtype=float" \
+  --tasks "copa" \
+  --device "cuda:0" \
+  --batch_size "auto:8" \
+  --use_cache "/path/to/.cache/huggingface/" \
+  --cache_requests "true" \
+  --cache_dir "/path/to/.cache/huggingface/" \
+  --seed 42 \
+  --log_samples \
+  --output_path "results/copa---gpt2_ft---eval"
 ```
 
 ### Testing Tasks and Datasets 
