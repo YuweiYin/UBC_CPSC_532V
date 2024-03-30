@@ -211,7 +211,7 @@ def parse_eval_args() -> argparse.Namespace:
     parser.add_argument(
         "--cache_dir",
         type=str,
-        default="~/.cache/huggingface/",
+        default="",
         help="The directory where data & model are cached"
     )
 
@@ -225,6 +225,13 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
 
     if args.wandb_args:
         wandb_logger = WandbLogger(args)
+
+    args.cache_dir = str(args.cache_dir)  # The directory where data & model are cached
+    if args.cache_dir == "":
+        args.cache_dir = None
+    else:
+        if not os.path.isdir(args.cache_dir):
+            os.makedirs(args.cache_dir, exist_ok=True)
 
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{args.verbosity}"))

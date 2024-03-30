@@ -2,7 +2,7 @@ import collections
 import itertools
 import logging
 import random
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, List
 
 import numpy as np
 import torch
@@ -28,7 +28,13 @@ from lm_eval.utils import (
 
 import copy
 from util.TextParser import TextParser
-
+from rag.retriever import (
+    AtomicRetriever, GPTRetriever, WikiRetriever, ConceptNetRetriever, ArxivRetriever, GoogleSearchRetriever,
+)
+from rag.prompt import (
+    PROMPT, fastRAG_PROMPT, general_PROMPT,
+    chatGPT_PROMPT_1, chatGPT_PROMPT_2, chatGPT_PROMPT_3, chatGPT_PROMPT_4, chatGPT_PROMPT_5,
+)
 
 if TYPE_CHECKING:
     from lm_eval.api.model import LM
@@ -39,31 +45,31 @@ from lm_eval.caching.cache import delete_cache
 
 @positional_deprecated
 def simple_evaluate(
-    model,
-    model_args: Optional[Union[str, dict, None]] = None,
-    tasks=None,
-    num_fewshot: Optional[int] = None,
-    batch_size: Optional[int] = None,
-    max_batch_size: Optional[int] = None,
-    device: Optional[str] = None,
-    use_cache: Optional[str] = None,
-    cache_requests: bool = False,
-    rewrite_requests_cache: bool = False,
-    delete_requests_cache: bool = False,
-    limit: Optional[Union[int, float]] = None,
-    bootstrap_iters: int = 100000,
-    check_integrity: bool = False,
-    decontamination_ngrams_path=None,
-    write_out: bool = False,
-    log_samples: bool = True,
-    gen_kwargs: str = None,
-    task_manager: TaskManager = None,
-    verbosity: str = "INFO",
-    predict_only: bool = False,
-    random_seed: int = 0,
-    numpy_random_seed: int = 1234,
-    torch_random_seed: int = 1234,
-    cache_dir: Optional[str] = None,
+        model,
+        model_args: Optional[Union[str, dict, None]] = None,
+        tasks=None,
+        num_fewshot: Optional[int] = None,
+        batch_size: Optional[int] = None,
+        max_batch_size: Optional[int] = None,
+        device: Optional[str] = None,
+        use_cache: Optional[str] = None,
+        cache_requests: bool = False,
+        rewrite_requests_cache: bool = False,
+        delete_requests_cache: bool = False,
+        limit: Optional[Union[int, float]] = None,
+        bootstrap_iters: int = 100000,
+        check_integrity: bool = False,
+        decontamination_ngrams_path=None,
+        write_out: bool = False,
+        log_samples: bool = True,
+        gen_kwargs: str = None,
+        task_manager: TaskManager = None,
+        verbosity: str = "INFO",
+        predict_only: bool = False,
+        random_seed: int = 0,
+        numpy_random_seed: int = 1234,
+        torch_random_seed: int = 1234,
+        cache_dir: Optional[str] = None,
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -149,7 +155,7 @@ def simple_evaluate(
     if tasks is None:
         tasks = []
     assert (
-        tasks != []
+            tasks != []
     ), "No tasks specified, or no tasks found. Please verify the task names."
 
     if gen_kwargs is not None:
@@ -292,16 +298,16 @@ decontaminate_suffix = "_decontaminate"
 
 @positional_deprecated
 def evaluate(
-    lm: "LM",
-    task_dict,
-    limit: Optional[int] = None,
-    cache_requests=False,
-    rewrite_requests_cache=False,
-    bootstrap_iters: Optional[int] = 100000,
-    decontamination_ngrams_path=None,
-    write_out: bool = False,
-    log_samples: bool = True,
-    verbosity: str = "INFO",
+        lm: "LM",
+        task_dict,
+        limit: Optional[int] = None,
+        cache_requests=False,
+        rewrite_requests_cache=False,
+        bootstrap_iters: Optional[int] = 100000,
+        decontamination_ngrams_path=None,
+        write_out: bool = False,
+        log_samples: bool = True,
+        verbosity: str = "INFO",
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -368,19 +374,161 @@ def evaluate(
             numpad = max(gathered_item) - gathered_item[lm.rank]
             padding_requests[task.OUTPUT_TYPE] += numpad
 
-    ### Run LM on inputs, get all outputs ###
+    # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
+    textParser = TextParser()  # Keyword extractor
+    atomicRetriever = AtomicRetriever()
+    # gptRetriever = GPTRetriever(api_key="", model_name="gpt-3.5-turbo")
+    wikiRetriever = WikiRetriever(full_text=False)
+    conceptNetRetriever = ConceptNetRetriever(verbose=False)
+    arxivRetriever = ArxivRetriever()
+    googleSearchRetriever = GoogleSearchRetriever()
+
+    def get_keywords(_query: str) -> List[str]:
+        _keywords_1 = textParser.get_keywords_keybert(_query, n_bag=1)
+        _keywords_2 = textParser.get_keywords_keybert(_query, n_bag=2)
+        _keywords = sorted(list(set(_keywords_1 + _keywords_2)))
+        return _keywords
+
+    # ### Run LM on inputs, get all outputs ###
     # execute each type of request
     for reqtype, reqs in requests.items():
         eval_logger.info(f"Running {reqtype} requests")
         # create `K` copies of each request `req` based off `K = req.repeats`
         cloned_reqs = []
         for req in reqs:
-            cloned_reqs.extend([req_rag] * req.repeats)
+            # Evaluator workflow
+            #     The evaluator feeds the model with req.arguments[0] (called "context") as input and
+            #     compares the model output with req.arguments[0] (called "continuation"), which calculate two values:
+            #     1. the logits.sum() of the generation probability;
+            #     2. the exact match score (whether the model generation is exactly the same as the reference)
+            #     See lm_eval/api/model.py `rem_res = getattr(self.lm, attr)(remaining_reqs)` and `loglikelihood(...)`
+            #     See lm_eval/models/huggingface.py `_loglikelihood_tokens(...)` and `multi_logits = F.log_softmax(...)`
+            #     Therefore, we need to prepend external knowledge (RAG retrievals) to the front of req.arguments[0]
+            # Retrieval-Augmented Generation (RAG) workflow
+            #     Step 0: [Optional] Query preprocessing, e.g., rewriting
+            #     Step 1: Keywords extraction (using KeyBERT)
+            #     Step 2: Search for relevant documents from multiple knowledge bases/sources (using online API)
+            #     Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+            #     Step 3: Augmentation: Combine the documents to the original query (different prompting methods)
+            #     Step 3.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
+            #     Step 4: Run models and get evaluation results
+            req.arguments_original = copy.deepcopy(req.arguments)  # Tuple(str): constructed input-output prompt
+            # req_docs = req.doc  # dict: task-specific dictionary -> raw attributes to construct our RAG prompt
+
+            # TODO: RAG Step 0: [Optional] Query preprocessing, e.g., rewriting
+            # TODO: Different knowledge source API needs different query/keyword input
+            task_name = req.task_name
+            if task_name == "wsc273":
+                # The Winograd Schema Challenge  https://cs.nyu.edu/~davise/papers/WinogradSchemas/WS.html
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"text": str, "pronoun": str, "pronoun_loc": int, "quote": str, "quote_loc": int,
+                #     "options": List[str], "label": int, "source": str}
+                # Task: Pick an option in the `options` list that the `pronoun` at `pronoun_loc` in the `text` refers to
+                cur_query = req.doc["text"]
+            elif task_name == "winogrande":
+                # WinoGrande: Adversarial WSC  https://winogrande.allenai.org/
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence": str, "option1": str, "option2": str, "answer": str}
+                # Task: Pick either `option1` or `option2` to replace the "_" in the `sentence`
+                cur_query = ""
+            elif task_name == "anli_r1":  # "anli"
+                # Adversarial NLI  https://github.com/facebookresearch/anli
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"uid": str, "premise": str, "hypothesis": str, "label": int, "reason": str}
+                # Task: NLI (premise -> hypothesis): label = 0 entailment; label = 1 neutral; label = 2 contradiction
+                cur_query = ""
+            elif task_name == "anli_r2":  # "anli"
+                cur_query = ""
+            elif task_name == "anli_r3":  # "anli"
+                cur_query = ""
+            elif task_name == "arc_easy":  # "ai2_arc"
+                # AI2 Reasoning Challenge  https://allenai.org/data/arc
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"id": str, "question": str, "choices": dict{"text": list, label: list}, "answerKey": str}
+                # Task: Answer the question by picking a choice (label) from the choices
+                cur_query = ""
+            elif task_name == "arc_challenge":  # "ai2_arc"
+                cur_query = ""
+            elif task_name == "piqa":
+                cur_query = ""
+            elif task_name == "swag":
+                cur_query = ""
+            elif task_name == "hellaswag":
+                cur_query = ""
+            elif task_name == "rte":  # GLUE - "glue"
+                cur_query = ""
+            elif task_name == "qnli":  # GLUE
+                cur_query = ""
+            elif task_name == "mnli":  # GLUE
+                cur_query = ""
+            elif task_name == "mnli_mismatch":  # GLUE
+                cur_query = ""
+            elif task_name == "mrpc":  # GLUE
+                cur_query = ""
+            elif task_name == "qqp":  # GLUE
+                cur_query = ""
+            elif task_name == "wnli":  # GLUE
+                cur_query = ""
+            elif task_name == "sst2":  # GLUE
+                cur_query = ""
+            elif task_name == "cola":  # GLUE
+                cur_query = ""
+            elif task_name == "cb":  # SuperGLUE - "super-glue-lm-eval-v1"
+                cur_query = ""
+            elif task_name == "wic":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "sglue_rte":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "boolq":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "copa":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "multirc":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "record":  # SuperGLUE
+                cur_query = ""
+            elif task_name == "wsc":  # SuperGLUE
+                cur_query = ""
+            else:
+                raise ValueError(f"ValueError: task_name = {task_name}")
+
+            # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
+            cur_keywords = get_keywords(cur_query)
+
+            # TODO: RAG Step 2: Search for relevant documents from multiple knowledge bases/sources (using online API)
+            atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+            # gpt_rag = gptRetriever.retrieve(cur_query)  # GPT generation
+            wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
+            conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
+            arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
+            googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+
+            for kw in cur_keywords:
+                wiki_rag += wikiRetriever.retrieve(kw)
+                conceptNet_rag += conceptNetRetriever.retrieve(kw)
+
+            # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+            # TODO: RAG Step 3: Augmentation: Combine the documents to the original query (different prompting methods)
+            rag_context = "RAG:\n"
+            rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
+            # rag_context += "GPT Knowledge:\n" + "\n".join(gpt_rag) + "\n"
+            rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
+            rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
+            rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
+            rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
+            req.arguments[0] = rag_context + req.arguments[0]  # Augmentation
+
+            cloned_reqs.extend([req] * req.repeats)
 
         if (lm.world_size > 1) and (padding_requests[reqtype] > 0):
             for _ in range(padding_requests[reqtype]):
                 cloned_reqs.extend([req] * req.repeats)
 
+        # TODO: RAG Step 3.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
+        # Use train.py / train_dp.py / train_ddp.py to fine-tune models; Load the trained model by
+        # setting `--model_args "pretrained=/path/to/huggingface_checkpoint,dtype=float" for eval.py
+
+        # TODO: RAG Step 4: Run models and get evaluation results
         # run requests through model
         resps = getattr(lm, reqtype)(cloned_reqs)
 
@@ -393,13 +541,13 @@ def evaluate(
 
     RANK = lm.rank
     WORLD_SIZE = lm.world_size
-    ### Postprocess outputs ###
+    # ### Postprocess outputs ###
     # TODO: del model here, maybe (idea: allow user to specify device of e.g. reward model separately)
     for task_output in eval_tasks:
         task = task_output.task
         task.apply_filters()
 
-        ### Collect values of metrics on all datapoints ###
+        # ### Collect values of metrics on all datapoints ###
         # # unpack results and sort back in order and return control to Task
         # TODO: make it possible to use a different metric per filter
         # Pre-process task.instances to group by doc_id
@@ -468,7 +616,7 @@ def evaluate(
                     )
 
     if RANK == 0:
-        ### Aggregate results over all datapoints ###
+        # ### Aggregate results over all datapoints ###
         # aggregate results ; run bootstrap CIs
         for task_output in eval_tasks:
             task_output.calculate_aggregate_metric(bootstrap_iters=bootstrap_iters)
@@ -476,7 +624,7 @@ def evaluate(
             eval_tasks
         )
 
-        ### Calculate group metrics ###
+        # ### Calculate group metrics ###
         if bool(results):
             for group, task_list in reversed(task_hierarchy.items()):
                 if len(task_list) == 0:
