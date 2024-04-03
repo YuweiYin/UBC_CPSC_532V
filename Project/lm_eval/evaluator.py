@@ -416,7 +416,14 @@ def evaluate(
             # req_docs = req.doc  # dict: task-specific dictionary -> raw attributes to construct our RAG prompt
 
             # TODO: RAG Step 0: [Optional] Query preprocessing, e.g., rewriting
-            # TODO: Different knowledge source API needs different query/keyword input
+            # gpt_instruction = f"Refine the following prompt to make it clearer and more specific for an LLM: " + query
+
+            # TODO: Solving most of the following tasks relies more on commonsense or inter-sentence reasoning
+            #   instead of external knowledge based on semantic matching (either sentence-level or word-level).
+            #   Therefore, the effectiveness of RAG for such tasks is questionable.
+            #   At least, the "missing info" to solve the task is more of reasoning path/clues.
+            #   It is also unknown if the provided extra knowledge will even degrade the performance.
+            # Different knowledge source API needs different query/keyword input
             task_name = req.task_name
             if task_name == "wsc273":
                 # The Winograd Schema Challenge  https://cs.nyu.edu/~davise/papers/WinogradSchemas/WS.html
@@ -430,49 +437,106 @@ def evaluate(
                 # req.arguments: Tuple(str, str)
                 # req.doc: {"sentence": str, "option1": str, "option2": str, "answer": str}
                 # Task: Pick either `option1` or `option2` to replace the "_" in the `sentence`
-                cur_query = ""
+                cur_query = req.doc["sentence"]
+                # answer_id = req.doc["answer"]
+                # if answer_id == "1":
+                #     answer_text = req.doc["option1"]
+                # elif answer_id == "2":
+                #     answer_text = req.doc["option2"]
+                # else:
+                #     raise ValueError(f"ValueError: answer = {answer_id}")
+                # cur_query = req.doc["sentence"].replace("_", answer_text)
             elif task_name == "anli_r1":  # "anli"
                 # Adversarial NLI  https://github.com/facebookresearch/anli
                 # req.arguments: Tuple(str, str)
                 # req.doc: {"uid": str, "premise": str, "hypothesis": str, "label": int, "reason": str}
                 # Task: NLI (premise -> hypothesis): label = 0 entailment; label = 1 neutral; label = 2 contradiction
-                cur_query = ""
+                cur_query = req.doc["hypothesis"]
             elif task_name == "anli_r2":  # "anli"
-                cur_query = ""
+                cur_query = req.doc["hypothesis"]
             elif task_name == "anli_r3":  # "anli"
-                cur_query = ""
+                cur_query = req.doc["hypothesis"]
             elif task_name == "arc_easy":  # "ai2_arc"
                 # AI2 Reasoning Challenge  https://allenai.org/data/arc
                 # req.arguments: Tuple(str, str)
                 # req.doc: {"id": str, "question": str, "choices": dict{"text": list, label: list}, "answerKey": str}
                 # Task: Answer the question by picking a choice (label) from the choices
-                cur_query = ""
+                cur_query = req.doc["question"]
             elif task_name == "arc_challenge":  # "ai2_arc"
-                cur_query = ""
+                cur_query = req.doc["question"]
             elif task_name == "piqa":
-                cur_query = ""
+                # Physical Interaction QA  https://leaderboard.allenai.org/physicaliqa/submissions/public
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"goal": str, "sol1": str, "sol2": str, "label": int}
+                # Task: Answer the question (`goal`) by picking a choice from `sol1` and `sol2`
+                cur_query = req.doc["goal"]
             elif task_name == "swag":
-                cur_query = ""
+                # Situations With Adversarial Generations  https://rowanzellers.com/swag/
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"startphrase": str, "sent1": str, "sent2": str,
+                #     "ending0": str, "ending1": str, "ending2": str, "ending3": str, "label": int}
+                # Task: Complete the sentence (`startphrase`) by picking a choice from `ending0`--`ending3`
+                cur_query = req.doc["sent1"]
             elif task_name == "hellaswag":
-                cur_query = ""
-            elif task_name == "rte":  # GLUE - "glue"
-                cur_query = ""
+                # Harder SWAG for Commonsense NLI https://rowanzellers.com/hellaswag/
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"query": str, "ctx": str, "ctx_a": str, "ctx_b": str, "activity_label": str,
+                #     "endings": List[str], "choices": List[str], "label": str, "gold": int, "split": str}
+                # Task: Complete the sentence (`query`) by picking a choice from the `endings` (or `choices`) list
+                cur_query = req.doc["ctx_a"]
+            elif task_name == "rte":  # GLUE - "glue"  https://gluebenchmark.com/
+                # Recognizing Textual Entailment
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                # Task: Predict if `sentence1` entails `sentence1`. label=0 -> entailment; label=1 -> not entailment
+                cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
             elif task_name == "qnli":  # GLUE
-                cur_query = ""
+                # The Stanford Question Answering Dataset
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"question": str, "sentence": str, "label": int, "idx": int}
+                # Task: Predict if `sentence` answer the `question`. label=0 -> yes; label=1 -> no
+                cur_query = req.doc["question"]
+                # cur_query = req.doc["question"] + " " + req.doc["sentence"]
             elif task_name == "mnli":  # GLUE
-                cur_query = ""
+                # The Multi-Genre Natural Language Inference Corpus
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"premise": str, "hypothesis": str, "label": int, "idx": int}
+                # Task: Predict if `premise` entails `hypothesis`. label=0 -> contradict; 1 -> neutral; 2 -> entailment
+                cur_query = req.doc["premise"]
+                # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
             elif task_name == "mnli_mismatch":  # GLUE
-                cur_query = ""
+                cur_query = req.doc["premise"]
+                # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
             elif task_name == "mrpc":  # GLUE
-                cur_query = ""
+                # The Microsoft Research Paraphrase Corpus
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                # Task: Predict if `sentence1` and `sentence2` is equivalent. label=0 -> no; 1 -> yes
+                cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
             elif task_name == "qqp":  # GLUE
-                cur_query = ""
+                # The Quora Question Pairs2 dataset
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"question1": str, "question2": str, "label": int, "idx": int}
+                # Task: Determine whether a pair of questions are semantically equivalent. label=0 -> no; 1 -> yes
+                cur_query = req.doc["question1"] + " " + req.doc["question2"]
             elif task_name == "wnli":  # GLUE
-                cur_query = ""
+                # The Winograd Schema Challenge
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                # Task: Predict if `sentence2` with the pronoun substituted is entailed by `sentence1`. 0->no; 1->yes
+                cur_query = req.doc["sentence2"]
             elif task_name == "sst2":  # GLUE
-                cur_query = ""
+                # The Stanford Sentiment Treebank
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence": str, "label": int, "idx": int}
+                # Task: Predict the sentiment of a given sentence. label=0 -> negative; label=1 -> positive
+                cur_query = req.doc["sentence"]
             elif task_name == "cola":  # GLUE
-                cur_query = ""
+                # The Corpus of Linguistic Acceptability
+                # req.arguments: Tuple(str, str)
+                # req.doc: {"sentence": str, "label": int, "idx": int}
+                # Task: Determine whether `sentence` is a grammatically correct English sentence.
+                cur_query = req.doc["sentence"]
             elif task_name == "cb":  # SuperGLUE - "super-glue-lm-eval-v1"
                 cur_query = ""
             elif task_name == "wic":  # SuperGLUE
@@ -508,6 +572,11 @@ def evaluate(
                 conceptNet_rag += conceptNetRetriever.retrieve(kw)
 
             # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+            # gpt_instruction = (
+            #     "Given the following documents retrieved by a retrieval-augmented generation system, "
+            #     "summarize the key points and refine the information for clarity and relevance:\n\n" +
+            #     "\n\n".join(rag_documents)
+            # )
             # TODO: RAG Step 3: Augmentation: Combine the documents to the original query (different prompting methods)
             rag_context = "RAG:\n"
             rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
