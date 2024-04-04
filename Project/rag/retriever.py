@@ -10,7 +10,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from openai import OpenAI
 
-from .openai_setup import OPENAI_API_KEY
+from .api_setup import OPENAI_API_KEY
 from .conceptnet_setup import PREFIX_URL, REL_TO_TEMPLATE
 from .prompt import PROMPT
 
@@ -44,7 +44,7 @@ class AtomicRetriever(Retriever):
 
 class GPTRetriever(Retriever):
     """
-    Note: please set a valid OPENAI_API_KEY in openai_setup.py
+    Note: please set a valid OPENAI_API_KEY in api_setup.py
     """
 
     def __init__(self, api_key: str = OPENAI_API_KEY, model_name: str = "gpt-3.5-turbo"):
