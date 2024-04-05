@@ -1,17 +1,19 @@
 #!/bin/bash
 
 echo -e "\n>>> START EVAL <<<\n"
+conda activate 532v
 
-MODEL=$1
+CUDA=$1
+MODEL=$2
 CACHE_DIR="/path/to/.cache/huggingface/"
 
 run_eval(){
   task=$1
   echo -e "\n\n>>> Start of EVAL Model '${MODEL}' on Task '${task}'<<<\n"
-  python3 eval.py --model "hf" \
+  CUDA_VISIBLE_DEVICES=${CUDA} python3 eval.py --model "hf" \
     --model_args "pretrained=${MODEL},dtype=float" \
     --tasks "${task}" \
-    --device "cuda:0" \
+    --device "cuda" \
     --batch_size "auto:8" \
     --use_cache "${CACHE_DIR}" \
     --cache_requests "true" \
@@ -31,6 +33,5 @@ run_eval "swag"
 run_eval "hellaswag"
 run_eval "glue"
 run_eval "super-glue-lm-eval-v1"
-#run_eval "super-glue-t5-prompt"
 
 echo -e "\n\n>>> DONE EVAL <<<\n\n"

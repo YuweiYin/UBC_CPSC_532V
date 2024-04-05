@@ -648,7 +648,7 @@ def evaluate(
                         arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
                     case "googleSearch":
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
-                    case _:
+                    case "ALL":
                         atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
                         llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
                         llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
@@ -687,6 +687,8 @@ def evaluate(
                         for kw in cur_keywords:  # searching using keywords
                             wiki_rag += wikiRetriever.retrieve(kw)
                             conceptNet_rag += conceptNetRetriever.retrieve(kw)
+                    case _:
+                        raise ValueError(f"ValueError: args.rag_source = {args.rag_source}")
 
                 # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
                 rag_docs = {
@@ -750,7 +752,8 @@ def evaluate(
 
         timer_all, timer_avg = sum(timer_list), np.mean(timer_list)
         logging.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
-        logging.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))  # [AVG] wiki: 1.8s
+        logging.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
+        # wnli [AVG] wiki: 1.6s
 
         if (lm.world_size > 1) and (padding_requests[req_type] > 0):
             req = reqs[-1]

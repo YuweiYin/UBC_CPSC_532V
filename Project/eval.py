@@ -214,6 +214,19 @@ def parse_eval_args() -> argparse.Namespace:
         default="",
         help="The directory where data & model are cached"
     )
+    parser.add_argument(
+        "--use_rag",
+        action="store_true",
+        default=False,
+        help="Use Retrieval-Augmented Generation (RAG) or not"
+    )
+    parser.add_argument(
+        "--rag_source",
+        type=str,
+        default="ALL",
+        help="(Options: \"atomic\", \"llm_gemini\", \"llm_openai\", \"llm_anthropic\", "
+             "\"wiki\", \"conceptNet\", \"arxiv\", \"googleSearch\". Default: ALL)"
+    )
 
     return parser.parse_args()
 
@@ -320,6 +333,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
     )
 
     results = evaluator.simple_evaluate(
+        args=args,
         model=args.model,
         model_args=args.model_args,
         tasks=task_names,
