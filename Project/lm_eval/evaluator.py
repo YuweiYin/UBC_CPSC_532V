@@ -1,6 +1,8 @@
+import json
 import collections
 import itertools
 import logging
+import os.path
 import random
 from typing import TYPE_CHECKING, Optional, Union, List
 
@@ -41,10 +43,14 @@ if TYPE_CHECKING:
     from lm_eval.tasks import Task
 
 from lm_eval.caching.cache import delete_cache
+from rag.llm_agent import LLMAgent
+# import multiprocessing as mp
+import time
 
 
 @positional_deprecated
 def simple_evaluate(
+        args,
         model,
         model_args: Optional[Union[str, dict, None]] = None,
         tasks=None,
@@ -73,13 +79,16 @@ def simple_evaluate(
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
+    :param args
+       Arguments
     :param model: Union[str, LM]
         Name of model or LM object, see lm_eval.models.get_model
     :param model_args: Optional[str, dict]
         String or dict arguments for each model class, see LM.create_from_arg_string and LM.create_from_arg_object.
         Ignored if `model` argument is a LM object.
     :param tasks: list[Union[str, dict, Task]]
-        List of task names or Task objects. Task objects will be taken to have name task.EVAL_HARNESS_NAME if defined and type(task).__name__ otherwise.
+        List of task names or Task objects.
+        Task objects will be taken to have name task.EVAL_HARNESS_NAME if defined and type(task).__name__ otherwise.
     :param num_fewshot: int
         Number of examples in few-shot context
     :param batch_size: int or str, optional
@@ -97,7 +106,8 @@ def simple_evaluate(
     :param delete_requests_cache: bool, optional
         Deletes all of the request cache if set to `True`. `None` if not desired.
     :param limit: int or float, optional
-        Limit the number of examples per task (only use this for testing), If <1, limit is a percentage of the total number of examples.
+        Limit the number of examples per task (only use this for testing),
+        If <1, limit is a percentage of the total number of examples.
     :param bootstrap_iters:
         Number of iterations for bootstrap statistics
     :param check_integrity: bool
@@ -161,7 +171,8 @@ def simple_evaluate(
     if gen_kwargs is not None:
         gen_kwargs = simple_parse_args_string(gen_kwargs)
         eval_logger.warning(
-            "generation_kwargs specified through cli, these settings will update set parameters in yaml tasks. Ensure 'do_sample=True' for non-greedy decoding!"
+            "generation_kwargs specified through cli, these settings will update set parameters in yaml tasks. "
+            "Ensure 'do_sample=True' for non-greedy decoding!"
         )
         if gen_kwargs == "":
             gen_kwargs = None
@@ -251,6 +262,7 @@ def simple_evaluate(
         run_task_tests(task_list=tasks)
 
     results = evaluate(
+        args=args,
         lm=lm,
         task_dict=task_dict,
         limit=limit,
@@ -298,6 +310,7 @@ decontaminate_suffix = "_decontaminate"
 
 @positional_deprecated
 def evaluate(
+        args,
         lm: "LM",
         task_dict,
         limit: Optional[int] = None,
@@ -311,6 +324,8 @@ def evaluate(
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
+    :param args
+        Arguments
     :param lm: obj
         Language Model
     :param task_dict: dict[str, Task]
@@ -361,8 +376,8 @@ def evaluate(
             print_writeout(task)
         # aggregate Instances by LM method requested to get output.
         for instance in task.instances:
-            reqtype = instance.request_type
-            requests[reqtype].append(instance)
+            req_type = instance.request_type
+            requests[req_type].append(instance)
 
         if lm.world_size > 1:
             instances_rnk = torch.tensor(len(task._instances), device=lm.device)
@@ -374,14 +389,27 @@ def evaluate(
             numpad = max(gathered_item) - gathered_item[lm.rank]
             padding_requests[task.OUTPUT_TYPE] += numpad
 
+    # TODO: Use LLM API to directly solve the task
+    # LLM_Gemini_Solver = LLMAgent(template="{}", model="google")  # LLM - Gemini
+    # LLM_OpenAI_Solver = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
+    # LLM_Anthropic_Solver = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
+
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
+    gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
     textParser = TextParser()  # Keyword extractor
     atomicRetriever = AtomicRetriever()
-    # gptRetriever = GPTRetriever(api_key="", model_name="gpt-3.5-turbo")
+    LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
+    LLM_OpenAI_Retriever = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
+    LLM_Anthropic_Retriever = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
     wikiRetriever = WikiRetriever(full_text=False)
     conceptNetRetriever = ConceptNetRetriever(verbose=False)
     arxivRetriever = ArxivRetriever()
     googleSearchRetriever = GoogleSearchRetriever()
+
+    save_dir = os.path.join(args.output_path, "eval_results")
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    timer_list = []
 
     def get_keywords(_query: str) -> List[str]:
         _keywords_1 = textParser.get_keywords_keybert(_query, n_bag=1)
@@ -391,11 +419,13 @@ def evaluate(
 
     # ### Run LM on inputs, get all outputs ###
     # execute each type of request
-    for reqtype, reqs in requests.items():
-        eval_logger.info(f"Running {reqtype} requests")
+    for req_type, reqs in requests.items():
+        eval_logger.info(f"Running {req_type} requests")
         # create `K` copies of each request `req` based off `K = req.repeats`
         cloned_reqs = []
+        reqs_to_save = []
         for req in reqs:
+            timer_start = time.perf_counter()
             # Evaluator workflow
             #     The evaluator feeds the model with req.arguments[0] (called "context") as input and
             #     compares the model output with req.arguments[0] (called "continuation"), which calculate two values:
@@ -419,178 +449,312 @@ def evaluate(
             # gpt_instruction = f"Refine the following prompt to make it clearer and more specific for an LLM: " + query
 
             # TODO: Solving most of the following tasks relies more on commonsense or inter-sentence reasoning
-            #   instead of external knowledge based on semantic matching (either sentence-level or word-level).
-            #   Therefore, the effectiveness of RAG for such tasks is questionable.
-            #   At least, the "missing info" to solve the task is more of reasoning path/clues.
-            #   It is also unknown if the provided extra knowledge will even degrade the performance.
+            #     instead of external knowledge based on semantic matching (either sentence-level or word-level).
+            #     Therefore, the effectiveness of RAG for such tasks is questionable.
+            #     At least, the "missing info" to solve the task is more of reasoning path/clues.
+            #     It is also unknown if the provided extra knowledge will even degrade the performance.
             # Different knowledge source API needs different query/keyword input
             task_name = req.task_name
-            if task_name == "wsc273":
-                # The Winograd Schema Challenge  https://cs.nyu.edu/~davise/papers/WinogradSchemas/WS.html
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"text": str, "pronoun": str, "pronoun_loc": int, "quote": str, "quote_loc": int,
-                #     "options": List[str], "label": int, "source": str}
-                # Task: Pick an option in the `options` list that the `pronoun` at `pronoun_loc` in the `text` refers to
-                cur_query = req.doc["text"]
-            elif task_name == "winogrande":
-                # WinoGrande: Adversarial WSC  https://winogrande.allenai.org/
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence": str, "option1": str, "option2": str, "answer": str}
-                # Task: Pick either `option1` or `option2` to replace the "_" in the `sentence`
-                cur_query = req.doc["sentence"]
-                # answer_id = req.doc["answer"]
-                # if answer_id == "1":
-                #     answer_text = req.doc["option1"]
-                # elif answer_id == "2":
-                #     answer_text = req.doc["option2"]
-                # else:
-                #     raise ValueError(f"ValueError: answer = {answer_id}")
-                # cur_query = req.doc["sentence"].replace("_", answer_text)
-            elif task_name == "anli_r1":  # "anli"
-                # Adversarial NLI  https://github.com/facebookresearch/anli
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"uid": str, "premise": str, "hypothesis": str, "label": int, "reason": str}
-                # Task: NLI (premise -> hypothesis): label = 0 entailment; label = 1 neutral; label = 2 contradiction
-                cur_query = req.doc["hypothesis"]
-            elif task_name == "anli_r2":  # "anli"
-                cur_query = req.doc["hypothesis"]
-            elif task_name == "anli_r3":  # "anli"
-                cur_query = req.doc["hypothesis"]
-            elif task_name == "arc_easy":  # "ai2_arc"
-                # AI2 Reasoning Challenge  https://allenai.org/data/arc
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"id": str, "question": str, "choices": dict{"text": list, label: list}, "answerKey": str}
-                # Task: Answer the question by picking a choice (label) from the choices
-                cur_query = req.doc["question"]
-            elif task_name == "arc_challenge":  # "ai2_arc"
-                cur_query = req.doc["question"]
-            elif task_name == "piqa":
-                # Physical Interaction QA  https://leaderboard.allenai.org/physicaliqa/submissions/public
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"goal": str, "sol1": str, "sol2": str, "label": int}
-                # Task: Answer the question (`goal`) by picking a choice from `sol1` and `sol2`
-                cur_query = req.doc["goal"]
-            elif task_name == "swag":
-                # Situations With Adversarial Generations  https://rowanzellers.com/swag/
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"startphrase": str, "sent1": str, "sent2": str,
-                #     "ending0": str, "ending1": str, "ending2": str, "ending3": str, "label": int}
-                # Task: Complete the sentence (`startphrase`) by picking a choice from `ending0`--`ending3`
-                cur_query = req.doc["sent1"]
-            elif task_name == "hellaswag":
-                # Harder SWAG for Commonsense NLI https://rowanzellers.com/hellaswag/
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"query": str, "ctx": str, "ctx_a": str, "ctx_b": str, "activity_label": str,
-                #     "endings": List[str], "choices": List[str], "label": str, "gold": int, "split": str}
-                # Task: Complete the sentence (`query`) by picking a choice from the `endings` (or `choices`) list
-                cur_query = req.doc["ctx_a"]
-            elif task_name == "rte":  # GLUE - "glue"  https://gluebenchmark.com/
-                # Recognizing Textual Entailment
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
-                # Task: Predict if `sentence1` entails `sentence1`. label=0 -> entailment; label=1 -> not entailment
-                cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
-            elif task_name == "qnli":  # GLUE
-                # The Stanford Question Answering Dataset
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"question": str, "sentence": str, "label": int, "idx": int}
-                # Task: Predict if `sentence` answer the `question`. label=0 -> yes; label=1 -> no
-                cur_query = req.doc["question"]
-                # cur_query = req.doc["question"] + " " + req.doc["sentence"]
-            elif task_name == "mnli":  # GLUE
-                # The Multi-Genre Natural Language Inference Corpus
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"premise": str, "hypothesis": str, "label": int, "idx": int}
-                # Task: Predict if `premise` entails `hypothesis`. label=0 -> contradict; 1 -> neutral; 2 -> entailment
-                cur_query = req.doc["premise"]
-                # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
-            elif task_name == "mnli_mismatch":  # GLUE
-                cur_query = req.doc["premise"]
-                # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
-            elif task_name == "mrpc":  # GLUE
-                # The Microsoft Research Paraphrase Corpus
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
-                # Task: Predict if `sentence1` and `sentence2` is equivalent. label=0 -> no; 1 -> yes
-                cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
-            elif task_name == "qqp":  # GLUE
-                # The Quora Question Pairs2 dataset
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"question1": str, "question2": str, "label": int, "idx": int}
-                # Task: Determine whether a pair of questions are semantically equivalent. label=0 -> no; 1 -> yes
-                cur_query = req.doc["question1"] + " " + req.doc["question2"]
-            elif task_name == "wnli":  # GLUE
-                # The Winograd Schema Challenge
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
-                # Task: Predict if `sentence2` with the pronoun substituted is entailed by `sentence1`. 0->no; 1->yes
-                cur_query = req.doc["sentence2"]
-            elif task_name == "sst2":  # GLUE
-                # The Stanford Sentiment Treebank
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence": str, "label": int, "idx": int}
-                # Task: Predict the sentiment of a given sentence. label=0 -> negative; label=1 -> positive
-                cur_query = req.doc["sentence"]
-            elif task_name == "cola":  # GLUE
-                # The Corpus of Linguistic Acceptability
-                # req.arguments: Tuple(str, str)
-                # req.doc: {"sentence": str, "label": int, "idx": int}
-                # Task: Determine whether `sentence` is a grammatically correct English sentence.
-                cur_query = req.doc["sentence"]
-            elif task_name == "cb":  # SuperGLUE - "super-glue-lm-eval-v1"
-                cur_query = ""
-            elif task_name == "wic":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "sglue_rte":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "boolq":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "copa":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "multirc":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "record":  # SuperGLUE
-                cur_query = ""
-            elif task_name == "wsc":  # SuperGLUE
-                cur_query = ""
+            cur_keywords = []
+            match task_name:
+                case "wsc273":
+                    # The Winograd Schema Challenge  https://cs.nyu.edu/~davise/papers/WinogradSchemas/WS.html
+                    # req.arguments: Tuple(str, str)  # the same for all tasks
+                    # req.doc: {"text": str, "pronoun": str, "pronoun_loc": int, "quote": str, "quote_loc": int,
+                    #     "options": List[str], "label": int, "source": str}
+                    # Task: Pick an option in `options` that the `pronoun` at `pronoun_loc` in the `text` refers to
+                    cur_query = req.doc["text"]
+                case "winogrande":
+                    # WinoGrande: Adversarial WSC  https://winogrande.allenai.org/
+                    # req.doc: {"sentence": str, "option1": str, "option2": str, "answer": str}
+                    # Task: Pick either `option1` or `option2` to replace the "_" in the `sentence`
+                    cur_query = req.doc["sentence"]
+                    # answer_id = req.doc["answer"]
+                    # if answer_id == "1":
+                    #     answer_text = req.doc["option1"]
+                    # elif answer_id == "2":
+                    #     answer_text = req.doc["option2"]
+                    # else:
+                    #     raise ValueError(f"ValueError: answer = {answer_id}")
+                    # cur_query = req.doc["sentence"].replace("_", answer_text)
+                case "anli_r1":  # "anli"
+                    # Adversarial NLI  https://github.com/facebookresearch/anli
+                    # req.doc: {"uid": str, "premise": str, "hypothesis": str, "label": int, "reason": str}
+                    # Task: NLI (premise -> hypothesis): label = 0 entailment; label = 1 neutral; label = 2 contradict
+                    cur_query = req.doc["hypothesis"]
+                case "anli_r2":  # "anli"
+                    cur_query = req.doc["hypothesis"]
+                case "anli_r3":  # "anli"
+                    cur_query = req.doc["hypothesis"]
+                case "arc_easy":  # "ai2_arc"
+                    # AI2 Reasoning Challenge  https://allenai.org/data/arc
+                    # req.doc: {"id": str, "question": str, "answerKey": str,
+                    #     "choices": dict{"text": list, label: list}}
+                    # Task: Answer the question by picking a choice (label) from the choices
+                    cur_query = req.doc["question"]
+                case "arc_challenge":  # "ai2_arc"
+                    cur_query = req.doc["question"]
+                case "piqa":
+                    # Physical Interaction QA  https://leaderboard.allenai.org/physicaliqa/submissions/public
+                    # req.doc: {"goal": str, "sol1": str, "sol2": str, "label": int}
+                    # Task: Answer the question (`goal`) by picking a choice from `sol1` and `sol2`
+                    cur_query = req.doc["goal"]
+                case "swag":
+                    # Situations With Adversarial Generations  https://rowanzellers.com/swag/
+                    # req.doc: {"startphrase": str, "sent1": str, "sent2": str,
+                    #     "ending0": str, "ending1": str, "ending2": str, "ending3": str, "label": int}
+                    # Task: Complete the sentence (`startphrase`) by picking a choice from `ending0`--`ending3`
+                    cur_query = req.doc["sent1"]
+                case "hellaswag":
+                    # Harder SWAG for Commonsense NLI https://rowanzellers.com/hellaswag/
+                    # req.doc: {"query": str, "ctx": str, "ctx_a": str, "ctx_b": str, "activity_label": str,
+                    #     "endings": List[str], "choices": List[str], "label": str, "gold": int, "split": str}
+                    # Task: Complete the sentence (`query`) by picking a choice from the `endings` (or `choices`) list
+                    cur_query = req.doc["ctx_a"]
+                case "rte":  # GLUE - "glue"  https://gluebenchmark.com/
+                    # Recognizing Textual Entailment
+                    # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                    # Task: Predict if `sentence1` entails `sentence1`. 0 -> entailment; 1 -> not entailment
+                    cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
+                case "qnli":  # GLUE
+                    # Stanford Question Answering Dataset
+                    # req.doc: {"question": str, "sentence": str, "label": int, "idx": int}
+                    # Task: Predict if `sentence` answer the `question`. label=0 -> yes; label=1 -> no
+                    cur_query = req.doc["question"]
+                    # cur_query = req.doc["question"] + " " + req.doc["sentence"]
+                case "mnli":  # GLUE
+                    # Multi-Genre Natural Language Inference Corpus
+                    # req.doc: {"premise": str, "hypothesis": str, "label": int, "idx": int}
+                    # Task: Predict if `premise` entails `hypothesis`. 0 -> contradict; 1 -> neutral; 2 -> entailment
+                    cur_query = req.doc["premise"]
+                    # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
+                case "mnli_mismatch":  # GLUE
+                    cur_query = req.doc["premise"]
+                    # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
+                case "mrpc":  # GLUE
+                    # Microsoft Research Paraphrase Corpus
+                    # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                    # Task: Predict if `sentence1` and `sentence2` is equivalent. label=0 -> no; 1 -> yes
+                    cur_query = req.doc["sentence1"] + " " + req.doc["sentence2"]
+                case "qqp":  # GLUE
+                    # Quora Question Pairs2 dataset
+                    # req.doc: {"question1": str, "question2": str, "label": int, "idx": int}
+                    # Task: Determine whether a pair of questions are semantically equivalent. label=0 -> no; 1 -> yes
+                    cur_query = req.doc["question1"] + " " + req.doc["question2"]
+                case "wnli":  # GLUE
+                    # Winograd Schema Challenge
+                    # req.doc: {"sentence1": str, "sentence2": str, "label": int, "idx": int}
+                    # Task: Predict if `sentence2` with the pronoun replaced is entailed by `sentence1`. 0->no; 1->yes
+                    cur_query = req.doc["sentence2"]
+                case "sst2":  # GLUE
+                    # Stanford Sentiment Treebank
+                    # req.doc: {"sentence": str, "label": int, "idx": int}
+                    # Task: Predict the sentiment of a given sentence. label=0 -> negative; label=1 -> positive
+                    cur_query = req.doc["sentence"]
+                case "cola":  # GLUE
+                    # Corpus of Linguistic Acceptability
+                    # req.doc: {"sentence": str, "label": int, "idx": int}
+                    # Task: Determine whether `sentence` is a grammatically correct English sentence.
+                    cur_query = req.doc["sentence"]
+                case "cb":  # SuperGLUE - "super-glue-lm-eval-v1"  https://super.gluebenchmark.com/
+                    # CommitmentBank
+                    # req.doc: {"premise": str, "hypothesis": str, "label": int, "idx": int}
+                    # Task: Predict if `premise` entails `hypothesis`. 0 -> entailment; 1 -> contradict; 2 -> neutral
+                    cur_query = req.doc["premise"]
+                    # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
+                case "wic":  # SuperGLUE
+                    # Word-in-Context
+                    # req.doc: {"word": str, "sentence1": str, "start1": int, "end1": int,
+                    #     "sentence2": str, "start2": int, "end2": int, "label": int, "idx": int}
+                    # Task: Determine whether the word is used with the same sense in both sentences. 0 -> no; 1 -> yes
+                    cur_query = req.doc["word"]
+                    # cur_query = req.doc["word"] + ". " + req.doc["sentence1"]+ " " + req.doc["sentence2"]
+                case "sglue_rte":  # SuperGLUE
+                    # Recognizing Textual Entailment (RTE)
+                    # req.doc: {"premise": str, "hypothesis": str, "label": int, "idx": int}
+                    # Task: Predict whether the given premise entails the hypothesis. label=0 -> entailment; 1 -> not
+                    cur_query = req.doc["premise"]
+                    # cur_query = req.doc["premise"] + " " + req.doc["hypothesis"]
+                case "boolq":  # SuperGLUE
+                    # BoolQ (Boolean Questions)
+                    # req.doc: {"question": str, "passage": str, "label": int, "idx": int}
+                    # Task: Solve the QA task by answering the yes/no question about the passage. 0 -> False; 1 -> True
+                    # cur_query = req.doc["passage"]
+                    cur_query = req.doc["question"]
+                    # cur_query = req.doc["passage"] + " " + req.doc["question"]
+                case "copa":  # SuperGLUE
+                    # Choice Of Plausible Alternatives
+                    # req.doc: {"premise": str, "choice1": str, "choice2": str,
+                    #     "question": str, "label": int, "idx": int}
+                    # Task: Choose the alternative which has the more plausible causal relationship with the premise.
+                    cur_query = req.doc["premise"]
+                    # cur_query = req.doc["premise"] + ". " + req.doc["choice1"] + ". " + req.doc["choice2"]
+                case "multirc":  # SuperGLUE
+                    # Multi-Sentence Reading Comprehension
+                    # req.doc: {"paragraph": str, "question": str, "answer": str, "label": int, "idx": dict}
+                    # Task: A true/false question-answering task. label=0 -> False; 1 -> True.
+                    cur_query = req.doc["question"]
+                    # cur_query = req.doc["paragraph"] + ". " + req.doc["question"]
+                case "record":  # SuperGLUE
+                    # Reading Comprehension with Commonsense Reasoning Dataset
+                    # RECORD is a multiple-choice QA task. Each example consists of a news article and
+                    #     a Cloze-style question about the article in which one entity is masked out.
+                    #     The system must predict the masked out entity from a given list of possible entities
+                    #     in the provided passage, where the same entity may be expressed
+                    #     using multiple different surface forms, all of which are considered correct.
+                    # req.doc: {"passage": str, "query": str, "entities": List[str],
+                    #     "entity_spans": Dict[str: List], "answers": List[str], "idx": dict}
+                    # Task: Choose all feasible `entities` to replace `@placeholder` in the `query`
+                    cur_query = req.doc["query"].replace("@placeholder", " ")
+                    # cur_query = req.doc["passage"] + ". " + req.doc["query"]
+                    cur_keywords = list(set(req.doc["entities"]))
+                case "wsc":  # SuperGLUE
+                    # Winograd Schema Challenge
+                    # Previously, a version of WSC recast as NLI as included in GLUE, known as WNLI.
+                    # SuperGLUE recasts the WSC dataset into the co-reference form.
+                    # req.doc: {"text": str, "span1_text": str, "span1_index": int,
+                    #     "span2_text": str, "span2_index": int, "label": int, "idx": int}
+                    # Task: Predict if the pronoun `span2_text` refers to `span1_text`. 0->no; 1->yes
+                    cur_query = req.doc["text"]
+                case _:
+                    raise ValueError(f"ValueError: task_name = {task_name}")
+
+            if hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag:  # Use RAG
+                # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
+                if len(cur_keywords) == 0:
+                    cur_keywords = get_keywords(cur_query)
+
+                # TODO: RAG Step 2: Search for relevant documents from multiple knowledge bases/sources (online API)
+                atomic_rag, llm_gemini_rag, llm_openai_rag, llm_anthropic_rag = [], [], [], []
+                wiki_rag, conceptNet_rag, arxiv_rag, googleSearch_rag = [], [], [], []
+                match args.rag_source:
+                    case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
+                        atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+                    # case "llm_gemini":
+                    #     llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
+                    # case "llm_openai":
+                    #     llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
+                    # case "llm_anthropic":
+                    #     llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                    case "wiki":
+                        wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
+                        for kw in cur_keywords:  # searching using keywords
+                            wiki_rag += wikiRetriever.retrieve(kw)
+                    case "conceptNet":
+                        conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
+                        for kw in cur_keywords:  # searching using keywords
+                            conceptNet_rag += conceptNetRetriever.retrieve(kw)
+                    case "arxiv":
+                        arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
+                    case "googleSearch":
+                        googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+                    case _:
+                        atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+                        # llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
+                        # llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
+                        # llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                        wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
+                        conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
+                        arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
+                        googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+
+                        # multiprocessing
+                        # p_atomic_rag = mp.Process(target=atomicRetriever.retrieve, args=(cur_query,))
+                        # # p_llm_gemini_rag = mp.Process(target=LLM_Gemini_Retriever.apply_agent, args=(cur_query,))
+                        # # p_llm_openai_rag = mp.Process(target=LLM_OpenAI_Retriever.apply_agent, args=(cur_query,))
+                        # # p_llm_anthropic_rag = mp.Process(target=LLM_Anthropic_Retriever.apply_agent, args=(cur_query,))
+                        # p_wiki_rag = mp.Process(target=wikiRetriever.retrieve, args=(cur_query,))
+                        # p_conceptNet_rag = mp.Process(target=conceptNetRetriever.retrieve, args=(cur_query,))
+                        # p_arxiv_rag = mp.Process(target=arxivRetriever.retrieve, args=(cur_query,))
+                        # p_googleSearch_rag = mp.Process(target=googleSearchRetriever.retrieve, args=(cur_query,))
+                        # p_atomic_rag.start()
+                        # # p_llm_gemini_rag.start()
+                        # # p_llm_openai_rag.start()
+                        # # p_llm_anthropic_rag.start()
+                        # p_wiki_rag.start()
+                        # p_conceptNet_rag.start()
+                        # p_arxiv_rag.start()
+                        # p_googleSearch_rag.start()
+                        # p_atomic_rag.join()
+                        # # p_llm_gemini_rag.join()
+                        # # p_llm_openai_rag.join()
+                        # # p_llm_anthropic_rag.join()
+                        # p_wiki_rag.join()
+                        # p_conceptNet_rag.join()
+                        # p_arxiv_rag.join()
+                        # p_googleSearch_rag.join()
+
+                        for kw in cur_keywords:  # searching using keywords
+                            wiki_rag += wikiRetriever.retrieve(kw)
+                            conceptNet_rag += conceptNetRetriever.retrieve(kw)
+
+                # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+                rag_docs = {
+                    "atomic": atomic_rag,
+                    "llm_gemini": llm_gemini_rag,
+                    "llm_openai": llm_openai_rag,
+                    "llm_anthropic": llm_anthropic_rag,
+                    "wiki_rag": wiki_rag,
+                    "conceptNet": conceptNet_rag,
+                    "arxiv": arxiv_rag,
+                    "googleSearch": googleSearch_rag,
+                }
+                rag_all = atomic_rag + llm_gemini_rag + llm_openai_rag + llm_anthropic_rag + \
+                    wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
+                # gpt_instruction = (
+                #     "Given the following documents retrieved by a retrieval-augmented generation system, "
+                #     "summarize the key points and refine the information for clarity and relevance:\n\n" +
+                #     "\n\n".join(rag_documents)
+                # )
+
+                # TODO: RAG Step 3: Augmentation: Combine the docs to the original query (different prompting methods)
+                if len(rag_all) > 0:
+                    rag_context = "Context:\n"
+                    if len(atomic_rag) > 0:
+                        rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
+                    if len(llm_gemini_rag) > 0:
+                        rag_context += "Gemini Knowledge:\n" + "\n".join(llm_gemini_rag) + "\n"
+                    if len(llm_openai_rag) > 0:
+                        rag_context += "OpenAI GPT Knowledge:\n" + "\n".join(llm_openai_rag) + "\n"
+                    if len(llm_anthropic_rag) > 0:
+                        rag_context += "Anthropic Knowledge:\n" + "\n".join(llm_anthropic_rag) + "\n"
+                    if len(wiki_rag) > 0:
+                        rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
+                    if len(conceptNet_rag) > 0:
+                        rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
+                    if len(arxiv_rag) > 0:
+                        rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
+                    if len(googleSearch_rag) > 0:
+                        rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
+                    req.arguments = (rag_context + req.arguments[0], req.arguments[1])  # Augmentation
             else:
-                raise ValueError(f"ValueError: task_name = {task_name}")
-
-            # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
-            cur_keywords = get_keywords(cur_query)
-
-            # TODO: RAG Step 2: Search for relevant documents from multiple knowledge bases/sources (using online API)
-            atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-            # gpt_rag = gptRetriever.retrieve(cur_query)  # GPT generation
-            wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
-            conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
-            arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
-            googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
-
-            for kw in cur_keywords:
-                wiki_rag += wikiRetriever.retrieve(kw)
-                conceptNet_rag += conceptNetRetriever.retrieve(kw)
-
-            # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
-            # gpt_instruction = (
-            #     "Given the following documents retrieved by a retrieval-augmented generation system, "
-            #     "summarize the key points and refine the information for clarity and relevance:\n\n" +
-            #     "\n\n".join(rag_documents)
-            # )
-            # TODO: RAG Step 3: Augmentation: Combine the documents to the original query (different prompting methods)
-            rag_context = "RAG:\n"
-            rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
-            # rag_context += "GPT Knowledge:\n" + "\n".join(gpt_rag) + "\n"
-            rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
-            rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
-            rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
-            rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
-            req.arguments[0] = rag_context + req.arguments[0]  # Augmentation
+                rag_docs = {}
 
             cloned_reqs.extend([req] * req.repeats)
+            req_to_save = {
+                "task_name": req.task_name,
+                "metadata": req.metadata,
+                "repeats": req.repeats,
+                "request_type": req.request_type,
+                "idx": req.idx,
+                "doc": req.doc,
+                "arguments": req.arguments,
+                "rag_docs": rag_docs,
+            }
+            # reqs_to_save.append(req_to_save)
+            reqs_to_save.extend([req_to_save] * req.repeats)
 
-        if (lm.world_size > 1) and (padding_requests[reqtype] > 0):
-            for _ in range(padding_requests[reqtype]):
+            timer_end = time.perf_counter()
+            timer_gap = timer_end - timer_start
+            timer_list.append(timer_gap)
+
+        timer_all, timer_avg = sum(timer_list), np.mean(timer_list)
+        logging.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
+        logging.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))  # [AVG] wiki: 1.8s
+
+        if (lm.world_size > 1) and (padding_requests[req_type] > 0):
+            req = reqs[-1]
+            for _ in range(padding_requests[req_type]):
                 cloned_reqs.extend([req] * req.repeats)
 
         # TODO: RAG Step 3.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
@@ -599,11 +763,23 @@ def evaluate(
 
         # TODO: RAG Step 4: Run models and get evaluation results
         # run requests through model
-        resps = getattr(lm, reqtype)(cloned_reqs)
+        resps = getattr(lm, req_type)(cloned_reqs)
 
         # put responses from model into a list of length K for each request.
-        for x, req in zip(resps, cloned_reqs):
-            req.resps.append(x)
+        for resp, req, req_to_save in zip(resps, cloned_reqs, reqs_to_save):
+            req.resps.append(resp)
+            req_to_save["resps"] = resp
+
+        # Save reqs
+        _task_name = reqs[-1].task_name
+        if args.use_rag:
+            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests---rag_{args.rag_source}.jsonl")
+        else:
+            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests.jsonl")
+        with open(save_req_fp, "w", encoding="utf-8") as fp_out:
+            for req_to_save in reqs_to_save:
+                to_write = json.dumps(req_to_save)
+                fp_out.write(to_write + "\n")
 
         if lm.world_size > 1:
             lm.accelerator.wait_for_everyone()
@@ -654,7 +830,7 @@ def evaluate(
                     task_output.sample_metrics[(metric, filter_key)].append(value)
 
     if WORLD_SIZE > 1:
-        # if multigpu, then gather data across all ranks to rank 0
+        # if multi-gpu, then gather data across all ranks to rank 0
         # first gather logged samples across all ranks
         for task_output in eval_tasks:
             if log_samples:
@@ -742,8 +918,10 @@ def evaluate(
                             stderr
                         ] = lm_eval.api.metrics.pooled_sample_stderr(stderrs, sizes)
                         # TODO: allow GroupConfigs to choose which variance formula is used, for back-compatibility
-                        # To use the old (likely incorrect) variance formula, comment out the above and uncomment this line:
-                        # results[group][stderr] = lm_eval.api.metrics.combined_sample_stderr(stderrs, sizes, metrics=metrics)
+                        # To use the old (likely incorrect) variance formula,
+                        #     comment out the above and uncomment this line:
+                        # results[group][stderr] = lm_eval.api.metrics.combined_sample_stderr(
+                        #     stderrs, sizes, metrics=metrics)
 
                     results[group]["samples"] = sum(sizes)
 
@@ -781,6 +959,22 @@ def evaluate(
         }
         if log_samples:
             results_dict["samples"] = dict(samples)
+
+        # Save results_dict
+        for _task_name in results_dict["results"].keys():
+            if args.use_rag:
+                save_res_fp = os.path.join(save_dir, f"{_task_name}---results---rag_{args.rag_source}.jsonl")
+            else:
+                save_res_fp = os.path.join(save_dir, f"{_task_name}---results.jsonl")
+            with open(save_res_fp, "w", encoding="utf-8") as fp_out:
+                fp_out.write(json.dumps({"results": results_dict["results"][_task_name]}) + "\n")
+                fp_out.write(json.dumps({"group_subtasks": results_dict["group_subtasks"][_task_name]}) + "\n")
+                fp_out.write(json.dumps({"configs": results_dict["configs"][_task_name]}) + "\n")
+                fp_out.write(json.dumps({"versions": results_dict["versions"][_task_name]}) + "\n")
+                fp_out.write(json.dumps({"n-shot": results_dict["n-shot"][_task_name]}) + "\n")
+                if "samples" in results_dict:
+                    for _res in results_dict["samples"][_task_name]:
+                        fp_out.write(json.dumps(_res) + "\n")
 
         return results_dict
 

@@ -1,11 +1,11 @@
-from api_setup import *
+# import json
+from .api_setup import *
 from openai import OpenAI
 import google.generativeai as genai
 import anthropic
-import json
 
 
-def apply_openai_agent(template, query, verbose: bool = True):
+def apply_openai_agent(template, query, verbose: bool = False):
     result = []
     try:
         client = OpenAI(
@@ -26,12 +26,11 @@ def apply_openai_agent(template, query, verbose: bool = True):
     return result
 
 
-def apply_gemini_agent(template: str, query: str, verbose: bool = True):
-    # %%
+def apply_gemini_agent(template: str, query: str, verbose: bool = False):
     result = []
     try:
         genai.configure(api_key=GOOGLE_API_KEY)
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel("gemini-pro")
         response = model.generate_content(template.format(query))
         result.append(response.text)
 
@@ -42,7 +41,7 @@ def apply_gemini_agent(template: str, query: str, verbose: bool = True):
     return result
 
 
-def apply_anthropic_agent(template: str, query: str, verbose: bool = True):
+def apply_anthropic_agent(template: str, query: str, verbose: bool = False):
     result = []
     try:
         client = anthropic.Anthropic(
@@ -67,8 +66,9 @@ def apply_anthropic_agent(template: str, query: str, verbose: bool = True):
     return result
 
 
-class Agent:
-    def __init__(self, template: str, model: str = "google", verbose: bool = True):
+class LLMAgent:
+
+    def __init__(self, template: str = "{}", model: str = "google", verbose: bool = True):
         self.template = template
         self.model = model
         self.verbose = verbose

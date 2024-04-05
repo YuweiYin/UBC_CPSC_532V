@@ -32,11 +32,16 @@ conda activate 532v
 
 ### Python3 Packages
 
-```bash
-pip install -r requirements.txt
-```
+* For generation/evaluation only:
 
 ```bash
+pip install -r requirements_eval.txt
+```
+
+* For training/fine-tuning:
+
+```bash
+pip install -r requirements_train.txt
 pip install accelerate -U
 pip install deepspeed
 #pip install vllm
@@ -172,7 +177,7 @@ We clone the [folder](https://github.com/EleutherAI/lm-evaluation-harness/tree/m
 the local [module](./lm_eval/) `./lm_eval`, add some new features, and use it as our evaluation codebase.
 For example, we support passing the `cache_dir` parameter when loading datasets, models, and tokenizers.
 
-Hence, we recommend using the following evaluation script:
+Hence, **we recommend using the following evaluation script**:
 
 ```bash
 python3 eval.py --model "hf" \
@@ -204,6 +209,27 @@ python3 eval.py --model "hf" \
   --seed 42 \
   --log_samples \
   --output_path "results/copa---gpt2_ft---eval"
+```
+
+### Evaluation with RAG
+
+* `--rag_source` can be: `"atomic"`, `"llm_gemini"`, `"llm_openai"`, `"llm_anthropic"`, `"wiki"`, `"conceptNet"`, `"arxiv"`, `"googleSearch"` or `""`. Default value `""` means use all RAG sources.
+* Before using LLMs (`"llm_gemini"`, `"llm_openai"`, or `"llm_anthropic"`), please specify the API keys in `rag/api_setup.py`
+
+```bash
+python3 eval.py --model "hf" \
+  --model_args "pretrained=gpt2,dtype=float" \
+  --tasks "copa" \
+  --device "cuda:0" \
+  --batch_size "auto:8" \
+  --use_cache "/path/to/.cache/huggingface/" \
+  --cache_requests "true" \
+  --cache_dir "/path/to/.cache/huggingface/" \
+  --seed 42 \
+  --log_samples \
+  --output_path "results/copa---gpt2---eval" \
+  --use_rag \
+  --rag_source "" \
 ```
 
 ### Testing Tasks and Datasets 

@@ -2,8 +2,10 @@ import os
 import json
 import requests
 from typing import List
-import wikipediaapi
-import arxiv
+# import wikipediaapi
+from rag import wikipediaapi
+# import arxiv
+from rag import arxiv
 from googlesearch import search as g_search
 
 import torch
