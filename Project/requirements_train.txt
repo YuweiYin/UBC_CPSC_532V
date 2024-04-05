@@ -38,7 +38,6 @@ optimum
 optimum-neuron
 optimum-openvino
 sympy>=1.12
-nagisa>=0.2.7
 jieba>=0.42.1
 wandb>=0.16.3
 tiktoken

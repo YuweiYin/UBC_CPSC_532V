@@ -3,6 +3,7 @@
 echo -e "\n>>> START EVAL <<<\n"
 
 MODEL=$1
+TASK=$2
 CACHE_DIR="/path/to/.cache/huggingface/"
 
 run_eval(){
@@ -22,15 +23,17 @@ run_eval(){
   echo -e "\n>>> End of EVAL <<< Model: ${MODEL}; Task: ${task}\n\n"
 }
 
-run_eval "wsc273"
-run_eval "winogrande"
-run_eval "anli"
-run_eval "ai2_arc"
-run_eval "piqa"
-run_eval "swag"
-run_eval "hellaswag"
-run_eval "glue"
-run_eval "super-glue-lm-eval-v1"
+#run_eval "wsc273"
+#run_eval "winogrande"
+#run_eval "anli"
+#run_eval "ai2_arc"
+#run_eval "piqa"
+#run_eval "swag"
+#run_eval "hellaswag"
+#run_eval "glue"
+#run_eval "super-glue-lm-eval-v1"
 #run_eval "super-glue-t5-prompt"
+
+run_eval "${TASK}"
 
 echo -e "\n\n>>> DONE EVAL <<<\n\n"
