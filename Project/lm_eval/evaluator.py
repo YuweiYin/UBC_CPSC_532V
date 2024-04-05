@@ -630,12 +630,12 @@ def evaluate(
                 match args.rag_source:
                     case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
                         atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                    # case "llm_gemini":
-                    #     llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
-                    # case "llm_openai":
-                    #     llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
-                    # case "llm_anthropic":
-                    #     llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                    case "llm_gemini":
+                        llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
+                    case "llm_openai":
+                        llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
+                    case "llm_anthropic":
+                        llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
                     case "wiki":
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
                         for kw in cur_keywords:  # searching using keywords
@@ -650,9 +650,9 @@ def evaluate(
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
                     case _:
                         atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                        # llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
-                        # llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
-                        # llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                        llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
+                        llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
+                        llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
                         conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
                         arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
