@@ -5,8 +5,10 @@ conda activate 532v
 
 CUDA=$1
 MODEL=$2
-TASK=$3
-RAG=$4
+DTYPE=$3  # "float32", "float16", "auto"
+BSZ=$4  # "64", "32", "auto:8"
+TASK=$5
+RAG=$6
 
 CACHE_DIR="/ubc/cs/research/nlp/yuweiyin/.cache/huggingface/"
 mkdir -p "${CACHE_DIR}"
@@ -16,10 +18,10 @@ run_eval(){
   rag=$2
   echo -e "\n\n>>> Start of EVAL --- RAG <<< Model: ${MODEL}; Task: ${task}; RAG Source: ${rag}\n"
   CUDA_VISIBLE_DEVICES=${CUDA} python3 eval.py --model "hf" \
-    --model_args "pretrained=${MODEL},dtype=auto" \
+    --model_args "pretrained=${MODEL},dtype=${DTYPE}" \
     --tasks "${task}" \
     --device "cuda" \
-    --batch_size "auto:8" \
+    --batch_size "${BSZ}" \
     --cache_dir "${CACHE_DIR}" \
     --seed 42 \
     --log_samples \

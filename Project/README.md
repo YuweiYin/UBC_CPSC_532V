@@ -254,7 +254,7 @@ We choose the following datasets to perform evaluation.
 * Before running `eval.sh` or `eval_rag.sh`, please modify the `CACHE_DIR` variable.
 
 ```bash
-bash eval.sh "0" "openai-community/gpt2"
+bash eval.sh "0" "openai-community/gpt2" "float16" "32"
 ```
 
 | Task                   | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
