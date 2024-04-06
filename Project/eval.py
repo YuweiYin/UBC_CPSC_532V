@@ -332,6 +332,15 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
         cache_requests=args.cache_requests
     )
 
+    model_name = str(args.model_args).strip()
+    if "," in model_name:
+        model_name = model_name.split(",")[0].strip()
+    if "=" in model_name:
+        model_name = model_name.split("=")[-1].strip()
+    if "/" in model_name:
+        model_name = model_name.split("/")[-1].strip()
+    args.model_name = model_name
+
     results = evaluator.simple_evaluate(
         args=args,
         model=args.model,

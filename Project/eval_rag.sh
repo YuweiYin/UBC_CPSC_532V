@@ -14,7 +14,7 @@ run_eval(){
   rag=$2
   echo -e "\n\n>>> Start of EVAL --- RAG <<< Model: ${MODEL}; Task: ${task}; RAG Source: ${rag}\n"
   CUDA_VISIBLE_DEVICES=${CUDA} python3 eval.py --model "hf" \
-    --model_args "pretrained=${MODEL},dtype=float" \
+    --model_args "pretrained=${MODEL},dtype=auto" \
     --tasks "${task}" \
     --device "cuda" \
     --batch_size "auto:8" \
@@ -23,7 +23,7 @@ run_eval(){
     --cache_dir "${CACHE_DIR}" \
     --seed 42 \
     --log_samples \
-    --output_path "results/${task}---${MODEL}---eval_rag-${rag}" \
+    --output_path "eval_results/${task}---rag-${rag}" \
     --use_rag \
     --rag_source "${rag}"
   echo -e "\n>>> End of EVAL --- RAG <<< Model: ${MODEL}; Task: ${task}; RAG Source: ${rag}\n\n"

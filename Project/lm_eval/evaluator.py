@@ -177,6 +177,7 @@ def simple_evaluate(
         if gen_kwargs == "":
             gen_kwargs = None
 
+    lm = None
     if isinstance(model, str):
         if model_args is None:
             model_args = ""
@@ -222,8 +223,8 @@ def simple_evaluate(
         task_manager = TaskManager(verbosity)
 
     eval_logger.info(
-        "get_task_dict has been updated to accept an optional argument, `task_manager`"
-        "Read more here:https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md#external-library-usage"
+        "get_task_dict has been updated to accept an optional argument, `task_manager`. Read more here: "
+        "https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md#external-library-usage"
     )
     task_dict = get_task_dict(tasks, task_manager, cache_dir=cache_dir)
     for task_name in task_dict.keys():
@@ -250,7 +251,8 @@ def simple_evaluate(
         if num_fewshot is not None:
             if (default_num_fewshot := task_obj.get_config("num_fewshot")) == 0:
                 eval_logger.info(
-                    f"num_fewshot has been set to 0 for {task_name} in its config. Manual configuration will be ignored."
+                    f"num_fewshot has been set to 0 for {task_name} in its config. "
+                    f"Manual configuration will be ignored."
                 )
             else:
                 eval_logger.warning(
@@ -260,6 +262,13 @@ def simple_evaluate(
 
     if check_integrity:
         run_task_tests(task_list=tasks)
+
+    # Show LM model
+    if lm is None:
+        raise ValueError(f"lm is None!")
+    param_all = sum(p.numel() for p in lm.lm.model.parameters())
+    param_train = sum(p.numel() for p in lm.lm.model.parameters() if p.requires_grad)
+    eval_logger.info(f"Model parameters: ALL = {param_all}; Trainable = {param_train}")
 
     results = evaluate(
         args=args,
@@ -401,18 +410,21 @@ def evaluate(
     # LLM_Anthropic_Solver = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
 
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
-    # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
-    textParser = TextParser()  # Keyword extractor
-    # atomicRetriever = AtomicRetriever()
-    LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
-    LLM_OpenAI_Retriever = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
-    LLM_Anthropic_Retriever = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
-    wikiRetriever = WikiRetriever(full_text=False)
-    conceptNetRetriever = ConceptNetRetriever(verbose=False)
-    arxivRetriever = ArxivRetriever()
-    googleSearchRetriever = GoogleSearchRetriever()
+    args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
+    if args.use_rag:
+        # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
+        textParser = TextParser()  # Keyword extractor
+        # atomicRetriever = AtomicRetriever()
+        LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
+        LLM_OpenAI_Retriever = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
+        LLM_Anthropic_Retriever = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
+        wikiRetriever = WikiRetriever(full_text=False)
+        conceptNetRetriever = ConceptNetRetriever(verbose=False)
+        arxivRetriever = ArxivRetriever()
+        googleSearchRetriever = GoogleSearchRetriever()
 
-    save_dir = os.path.join(args.output_path, "eval_results")
+    # save_dir = os.path.join(args.output_path, "eval_results")
+    save_dir = str(args.output_path)
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
     timer_list = []
@@ -625,7 +637,7 @@ def evaluate(
                 case _:
                     raise ValueError(f"ValueError: task_name = {task_name}")
 
-            if hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag:  # Use RAG
+            if args.use_rag:  # Use RAG
                 # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
                 if len(cur_keywords) == 0:
                     cur_keywords = get_keywords(cur_query)
@@ -781,11 +793,14 @@ def evaluate(
             req_to_save["resps"] = resp
 
         # Save reqs
-        _task_name = str(reqs[-1].task_name).strip().replace("/", "_")
+        _task_name = str(reqs[-1].task_name).strip()
+        if "/" in _task_name:
+            _task_name = _task_name.split("/")[-1].strip()
         if args.use_rag:
-            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests---rag_{args.rag_source}.jsonl")
+            save_req_fp = os.path.join(
+                save_dir, f"{_task_name}---{args.model_name}---requests---rag_{args.rag_source}.jsonl")
         else:
-            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests.jsonl")
+            save_req_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---requests.jsonl")
         with open(save_req_fp, "w", encoding="utf-8") as fp_out:
             for req_to_save in reqs_to_save:
                 to_write = json.dumps(req_to_save)
@@ -972,12 +987,16 @@ def evaluate(
 
         # Save results_dict
         for _task_name in results_dict["results"].keys():
+            _task_name = str(_task_name).strip()
+            if "/" in _task_name:
+                _task_name = _task_name.split("/")[-1].strip()
             if args.use_rag:
-                save_res_fp = os.path.join(save_dir, f"{_task_name}---results---rag_{args.rag_source}.jsonl")
+                save_res_fp = os.path.join(
+                    save_dir, f"{_task_name}---{args.model_name}---results---rag_{args.rag_source}.jsonl")
             else:
-                save_res_fp = os.path.join(save_dir, f"{_task_name}---results.jsonl")
-            try:
-                with open(save_res_fp, "w", encoding="utf-8") as fp_out:
+                save_res_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---results.jsonl")
+            with open(save_res_fp, "w", encoding="utf-8") as fp_out:
+                try:
                     fp_out.write(json.dumps({"results": results_dict["results"][_task_name]}) + "\n")
                     fp_out.write(json.dumps({"group_subtasks": results_dict["group_subtasks"][_task_name]}) + "\n")
                     fp_out.write(json.dumps({"configs": results_dict["configs"][_task_name]}) + "\n")
@@ -986,11 +1005,12 @@ def evaluate(
                     if "samples" in results_dict:
                         for _res in results_dict["samples"][_task_name]:
                             fp_out.write(json.dumps(_res) + "\n")
-            except Exception as e:
-                if verbose:
-                    eval_logger.info(e)
-                if os.path.isfile(save_res_fp):
-                    os.remove(save_res_fp)
+                except Exception as e:
+                    if verbose:
+                        eval_logger.info(e)
+                    if os.path.isfile(save_res_fp):
+                        os.remove(save_res_fp)
+                    break
 
         return results_dict
 

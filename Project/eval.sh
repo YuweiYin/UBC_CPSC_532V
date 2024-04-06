@@ -11,7 +11,7 @@ run_eval(){
   task=$1
   echo -e "\n\n>>> Start of EVAL Model '${MODEL}' on Task '${task}'<<<\n"
   CUDA_VISIBLE_DEVICES=${CUDA} python3 eval.py --model "hf" \
-    --model_args "pretrained=${MODEL},dtype=float" \
+    --model_args "pretrained=${MODEL},dtype=auto" \
     --tasks "${task}" \
     --device "cuda" \
     --batch_size "auto:8" \
@@ -20,7 +20,7 @@ run_eval(){
     --cache_dir "${CACHE_DIR}" \
     --seed 42 \
     --log_samples \
-    --output_path "results/${task}---${MODEL}---eval"
+    --output_path "eval_results/${task}"
   echo -e "\n>>> End of EVAL <<< Model: ${MODEL}; Task: ${task}\n\n"
 }
 
