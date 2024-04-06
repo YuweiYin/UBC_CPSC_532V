@@ -28,7 +28,6 @@ from lm_eval.utils import (
     simple_parse_args_string,
 )
 
-import copy
 from util.TextParser import TextParser
 from rag.retriever import (
     AtomicRetriever, GPTRetriever, WikiRetriever, ConceptNetRetriever, ArxivRetriever, GoogleSearchRetriever,
@@ -46,6 +45,7 @@ from lm_eval.caching.cache import delete_cache
 from rag.llm_agent import LLMAgent
 # import multiprocessing as mp
 import time
+import copy
 
 
 @positional_deprecated
@@ -314,13 +314,14 @@ def evaluate(
         lm: "LM",
         task_dict,
         limit: Optional[int] = None,
-        cache_requests=False,
-        rewrite_requests_cache=False,
+        cache_requests: bool = False,
+        rewrite_requests_cache: bool = False,
         bootstrap_iters: Optional[int] = 100000,
         decontamination_ngrams_path=None,
         write_out: bool = False,
         log_samples: bool = True,
         verbosity: str = "INFO",
+        verbose: bool = False,
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -332,12 +333,17 @@ def evaluate(
         Dictionary of tasks. Tasks will be taken to have name type(task).config.task .
     :param limit: int, optional
         Limit the number of examples per task (only use this for testing)
-    :param bootstrap_iters:
+    :param cache_requests: bool.
+    :param rewrite_requests_cache: bool.
+    :param bootstrap_iters: Optional[int]
         Number of iterations for bootstrap statistics
+    :param decontamination_ngrams_path
     :param write_out: bool
         If True, write out an example document and model input for checking task integrity
     :param log_samples: bool
         If True, write out all model outputs and documents for per-sample measurement and post-hoc analysis
+    :param verbosity: str
+    :param verbose: bool
     :return
         Dictionary of results
     """
@@ -397,7 +403,7 @@ def evaluate(
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
     textParser = TextParser()  # Keyword extractor
-    atomicRetriever = AtomicRetriever()
+    # atomicRetriever = AtomicRetriever()
     LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
     LLM_OpenAI_Retriever = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
     LLM_Anthropic_Retriever = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
@@ -628,8 +634,8 @@ def evaluate(
                 atomic_rag, llm_gemini_rag, llm_openai_rag, llm_anthropic_rag = [], [], [], []
                 wiki_rag, conceptNet_rag, arxiv_rag, googleSearch_rag = [], [], [], []
                 match args.rag_source:
-                    case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
-                        atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+                    # case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
+                    #     atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
                     case "llm_gemini":
                         llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
                     case "llm_openai":
@@ -649,7 +655,7 @@ def evaluate(
                     case "googleSearch":
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
                     case "ALL":
-                        atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+                        # atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
                         llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
                         llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
                         llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
@@ -752,8 +758,8 @@ def evaluate(
             timer_list.append(timer_gap)
 
         timer_all, timer_avg = sum(timer_list), np.mean(timer_list)
-        logging.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
-        logging.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
+        eval_logger.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
+        eval_logger.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
         # wnli [AVG] wiki: 1.6s
 
         if (lm.world_size > 1) and (padding_requests[req_type] > 0):
@@ -970,15 +976,21 @@ def evaluate(
                 save_res_fp = os.path.join(save_dir, f"{_task_name}---results---rag_{args.rag_source}.jsonl")
             else:
                 save_res_fp = os.path.join(save_dir, f"{_task_name}---results.jsonl")
-            with open(save_res_fp, "w", encoding="utf-8") as fp_out:
-                fp_out.write(json.dumps({"results": results_dict["results"][_task_name]}) + "\n")
-                fp_out.write(json.dumps({"group_subtasks": results_dict["group_subtasks"][_task_name]}) + "\n")
-                fp_out.write(json.dumps({"configs": results_dict["configs"][_task_name]}) + "\n")
-                fp_out.write(json.dumps({"versions": results_dict["versions"][_task_name]}) + "\n")
-                fp_out.write(json.dumps({"n-shot": results_dict["n-shot"][_task_name]}) + "\n")
-                if "samples" in results_dict:
-                    for _res in results_dict["samples"][_task_name]:
-                        fp_out.write(json.dumps(_res) + "\n")
+            try:
+                with open(save_res_fp, "w", encoding="utf-8") as fp_out:
+                    fp_out.write(json.dumps({"results": results_dict["results"][_task_name]}) + "\n")
+                    fp_out.write(json.dumps({"group_subtasks": results_dict["group_subtasks"][_task_name]}) + "\n")
+                    fp_out.write(json.dumps({"configs": results_dict["configs"][_task_name]}) + "\n")
+                    fp_out.write(json.dumps({"versions": results_dict["versions"][_task_name]}) + "\n")
+                    fp_out.write(json.dumps({"n-shot": results_dict["n-shot"][_task_name]}) + "\n")
+                    if "samples" in results_dict:
+                        for _res in results_dict["samples"][_task_name]:
+                            fp_out.write(json.dumps(_res) + "\n")
+            except Exception as e:
+                if verbose:
+                    eval_logger.info(e)
+                if os.path.isfile(save_res_fp):
+                    os.remove(save_res_fp)
 
         return results_dict
 
