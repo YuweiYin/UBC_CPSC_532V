@@ -401,7 +401,7 @@ def evaluate(
     # LLM_Anthropic_Solver = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
 
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
-    gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
+    # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
     textParser = TextParser()  # Keyword extractor
     # atomicRetriever = AtomicRetriever()
     LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
@@ -781,7 +781,7 @@ def evaluate(
             req_to_save["resps"] = resp
 
         # Save reqs
-        _task_name = reqs[-1].task_name
+        _task_name = str(reqs[-1].task_name).strip().replace("/", "_")
         if args.use_rag:
             save_req_fp = os.path.join(save_dir, f"{_task_name}---requests---rag_{args.rag_source}.jsonl")
         else:

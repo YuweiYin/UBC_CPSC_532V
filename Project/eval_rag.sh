@@ -7,7 +7,7 @@ CUDA=$1
 MODEL=$2
 TASK=$3
 RAG=$4
-CACHE_DIR="/path/to/.cache/huggingface/"
+CACHE_DIR="/ubc/cs/research/nlp/yuweiyin/.cache/huggingface/"
 
 run_eval(){
   task=$1

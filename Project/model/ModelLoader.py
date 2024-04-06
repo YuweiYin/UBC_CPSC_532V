@@ -6,6 +6,7 @@ from typing import Optional
 
 import torch
 from transformers import AutoModelForCausalLM
+import hf_olmo
 
 
 class ModelLoader:
@@ -51,14 +52,18 @@ class ModelLoader:
             model_name: str = "",
             local_dir: str = "",
             local_path: str = "",
+            revision: Optional[str] = None,
             cache_dir: Optional[str] = None,  # "~/.cache/huggingface/"
+            # float16: bool = False,
     ):
         """
         Get the model via Hugging Face API and/or init with the local checkpoint.
         :param model_name: model name (for Hugging Face API). https://huggingface.co/models
         :param local_dir: the directory of the local checkpoint (from model.save_pretrained(local_dir)).
         :param local_path: file path of the local checkpoint (from torch.save(model.state_dict(), local_path)).
+        :param revision: Hugging Face model revision.
         :param cache_dir: The directory where data & model are cached.
+        # :param float16: Use float16 mode or not.
         :return: the model (Causal LM). https://huggingface.co/docs/transformers/en/tasks/language_modeling
         """
 
@@ -76,23 +81,41 @@ class ModelLoader:
         model_name = model_name.strip()
         self.logger.info(f"[get_model] >>> Loading model from Hugging Face. model_name: {model_name}")
 
-        if model_name == "gpt1":
-            # openai-gpt ("GPT-1") is the first transformer-based language model created and released by OpenAI
-            model = AutoModelForCausalLM.from_pretrained("openai-community/openai-gpt", cache_dir=cache_dir)
-        elif model_name == "gpt2":
-            # The smallest version of GPT-2, with 124M parameters.
-            model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2", cache_dir=cache_dir)
-        elif model_name == "gpt2-medium":
-            # GPT-2 Medium is the 355M parameter version of GPT-2
-            model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2-medium", cache_dir=cache_dir)
-        elif model_name == "gpt2-large":
-            # GPT-2 Large is the 774M parameter version of GPT-2
-            model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2-large", cache_dir=cache_dir)
-        elif model_name == "gpt2-xl":
-            # GPT-2 XL is the 1.5B parameter version of GPT-2
-            model = AutoModelForCausalLM.from_pretrained("openai-community/gpt2-xl", cache_dir=cache_dir)
-        else:
-            raise ValueError(f"[DataLoader.get_splits] ValueError: ds_name = {model_name}")
+        match model_name:
+            case "gpt1":
+                # openai-gpt ("GPT-1") is the first transformer-based language model created and released by OpenAI
+                model = AutoModelForCausalLM.from_pretrained(
+                    "openai-community/openai-gpt", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "gpt2":
+                # The smallest version of GPT-2, with 124M parameters.
+                model = AutoModelForCausalLM.from_pretrained(
+                    "openai-community/gpt2", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "gpt2-medium":
+                # GPT-2 Medium is the 355M parameter version of GPT-2
+                model = AutoModelForCausalLM.from_pretrained(
+                    "openai-community/gpt2-medium", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "gpt2-large":
+                # GPT-2 Large is the 774M parameter version of GPT-2
+                model = AutoModelForCausalLM.from_pretrained(
+                    "openai-community/gpt2-large", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "gpt2-xl":
+                # GPT-2 XL is the 1.5B parameter version of GPT-2
+                model = AutoModelForCausalLM.from_pretrained(
+                    "openai-community/gpt2-xl", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "olmo-1b":
+                # https://huggingface.co/allenai/OLMo-1B
+                model = AutoModelForCausalLM.from_pretrained(
+                    "allenai/OLMo-1B", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "olmo-7b":
+                # https://huggingface.co/allenai/OLMo-7B
+                model = AutoModelForCausalLM.from_pretrained(
+                    "allenai/OLMo-7B", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case "mistral-7b":
+                # https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2
+                model = AutoModelForCausalLM.from_pretrained(
+                    "mistralai/Mistral-7B-Instruct-v0.2", revision=revision, torch_dtype="auto", cache_dir=cache_dir)
+            case _:
+                raise ValueError(f"[DataLoader.get_splits] ValueError: ds_name = {model_name}")
 
         if isinstance(local_path, str) and os.path.isfile(local_path):
             try:

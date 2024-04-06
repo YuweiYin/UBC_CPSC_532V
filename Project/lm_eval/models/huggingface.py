@@ -96,7 +96,8 @@ class HFLM(TemplateLM):
         dtype: Optional[Union[str, torch.dtype]] = "auto",
         batch_size: Optional[Union[int, str]] = 1,
         max_batch_size: Optional[int] = 64,
-        trust_remote_code: Optional[bool] = False,
+        # trust_remote_code: Optional[bool] = False,
+        trust_remote_code: Optional[bool] = True,
         use_fast_tokenizer: Optional[bool] = True,
         add_bos_token: Optional[bool] = False,
         # arguments used for splitting a model across GPUs naively.
@@ -413,7 +414,8 @@ class HFLM(TemplateLM):
         self,
         config: Union[transformers.PretrainedConfig, transformers.AutoConfig],
         backend: Optional[Literal["default", "causal", "seq2seq"]] = "default",
-        trust_remote_code: Optional[bool] = False,
+        # trust_remote_code: Optional[bool] = False,
+        trust_remote_code: Optional[bool] = True,
     ) -> None:
         """
         Helper method during initialization.
@@ -465,7 +467,8 @@ class HFLM(TemplateLM):
         self,
         pretrained: str,
         revision: str = "main",
-        trust_remote_code: bool = False,
+        # trust_remote_code: bool = False,
+        trust_remote_code: bool = True,
         cache_dir: Optional[str] = None,
     ) -> None:
         self._config = transformers.AutoConfig.from_pretrained(
@@ -480,7 +483,8 @@ class HFLM(TemplateLM):
         pretrained: str,
         revision: Optional[str] = "main",
         dtype: Optional[Union[str, torch.dtype]] = "auto",
-        trust_remote_code: Optional[bool] = False,
+        # trust_remote_code: Optional[bool] = False,
+        trust_remote_code: Optional[bool] = True,
         # arguments used for splitting a model across GPUs naively.
         # only used if `parallelize=True`.
         # (accelerate naive PP (device_map) options)
@@ -588,7 +592,8 @@ class HFLM(TemplateLM):
             ]
         ],
         revision: Optional[str] = "main",
-        trust_remote_code: Optional[bool] = False,
+        # trust_remote_code: Optional[bool] = False,
+        trust_remote_code: Optional[bool] = True,
         use_fast_tokenizer: Optional[bool] = True,
         cache_dir: Optional[str] = None,
     ) -> None:

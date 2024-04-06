@@ -263,45 +263,45 @@ We choose the following datasets to perform evaluation.
 bash eval.sh "gpt2"
 ```
 
-| Task                        | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
-|-----------------------------|---------|--------|--------|--------|------------------|
-| **GLUE**                    | N/A     | None   | None   | mcc    | 0.0126 (±0.0315) |
-| **GLUE**                    |         |        |        | acc    | 0.4658 (±0.0019) |
-| **GLUE**                    |         |        |        | f1     | 0.3786 (±0.0035) |
-| GLUE - `cola`               | 1       | None   | None   | mcc    | 0.0126 (±0.0315) |
-| GLUE - `mnli`               | 1       | None   | None   | acc    | 0.3372 (±0.0048) |
-| GLUE - `mnli_mismatch`      | 1       | None   | None   | acc    | 0.3321 (±0.0047) |
-| GLUE - `mrpc`               | 1       | None   | None   | acc    | 0.5613 (±0.0246) |
-| GLUE - `mrpc`               |         | None   | None   | f1     | 0.6832 (±0.0226) |
-| GLUE - `qnli`               | 1       | None   | None   | acc    | 0.5017 (±0.0068) |
-| GLUE - `qqp`                | 1       | None   | None   | acc    | 0.5215 (±0.0025) |
-| GLUE - `qqp`                |         | None   | None   | f1     | 0.3755 (±0.0035) |
-| GLUE - `rte`                | 1       | None   | None   | acc    | 0.5307 (±0.0300) |
-| GLUE - `sst2`               | 1       | None   | None   | acc    | 0.5505 (±0.0169) |
-| GLUE - `wnli`               | 1       | None   | None   | acc    | 0.4225 (±0.0590) |
+| Task                   | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
+|------------------------|---------|--------|--------|--------|------------------|
+| **GLUE**               | N/A     | None   | None   | mcc    | 0.0126 (±0.0315) |
+| **GLUE**               |         |        |        | acc    | 0.4658 (±0.0019) |
+| **GLUE**               |         |        |        | f1     | 0.3786 (±0.0035) |
+| GLUE - `rte`           | 1       | None   | None   | acc    | 0.5307 (±0.0300) |
+| GLUE - `qnli`          | 1       | None   | None   | acc    | 0.5017 (±0.0068) |
+| GLUE - `mnli`          | 1       | None   | None   | acc    | 0.3372 (±0.0048) |
+| GLUE - `mnli_mismatch` | 1       | None   | None   | acc    | 0.3321 (±0.0047) |
+| GLUE - `mrpc`          | 1       | None   | None   | acc    | 0.5613 (±0.0246) |
+| GLUE - `mrpc`          |         | None   | None   | f1     | 0.6832 (±0.0226) |
+| GLUE - `qqp`           | 1       | None   | None   | acc    | 0.5215 (±0.0025) |
+| GLUE - `qqp`           |         | None   | None   | f1     | 0.3755 (±0.0035) |
+| GLUE - `wnli`          | 1       | None   | None   | acc    | 0.4225 (±0.0590) |
+| GLUE - `sst2`          | 1       | None   | None   | acc    | 0.5505 (±0.0169) |
+| GLUE - `cola`          | 1       | None   | None   | mcc    | 0.0126 (±0.0315) |
 
 
-| Task                        | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
-|-----------------------------|---------|--------|--------|--------|------------------|
-| **SuperGLUE**               | N/A     | None   | None   | acc    | 0.5116 (±0.0052) |
-| **SuperGLUE**               |         | None   | None   | em     | 0.2573 (±0.0044) |
-| **SuperGLUE**               |         | None   | None   | f1     | 0.2649 (±N/A)    |
-| SuperGLUE - `boolq`         | 2       | None   | None   | acc    | 0.4872 (±0.0087) |
-| SuperGLUE - `cb`            | 1       | None   | None   | acc    | 0.4107 (±0.0663) |
-| SuperGLUE - `cb`            |         | None   | None   | f1     | 0.2619 (±N/A)    |
-| SuperGLUE - `copa`          | 1       | None   | None   | acc    | 0.6200 (±0.0488) |
-| SuperGLUE - `multirc`       | 1       | None   | None   | acc    | 0.5301 (±0.0072) |
-| SuperGLUE - `record`        | 1       | None   | None   | f1     | 0.2649 (±0.0044) |
-| SuperGLUE - `record`        |         | None   | None   | em     | 0.2573 (±0.0044) |
-| SuperGLUE - `rte`           | 0       | None   | None   | acc    | 0.5307 (±0.0300) |
-| SuperGLUE - `wic`           | 1       | None   | None   | acc    | 0.4922 (±0.0198) |
-| SuperGLUE - `wsc`           | 1       | None   | None   | acc    | 0.4327 (±0.0488) |
+| Task                    | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
+|-------------------------|---------|--------|--------|--------|------------------|
+| **SuperGLUE**           | N/A     | None   | None   | acc    | 0.5116 (±0.0052) |
+| **SuperGLUE**           |         | None   | None   | em     | 0.2573 (±0.0044) |
+| **SuperGLUE**           |         | None   | None   | f1     | 0.2649 (±N/A)    |
+| SuperGLUE - `cb`        | 1       | None   | None   | acc    | 0.4107 (±0.0663) |
+| SuperGLUE - `cb`        |         | None   | None   | f1     | 0.2619 (±N/A)    |
+| SuperGLUE - `wic`       | 1       | None   | None   | acc    | 0.4922 (±0.0198) |
+| SuperGLUE - `sglue_rte` | 0       | None   | None   | acc    | 0.5307 (±0.0300) |
+| SuperGLUE - `boolq`     | 2       | None   | None   | acc    | 0.4872 (±0.0087) |
+| SuperGLUE - `copa`      | 1       | None   | None   | acc    | 0.6200 (±0.0488) |
+| SuperGLUE - `multirc`   | 1       | None   | None   | acc    | 0.5301 (±0.0072) |
+| SuperGLUE - `record`    | 1       | None   | None   | f1     | 0.2649 (±0.0044) |
+| SuperGLUE - `record`    |         | None   | None   | em     | 0.2573 (±0.0044) |
+| SuperGLUE - `wsc`       | 1       | None   | None   | acc    | 0.4327 (±0.0488) |
 
 
 | Task                        | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
 |-----------------------------|---------|--------|--------|--------|------------------|
 | **WSC273** `wsc273`         | 1       | None   | None   | acc    | 0.5861 (±0.0299) |
-| **WinoGrande** `winogrande` | 1       | None   | None   | acc    | 0.5162 (±0.014)  |
+| **WinoGrande** `winogrande` | 1       | None   | None   | acc    | 0.5162 (±0.0140) |
 | **ANLI** `anli`             | N/A     | None   | None   | acc    | 0.3434 (±0.0084) |
 | ANLI - `anli_r1`            | 1       | None   | None   | acc    | 0.3410 (±0.0150) |
 | ANLI - `anli_r2`            | 1       | None   | None   | acc    | 0.3390 (±0.0150) |
@@ -314,3 +314,12 @@ bash eval.sh "gpt2"
 | **HellaSwag** `hellaswag`   | 1       | None   | None   | acc    | 0.2892 (±0.0045) |
 
 ---
+
+```txt
+directly use GPT to solve the QA task
+train an NN from scratch
+use RAG:
+    basic extract (use WikiAPI / ConceptNet / COMET-Atomic / GPT, or combined)
+    use pre-process (like rewriting) or not
+    use post-process or not
+```

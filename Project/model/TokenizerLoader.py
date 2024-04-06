@@ -5,6 +5,7 @@ import logging
 from typing import Optional
 
 from transformers import AutoTokenizer
+import hf_olmo
 
 
 class TokenizerLoader:
@@ -102,32 +103,48 @@ class TokenizerLoader:
         model_name = model_name.strip()
         self.logger.info(f"Loading tokenizer from Hugging Face. model_name: {model_name}")
 
-        if model_name == "gpt1":
-            # openai-gpt (a.k.a. "GPT-1") is the first transformer-based language model created and released by OpenAI
-            tokenizer = AutoTokenizer.from_pretrained(
-                "openai-community/openai-gpt", cache_dir=cache_dir,
-                padding_side=padding_side, truncation_side=truncation_side)
-        elif model_name == "gpt2":
-            # The smallest version of GPT-2, with 124M parameters.
-            tokenizer = AutoTokenizer.from_pretrained(
-                "openai-community/gpt2", cache_dir=cache_dir,
-                padding_side=padding_side, truncation_side=truncation_side)
-        elif model_name == "gpt2-medium":
-            # GPT-2 Medium is the 355M parameter version of GPT-2
-            tokenizer = AutoTokenizer.from_pretrained(
-                "openai-community/gpt2-medium", cache_dir=cache_dir,
-                padding_side=padding_side, truncation_side=truncation_side)
-        elif model_name == "gpt2-large":
-            # GPT-2 Large is the 774M parameter version of GPT-2
-            tokenizer = AutoTokenizer.from_pretrained(
-                "openai-community/gpt2-large", cache_dir=cache_dir,
-                padding_side=padding_side, truncation_side=truncation_side)
-        elif model_name == "gpt2-xl":
-            # GPT-2 XL is the 1.5B parameter version of GPT-2
-            tokenizer = AutoTokenizer.from_pretrained(
-                "openai-community/gpt2-xl", cache_dir=cache_dir,
-                padding_side=padding_side, truncation_side=truncation_side)
-        else:
-            raise ValueError(f"[DataLoader.get_splits] ValueError: ds_name = {model_name}")
+        match model_name:
+            case "gpt1":
+                # openai-gpt ("GPT-1"): the first transformer-based language model created and released by OpenAI
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "openai-community/openai-gpt", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "gpt2":
+                # The smallest version of GPT-2, with 124M parameters.
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "openai-community/gpt2", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "gpt2-medium":
+                # GPT-2 Medium is the 355M parameter version of GPT-2
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "openai-community/gpt2-medium", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "gpt2-large":
+                # GPT-2 Large is the 774M parameter version of GPT-2
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "openai-community/gpt2-large", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "gpt2-xl":
+                # GPT-2 XL is the 1.5B parameter version of GPT-2
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "openai-community/gpt2-xl", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "olmo-1b":
+                # https://huggingface.co/allenai/OLMo-1B
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "allenai/OLMo-1B", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "olmo-7b":
+                # https://huggingface.co/allenai/OLMo-7B
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "allenai/OLMo-7B", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case "mistral-7b":
+                # https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2
+                tokenizer = AutoTokenizer.from_pretrained(
+                    "mistralai/Mistral-7B-Instruct-v0.2", cache_dir=cache_dir,
+                    padding_side=padding_side, truncation_side=truncation_side)
+            case _:
+                raise ValueError(f"[DataLoader.get_splits] ValueError: ds_name = {model_name}")
 
         return tokenizer
