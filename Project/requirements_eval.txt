@@ -42,10 +42,10 @@ sentencepiece>=0.1.98
 protobuf>=4.22.1
 anthropic
 openai>=1.3.9
-antlr4-python3-runtime>=4.11
 Wikipedia-API
 arxiv
 googlesearch-python
 keybert
 anthropic
 google-generativeai
+ai2-olmo

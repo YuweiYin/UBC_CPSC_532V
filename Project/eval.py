@@ -251,6 +251,15 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
     eval_logger.info(f"Verbosity set to {args.verbosity}")
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+    model_name = str(args.model_args).strip()
+    if "," in model_name:
+        model_name = model_name.split(",")[0].strip()
+    if "=" in model_name:
+        model_name = model_name.split("=")[-1].strip()
+    if "/" in model_name:
+        model_name = model_name.split("/")[-1].strip()
+    args.model_name = model_name
+
     if args.predict_only:
         args.log_samples = True
     if (args.log_samples or args.predict_only) and not args.output_path:
@@ -307,6 +316,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
                     f"or '--verbosity DEBUG' to troubleshoot task registration issues."
                 )
 
+    args.output_path = os.path.join(args.output_path, args.model_name)
     if args.output_path:
         path = Path(args.output_path)
         # check if file or 'dir/results.json' exists
@@ -331,15 +341,6 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
     request_caching_args = request_caching_arg_to_dict(
         cache_requests=args.cache_requests
     )
-
-    model_name = str(args.model_args).strip()
-    if "," in model_name:
-        model_name = model_name.split(",")[0].strip()
-    if "=" in model_name:
-        model_name = model_name.split("=")[-1].strip()
-    if "/" in model_name:
-        model_name = model_name.split("/")[-1].strip()
-    args.model_name = model_name
 
     results = evaluator.simple_evaluate(
         args=args,

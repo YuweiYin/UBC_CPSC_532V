@@ -158,7 +158,7 @@ Command line tool `lm-eval` usage (basic example):
 
 ```bash
 lm_eval --model "hf" \
-  --model_args "pretrained=EleutherAI/pythia-160m,revision=step100000,dtype=float" \
+  --model_args "pretrained=EleutherAI/pythia-160m,revision=step100000,dtype=auto" \
   --tasks "lambada_openai,hellaswag" \
   --device "cuda:0" \
   --batch_size "auto:4" \
@@ -181,7 +181,7 @@ Hence, **we recommend using the following evaluation script**:
 
 ```bash
 python3 eval.py --model "hf" \
-  --model_args "pretrained=gpt2,dtype=float" \
+  --model_args "pretrained=gpt2,dtype=auto" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
@@ -190,7 +190,7 @@ python3 eval.py --model "hf" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "results/copa---gpt2---eval"
+  --output_path "eval_results/copa---gpt2"
 ```
 
 ### Evaluate the Fine-tuned Models
@@ -199,7 +199,7 @@ Suppose the fine-tuned checkpoint under the `"runs/commonsense_qa---gpt2/ckpt/mo
 
 ```bash
 python3 eval.py --model "hf" \
-  --model_args "pretrained=runs/commonsense_qa---gpt2/ckpt/model_epoch_9,dtype=float" \
+  --model_args "pretrained=runs/commonsense_qa---gpt2/ckpt/model_epoch_9,dtype=auto" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
@@ -208,17 +208,17 @@ python3 eval.py --model "hf" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "results/copa---gpt2_ft---eval"
+  --output_path "eval_results/copa---gpt2_ft"
 ```
 
 ### Evaluation with RAG
 
-* `--rag_source` can be: `"atomic"`, `"llm_gemini"`, `"llm_openai"`, `"llm_anthropic"`, `"wiki"`, `"conceptNet"`, `"arxiv"`, `"googleSearch"` or `""`. Default value `""` means use all RAG sources.
+* `--rag_source` can be: `"atomic"`, `"llm_gemini"`, `"llm_openai"`, `"llm_anthropic"`, `"wiki"`, `"conceptNet"`, `"arxiv"`, `"googleSearch"` or `"ALL"`. Default value `"ALL"` means use all RAG sources.
 * Before using LLMs (`"llm_gemini"`, `"llm_openai"`, or `"llm_anthropic"`), please specify the API keys in `rag/api_setup.py`
 
 ```bash
 python3 eval.py --model "hf" \
-  --model_args "pretrained=gpt2,dtype=float" \
+  --model_args "pretrained=gpt2,dtype=auto" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
@@ -227,9 +227,9 @@ python3 eval.py --model "hf" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "results/copa---gpt2---eval" \
+  --output_path "eval_results/copa---gpt2" \
   --use_rag \
-  --rag_source "" \
+  --rag_source "ALL" \
 ```
 
 ### Testing Tasks and Datasets 
@@ -259,8 +259,10 @@ We choose the following datasets to perform evaluation.
 
 ### Experimental Results
 
+* Before running `eval.sh` or `eval_rag.sh`, please modify the `CACHE_DIR` variable.
+
 ```bash
-bash eval.sh "gpt2"
+bash eval.sh "0" "openai-community/gpt2"
 ```
 
 | Task                   | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
@@ -314,12 +316,3 @@ bash eval.sh "gpt2"
 | **HellaSwag** `hellaswag`   | 1       | None   | None   | acc    | 0.2892 (±0.0045) |
 
 ---
-
-```txt
-directly use GPT to solve the QA task
-train an NN from scratch
-use RAG:
-    basic extract (use WikiAPI / ConceptNet / COMET-Atomic / GPT, or combined)
-    use pre-process (like rewriting) or not
-    use post-process or not
-```

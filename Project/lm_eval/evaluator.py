@@ -423,7 +423,6 @@ def evaluate(
         arxivRetriever = ArxivRetriever()
         googleSearchRetriever = GoogleSearchRetriever()
 
-    # save_dir = os.path.join(args.output_path, "eval_results")
     save_dir = str(args.output_path)
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
@@ -797,10 +796,12 @@ def evaluate(
         if "/" in _task_name:
             _task_name = _task_name.split("/")[-1].strip()
         if args.use_rag:
-            save_req_fp = os.path.join(
-                save_dir, f"{_task_name}---{args.model_name}---requests---rag_{args.rag_source}.jsonl")
+            # save_req_fp = os.path.join(
+            #     save_dir, f"{_task_name}---{args.model_name}---requests---rag_{args.rag_source}.jsonl")
+            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests---rag_{args.rag_source}.jsonl")
         else:
-            save_req_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---requests.jsonl")
+            # save_req_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---requests.jsonl")
+            save_req_fp = os.path.join(save_dir, f"{_task_name}---requests.jsonl")
         with open(save_req_fp, "w", encoding="utf-8") as fp_out:
             for req_to_save in reqs_to_save:
                 to_write = json.dumps(req_to_save)
@@ -991,10 +992,12 @@ def evaluate(
             if "/" in _task_name:
                 _task_name = _task_name.split("/")[-1].strip()
             if args.use_rag:
-                save_res_fp = os.path.join(
-                    save_dir, f"{_task_name}---{args.model_name}---results---rag_{args.rag_source}.jsonl")
+                # save_res_fp = os.path.join(
+                #     save_dir, f"{_task_name}---{args.model_name}---results---rag_{args.rag_source}.jsonl")
+                save_res_fp = os.path.join(save_dir, f"{_task_name}---results---rag_{args.rag_source}.jsonl")
             else:
-                save_res_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---results.jsonl")
+                # save_res_fp = os.path.join(save_dir, f"{_task_name}---{args.model_name}---results.jsonl")
+                save_res_fp = os.path.join(save_dir, f"{_task_name}---results.jsonl")
             with open(save_res_fp, "w", encoding="utf-8") as fp_out:
                 try:
                     fp_out.write(json.dumps({"results": results_dict["results"][_task_name]}) + "\n")
