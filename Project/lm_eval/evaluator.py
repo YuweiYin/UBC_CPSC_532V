@@ -728,6 +728,7 @@ def evaluate(
                         rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
                     if len(googleSearch_rag) > 0:
                         rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
+                    rag_context += "\n\nAnswer the following question based on the above context:\n"
                     req.arguments = (rag_context + req.arguments[0], req.arguments[1])  # Augmentation
             else:
                 rag_docs = {}
