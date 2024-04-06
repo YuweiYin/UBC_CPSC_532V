@@ -17,12 +17,10 @@ run_eval(){
     --tasks "${task}" \
     --device "cuda" \
     --batch_size "auto:8" \
-    --use_cache "${CACHE_DIR}" \
-    --cache_requests "true" \
     --cache_dir "${CACHE_DIR}" \
     --seed 42 \
     --log_samples \
-    --output_path "eval_results/${task}"
+    --output_path "results_eval/${task}"
   echo -e "\n>>> End of EVAL <<< Model: ${MODEL}; Task: ${task}\n\n"
 }
 

@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from lm_eval.tasks import Task
 
 from lm_eval.caching.cache import delete_cache
+from lm_eval.models.huggingface import HFLM
 from rag.llm_agent import LLMAgent
 # import multiprocessing as mp
 import time
@@ -266,8 +267,14 @@ def simple_evaluate(
     # Show LM model
     if lm is None:
         raise ValueError(f"lm is None!")
-    param_all = sum(p.numel() for p in lm.lm.model.parameters())
-    param_train = sum(p.numel() for p in lm.lm.model.parameters() if p.requires_grad)
+    if isinstance(lm, HFLM):
+        param_all = sum(p.numel() for p in lm.model.parameters())
+        param_train = sum(p.numel() for p in lm.model.parameters() if p.requires_grad)
+    elif hasattr(lm, "lm") and isinstance(lm.lm, HFLM):
+        param_all = sum(p.numel() for p in lm.lm.model.parameters())
+        param_train = sum(p.numel() for p in lm.lm.model.parameters() if p.requires_grad)
+    else:
+        raise ValueError(f"ValueError: type(lm) = {type(lm)}")
     eval_logger.info(f"Model parameters: ALL = {param_all}; Trainable = {param_train}")
 
     results = evaluate(

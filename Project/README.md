@@ -162,8 +162,6 @@ lm_eval --model "hf" \
   --tasks "lambada_openai,hellaswag" \
   --device "cuda:0" \
   --batch_size "auto:4" \
-  --use_cache "/path/to/.cache/huggingface/" \
-  --cache_requests "true" \
   --seed 42
 ```
 
@@ -185,12 +183,10 @@ python3 eval.py --model "hf" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
-  --use_cache "/path/to/.cache/huggingface/" \
-  --cache_requests "true" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "eval_results/copa---gpt2"
+  --output_path "results_eval/copa---gpt2"
 ```
 
 ### Evaluate the Fine-tuned Models
@@ -203,12 +199,10 @@ python3 eval.py --model "hf" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
-  --use_cache "/path/to/.cache/huggingface/" \
-  --cache_requests "true" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "eval_results/copa---gpt2_ft"
+  --output_path "results_eval/copa---gpt2_ft"
 ```
 
 ### Evaluation with RAG
@@ -222,12 +216,10 @@ python3 eval.py --model "hf" \
   --tasks "copa" \
   --device "cuda:0" \
   --batch_size "auto:8" \
-  --use_cache "/path/to/.cache/huggingface/" \
-  --cache_requests "true" \
   --cache_dir "/path/to/.cache/huggingface/" \
   --seed 42 \
   --log_samples \
-  --output_path "eval_results/copa---gpt2" \
+  --output_path "results_eval/copa---gpt2" \
   --use_rag \
   --rag_source "ALL" \
 ```
