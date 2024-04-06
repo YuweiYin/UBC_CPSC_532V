@@ -6,7 +6,6 @@ from typing import Optional
 
 import torch
 from transformers import AutoModelForCausalLM
-import hf_olmo
 
 
 class ModelLoader:

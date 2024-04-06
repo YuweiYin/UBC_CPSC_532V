@@ -768,7 +768,7 @@ def evaluate(
             timer_gap = timer_end - timer_start
             timer_list.append(timer_gap)
 
-        timer_all, timer_avg = sum(timer_list), np.mean(timer_list)
+        timer_all, timer_avg = sum(timer_list), float(np.mean(timer_list))
         eval_logger.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
         eval_logger.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
         # wnli [AVG] wiki: 1.6s
