@@ -1,4 +1,5 @@
 import os
+import gc
 import re
 import sys
 import time
@@ -10,6 +11,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
+import torch.cuda
 
 from lm_eval import evaluator, utils
 from lm_eval.evaluator import request_caching_arg_to_dict
@@ -428,4 +430,6 @@ if __name__ == "__main__":
     timer_end = time.perf_counter()
     logging.info("Total Running Time: %.1f sec (%.1f min)" % (timer_end - timer_start, (timer_end - timer_start) / 60))
 
+    torch.cuda.empty_cache()
+    gc.collect()
     sys.exit(0)

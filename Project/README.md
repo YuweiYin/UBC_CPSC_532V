@@ -32,13 +32,18 @@ conda activate 532v
 
 ### Python3 Packages
 
+```bash
+git clone https://github.com/YuweiYin/UBC_CPSC_532V
+cd Project/
+```
+
 * For generation/evaluation only:
 
 ```bash
 pip install -r requirements_eval.txt
 ```
 
-* For training/fine-tuning:
+* For training/fine-tuning (optional):
 
 ```bash
 pip install -r requirements_train.txt
@@ -134,7 +139,7 @@ python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1"
 **Model Parallel** ([PyTorch](https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html), 
 [Transformers](https://huggingface.co/transformers/v4.9.2/parallelism.html)) is also recommended.
 
-## Experimental Results
+## Experiments
 
 ### Training Results
 
@@ -151,7 +156,6 @@ Use [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness)
 git clone https://github.com/EleutherAI/lm-evaluation-harness
 cd lm-evaluation-harness
 pip install -e .
-#pip install vllm
 ```
 
 Command line tool `lm-eval` usage (basic example):
@@ -240,71 +244,24 @@ We choose the following datasets to perform evaluation.
 * SWAG: `swag`
 * HellaSwag: `hellaswag`
 
-**Multilingual** (TBD)
-
-* XCOPA: `xcopa`
-* XNLI: `xnli`
-
 ### Baselines
 
+* `openai-community/openai-gpt`: GPT-1
 * `openai-community/gpt2`: The smallest version of GPT-2, with 124M parameters. ([LINK](https://huggingface.co/openai-community/gpt2))
+* `openai-community/gpt2-medium`: 
+* `openai-community/gpt2-large`: 
+* `openai-community/gpt2-xl`: 
+
 
 ### Experimental Results
 
-* Before running `eval.sh` or `eval_rag.sh`, please modify the `CACHE_DIR` variable.
+* Before running `eval.sh` or `eval_rag.sh`, please modify the `CACHE_DIR` variable (`""` for default Hugging Face directory: `"~/.cache/huggingface/"`).
 
 ```bash
-bash eval.sh "0" "openai-community/gpt2" "float16" "32"
+bash eval_all.sh "0" "openai-community/gpt2" "float16" "auto:8"
+
+#mkdir -p log
+#nohup bash eval_all.sh "0" "openai-community/gpt2" "float16" "auto:8" > log/eval---gpt2---all.log 2>&1 &
 ```
-
-| Task                   | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
-|------------------------|---------|--------|--------|--------|------------------|
-| **GLUE**               | N/A     | None   | None   | mcc    | 0.0126 (±0.0315) |
-| **GLUE**               |         |        |        | acc    | 0.4658 (±0.0019) |
-| **GLUE**               |         |        |        | f1     | 0.3786 (±0.0035) |
-| GLUE - `rte`           | 1       | None   | None   | acc    | 0.5307 (±0.0300) |
-| GLUE - `qnli`          | 1       | None   | None   | acc    | 0.5017 (±0.0068) |
-| GLUE - `mnli`          | 1       | None   | None   | acc    | 0.3372 (±0.0048) |
-| GLUE - `mnli_mismatch` | 1       | None   | None   | acc    | 0.3321 (±0.0047) |
-| GLUE - `mrpc`          | 1       | None   | None   | acc    | 0.5613 (±0.0246) |
-| GLUE - `mrpc`          |         | None   | None   | f1     | 0.6832 (±0.0226) |
-| GLUE - `qqp`           | 1       | None   | None   | acc    | 0.5215 (±0.0025) |
-| GLUE - `qqp`           |         | None   | None   | f1     | 0.3755 (±0.0035) |
-| GLUE - `wnli`          | 1       | None   | None   | acc    | 0.4225 (±0.0590) |
-| GLUE - `sst2`          | 1       | None   | None   | acc    | 0.5505 (±0.0169) |
-| GLUE - `cola`          | 1       | None   | None   | mcc    | 0.0126 (±0.0315) |
-
-
-| Task                    | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
-|-------------------------|---------|--------|--------|--------|------------------|
-| **SuperGLUE**           | N/A     | None   | None   | acc    | 0.5116 (±0.0052) |
-| **SuperGLUE**           |         | None   | None   | em     | 0.2573 (±0.0044) |
-| **SuperGLUE**           |         | None   | None   | f1     | 0.2649 (±N/A)    |
-| SuperGLUE - `cb`        | 1       | None   | None   | acc    | 0.4107 (±0.0663) |
-| SuperGLUE - `cb`        |         | None   | None   | f1     | 0.2619 (±N/A)    |
-| SuperGLUE - `wic`       | 1       | None   | None   | acc    | 0.4922 (±0.0198) |
-| SuperGLUE - `sglue_rte` | 0       | None   | None   | acc    | 0.5307 (±0.0300) |
-| SuperGLUE - `boolq`     | 2       | None   | None   | acc    | 0.4872 (±0.0087) |
-| SuperGLUE - `copa`      | 1       | None   | None   | acc    | 0.6200 (±0.0488) |
-| SuperGLUE - `multirc`   | 1       | None   | None   | acc    | 0.5301 (±0.0072) |
-| SuperGLUE - `record`    | 1       | None   | None   | f1     | 0.2649 (±0.0044) |
-| SuperGLUE - `record`    |         | None   | None   | em     | 0.2573 (±0.0044) |
-| SuperGLUE - `wsc`       | 1       | None   | None   | acc    | 0.4327 (±0.0488) |
-
-
-| Task                        | Version | Filter | n-shot | Metric | GPT-2 (Small)    |
-|-----------------------------|---------|--------|--------|--------|------------------|
-| **WSC273** `wsc273`         | 1       | None   | None   | acc    | 0.5861 (±0.0299) |
-| **WinoGrande** `winogrande` | 1       | None   | None   | acc    | 0.5162 (±0.0140) |
-| **ANLI** `anli`             | N/A     | None   | None   | acc    | 0.3434 (±0.0084) |
-| ANLI - `anli_r1`            | 1       | None   | None   | acc    | 0.3410 (±0.0150) |
-| ANLI - `anli_r2`            | 1       | None   | None   | acc    | 0.3390 (±0.0150) |
-| ANLI - `anli_r3`            | 1       | None   | None   | acc    | 0.3492 (±0.0138) |
-| **ARC** `ai2_arc`           | N/A     | None   | None   | acc    | 0.3563 (±0.0078) |
-| ARC - `arc_easy`            | 1       | None   | None   | acc    | 0.4381 (±0.0102) |
-| ARC - `arc_challenge`       | 1       | None   | None   | acc    | 0.1903 (±0.0115) |
-| **PIQA** `piqa`             | 1       | None   | None   | acc    | 0.6289 (±0.0113) |
-| **SWAG** `swag`             | 1       | None   | None   | acc    | 0.4052 (±0.0035) |
-| **HellaSwag** `hellaswag`   | 1       | None   | None   | acc    | 0.2892 (±0.0045) |
 
 ---
