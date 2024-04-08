@@ -743,6 +743,11 @@ def evaluate(
 
                 # TODO: RAG Step 3: Augmentation: Combine the docs to the original query (different prompting methods)
                 if len(rag_all) > 0:
+                    # augmentation_short_prompt = augmentationPrompts.augmentation_short(cur_query, docs=rag_docs)
+                    # augmentation_medium_prompt = augmentationPrompts.augmentation_medium(cur_query, docs=rag_docs)
+                    # augmentation_long_prompt = augmentationPrompts.augmentation_long(cur_query, docs=rag_docs)
+                    # req.arguments = (augmentation_short_prompt, req.arguments[1])  # Augmentation
+
                     rag_context = "Context:\n"
                     if len(atomic_rag) > 0:
                         rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"

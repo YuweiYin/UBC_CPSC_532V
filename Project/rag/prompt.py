@@ -207,16 +207,15 @@ to make the information more accessible and understandable in relation to the or
 class AugmentationPrompts:
 
     def __init__(self):
+        # NOTE: Put the {query} to the end of the prompt (to fit the evaluation method)
         pass
 
     @staticmethod
     def augmentation_short(query: str, docs: List[str]) -> str:
         # Transforming Document Content into a Structured Format
         prompt_template = """
-Given the original query: "{query}"\n\
 Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
-Based on the original query and the enriched information from the above documents, \
-generate an accurate, concise, and reasonable answer.
+Based on the above documents, generate an accurate, concise, and reasonable answer to the following query:\n\n{query}
         """.strip()
         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
         return prompt
@@ -225,12 +224,11 @@ generate an accurate, concise, and reasonable answer.
     def augmentation_medium(query: str, docs: List[str]) -> str:
         # Transforming Document Content into a Structured Format
         prompt_template = """
-Given the original query: "{query}"\n\
 Give the relevant information extracted from external documents:\n\n{docs}\n\
-Using the key information from the above documents to answer the original query. \
-Create an accurate, concise, and reasonable response that blends both sources.\n\
+Using the key information from the above documents to create an accurate, concise, and reasonable response. \
 Aim for coherence and insight, addressing the query with depth and clarity. \
-Highlight any significant agreements or contradictions from the external information, ensuring a balanced view.
+Highlight any significant agreements or contradictions from the external information, ensuring a balanced view. \
+Answer the following query:\n\n{query}
         """.strip()
         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
         return prompt
@@ -238,15 +236,15 @@ Highlight any significant agreements or contradictions from the external informa
     @staticmethod
     def augmentation_long(query: str, docs: List[str]) -> str:
         prompt_template = """
-Given the original query: "{query}"\n\
 Give the relevant information extracted from external documents:\n\n{docs}\n\
 Generate a comprehensive response that incorporates this information to provide \
-an accurate, concise, and reasonable answer or continuation of the original query.\n\
+an accurate, concise, and reasonable answer.\n\
 The response should reflect an understanding of the query's intent and the knowledge contained \
 within the processed documents. Ensure the generated content is coherent, logically structured, \
 and seamlessly integrates the external information to enhance the quality and depth of the answer. \
-If the processed information supports or contradicts the original query, \
-highlight these aspects appropriately, providing a balanced and informed perspective.
+If the processed information supports or contradicts the query, \
+highlight these aspects appropriately, providing a balanced and informed perspective. \
+Answer the following query:\n\n{query}
         """.strip()
         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
         return prompt
