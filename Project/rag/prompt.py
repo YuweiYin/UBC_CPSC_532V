@@ -119,8 +119,20 @@ Ensure the summary is concise and captures the essence of the document related t
         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
         return prompt
 
+#     @staticmethod
+#     def generating_summary(query: str, docs: List[str]) -> str:
+#         # Generating a Consolidated Summary from Multiple Documents
+#         prompt_template = """
+# Given the original query: "{query}"\n\
+# Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+# From the above documents, generate a comprehensive summary that integrates the most relevant information \
+# from each document related to the original query. The summary should be coherent and concise.
+#         """.strip()
+#         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+#         return prompt
+
     @staticmethod
-    def extracting_key_information(query: str, docs: List[str]) -> str:
+    def extracting_key_info(query: str, docs: List[str]) -> str:
         # Extracting Key Information from Documents
         prompt_template = """
 Given the original query: "{query}"\n\
@@ -144,18 +156,6 @@ Remove any irrelevant details and enhance the clarity of the document's main poi
         return prompt
 
     @staticmethod
-    def generating_summary(query: str, docs: List[str]) -> str:
-        # Generating a Consolidated Summary from Multiple Documents
-        prompt_template = """
-Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
-From the above documents, generate a comprehensive summary that integrates the most relevant information \
-from each document related to the original query. The summary should be coherent and concise.
-        """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
-        return prompt
-
-    @staticmethod
     def evaluating_documents(query: str, docs: List[str]) -> str:
         # Evaluating Document Quality and Relevance
         prompt_template = """
@@ -168,12 +168,12 @@ Provide a brief assessment highlighting its relevance, accuracy, and any biases 
         return prompt
 
     @staticmethod
-    def identifying_contradictions_agreements(query: str, docs: List[str]) -> str:
+    def identifying_conflict(query: str, docs: List[str]) -> str:
         # Identifying and Highlighting Contradictions or Agreements
         prompt_template = """
 Given the original query: "{query}"\n\
 Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
-Identify and highlight any contradictions or agreements among the above documents with respect to the original query. \
+Identify and highlight any agreements or contradictions among the above documents with respect to the original query. \
 Summarize the points of agreement or conflict.
         """.strip()
         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))

@@ -1,11 +1,31 @@
-# import json
-from .api_setup import *
+from .api_setup import GOOGLE_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY
 from openai import OpenAI
 import google.generativeai as genai
 import anthropic
+from typing import List
 
 
-def apply_openai_agent(template, query, verbose: bool = False):
+def apply_gemini_agent(
+        prompt: str,
+        sys_info: str = "You are a helpful assistant.",
+        verbose: bool = False) -> List[str]:
+    result = []
+    try:
+        genai.configure(api_key=GOOGLE_API_KEY)
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
+        result.append(response.text)
+    except Exception as e:
+        if verbose:
+            print(e)
+
+    return result
+
+
+def apply_openai_agent(
+        prompt: str,
+        sys_info: str = "You are a helpful assistant.",
+        verbose: bool = False) -> List[str]:
     result = []
     try:
         client = OpenAI(
@@ -14,8 +34,8 @@ def apply_openai_agent(template, query, verbose: bool = False):
         chat_completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": template.format(query)}
+                {"role": "system", "content": sys_info},
+                {"role": "user", "content": prompt}
             ],
         )
         result.append(chat_completion.choices[0].message.content)
@@ -26,35 +46,22 @@ def apply_openai_agent(template, query, verbose: bool = False):
     return result
 
 
-def apply_gemini_agent(template: str, query: str, verbose: bool = False):
-    result = []
-    try:
-        genai.configure(api_key=GOOGLE_API_KEY)
-        model = genai.GenerativeModel("gemini-pro")
-        response = model.generate_content(template.format(query))
-        result.append(response.text)
-
-    except Exception as e:
-        if verbose:
-            print(e)
-
-    return result
-
-
-def apply_anthropic_agent(template: str, query: str, verbose: bool = False):
+def apply_anthropic_agent(
+        prompt: str,
+        sys_info: str = "You are a helpful assistant.",
+        verbose: bool = False) -> List[str]:
     result = []
     try:
         client = anthropic.Anthropic(
             api_key=ANTHROPIC_API_KEY,
         )
-
         message = client.messages.create(
             model="claude-3-sonnet-20240229",
             max_tokens=1000,
             temperature=0.0,
-            system="You are a helpful assistant.",
+            system=sys_info,
             messages=[
-                {"role": "user", "content": template.format(query)}
+                {"role": "user", "content": prompt}
             ]
         )
 
@@ -68,43 +75,19 @@ def apply_anthropic_agent(template: str, query: str, verbose: bool = False):
 
 class LLMAgent:
 
-    def __init__(self, template: str = "{}", model: str = "google", verbose: bool = True):
-        self.template = template
+    def __init__(self, model: str = "google", verbose: bool = False):
         self.model = model
         self.verbose = verbose
 
-    def apply_agent(self, query: str):
+    def apply_agent(self, prompt: str, sys_info: str = "You are a helpful assistant.") -> List[str]:
         match self.model:
             case "google":
-                return apply_gemini_agent(self.template, query, self.verbose)
+                responses = apply_gemini_agent(prompt=prompt, sys_info=sys_info, verbose=self.verbose)
             case "openai":
-                return apply_openai_agent(self.template, query, self.verbose)
+                responses = apply_openai_agent(prompt=prompt, sys_info=sys_info, verbose=self.verbose)
             case "anthropic":
-                return apply_anthropic_agent(self.template, query, self.verbose)
+                responses = apply_anthropic_agent(prompt=prompt, sys_info=sys_info, verbose=self.verbose)
             case _:
                 raise NameError(f"Unknown model: {self.model}")
 
-
-# class ExtractiveAgent(Agent):
-#     # Extractive agent is used for supplemental keyword extraction. Input query is a (question) string.
-#     def __init__(self, template: str, model: str = "google", verbose: bool = True):
-#         super().__init__(template, model, verbose)
-#
-#
-# class SummarizeAgent(Agent):
-#     # Summarize agent directly summarizes the retrieved information.
-#     def __init__(self, path, template):
-#         super().__init__(template)
-#         self.retrieved_text = json.load(open(path))
-#
-#     def apply_agent(self, query):
-#         return
-#
-#
-# class RerankAgent(Agent):
-#     # Rerank agent can take retrieved text and performs reranking.
-#     # To be added
-#
-#     def __init__(self, path, template: str, model: str = "google", verbose: bool = True):
-#         super().__init__(template)
-#         raise NotImplementedError
+        return responses

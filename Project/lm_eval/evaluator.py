@@ -1,3 +1,5 @@
+import time
+import copy
 import json
 import collections
 import itertools
@@ -5,6 +7,7 @@ import logging
 import os.path
 import random
 from typing import TYPE_CHECKING, Optional, Union, List
+# import multiprocessing as mp
 
 import numpy as np
 import torch
@@ -13,40 +16,28 @@ import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.models
 from lm_eval.evaluator_utils import (
-    consolidate_results,
-    get_sample_size,
-    get_task_list,
-    prepare_print_tasks,
-    print_writeout,
-    run_task_tests,
+    consolidate_results, get_sample_size, get_task_list, prepare_print_tasks, print_writeout, run_task_tests,
 )
 from lm_eval.logging_utils import add_env_info, get_git_commit_hash
 from lm_eval.tasks import TaskManager, get_task_dict
 from lm_eval.utils import (
-    eval_logger,
-    positional_deprecated,
-    simple_parse_args_string,
+    eval_logger, positional_deprecated, simple_parse_args_string,
 )
+from lm_eval.caching.cache import delete_cache
+from lm_eval.models.huggingface import HFLM
 
 from util.TextParser import TextParser
 from rag.retriever import (
     AtomicRetriever, GPTRetriever, WikiRetriever, ConceptNetRetriever, ArxivRetriever, GoogleSearchRetriever,
 )
+from rag.llm_agent import LLMAgent
 from rag.prompt import (
-    PROMPT, fastRAG_PROMPT, general_PROMPT,
-    chatGPT_PROMPT_1, chatGPT_PROMPT_2, chatGPT_PROMPT_3, chatGPT_PROMPT_4, chatGPT_PROMPT_5,
+    DirectQAPrompts, PreProcessingPrompts, PostProcessingPrompts, AugmentationPrompts, BackupPrompts,
 )
 
 if TYPE_CHECKING:
     from lm_eval.api.model import LM
     from lm_eval.tasks import Task
-
-from lm_eval.caching.cache import delete_cache
-from lm_eval.models.huggingface import HFLM
-from rag.llm_agent import LLMAgent
-# import multiprocessing as mp
-import time
-import copy
 
 
 @positional_deprecated
@@ -411,24 +402,29 @@ def evaluate(
             numpad = max(gathered_item) - gathered_item[lm.rank]
             padding_requests[task.OUTPUT_TYPE] += numpad
 
-    # TODO: Use LLM API to directly solve the task
-    # LLM_Gemini_Solver = LLMAgent(template="{}", model="google")  # LLM - Gemini
-    # LLM_OpenAI_Solver = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
-    # LLM_Anthropic_Solver = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
-
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
     if args.use_rag:
         # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
         textParser = TextParser()  # Keyword extractor
         # atomicRetriever = AtomicRetriever()
-        LLM_Gemini_Retriever = LLMAgent(template="{}", model="google")  # LLM - Gemini
-        LLM_OpenAI_Retriever = LLMAgent(template="{}", model="openai")  # LLM - OpenAI GPT
-        LLM_Anthropic_Retriever = LLMAgent(template="{}", model="anthropic")  # LLM - Anthropic
+        LLM_Gemini_Retriever = LLMAgent(model="google")  # LLM - Gemini
+        LLM_OpenAI_Retriever = LLMAgent(model="openai")  # LLM - OpenAI GPT
+        LLM_Anthropic_Retriever = LLMAgent(model="anthropic")  # LLM - Anthropic
         wikiRetriever = WikiRetriever(full_text=False)
         conceptNetRetriever = ConceptNetRetriever(verbose=False)
         arxivRetriever = ArxivRetriever()
         googleSearchRetriever = GoogleSearchRetriever()
+
+    # Prompts (templates) and agents for LLMs
+    directQAPrompts = DirectQAPrompts()
+    preProcessingPrompts = PreProcessingPrompts()
+    postProcessingPrompts = PostProcessingPrompts()
+    augmentationPrompts = AugmentationPrompts()
+    backupPrompts = BackupPrompts()
+    preProcessingAgent = LLMAgent(model="google")  # To preprocess the query
+    postProcessingAgent = LLMAgent(model="google")  # To postprocess the query and documents
+    qaAgent = LLMAgent(model="google")  # To answer the query. TODO: not fit the current eval method
 
     save_dir = str(args.output_path)
     if not os.path.isdir(save_dir):
@@ -468,9 +464,6 @@ def evaluate(
             #     Step 4: Run models and get evaluation results
             req.arguments_original = copy.deepcopy(req.arguments)  # Tuple(str): constructed input-output prompt
             # req_docs = req.doc  # dict: task-specific dictionary -> raw attributes to construct our RAG prompt
-
-            # TODO: RAG Step 0: [Optional] Query preprocessing, e.g., rewriting
-            # gpt_instruction = f"Refine the following prompt to make it clearer and more specific for an LLM: " + query
 
             # TODO: Solving most of the following tasks relies more on commonsense or inter-sentence reasoning
             #     instead of external knowledge based on semantic matching (either sentence-level or word-level).
@@ -644,6 +637,15 @@ def evaluate(
                     raise ValueError(f"ValueError: task_name = {task_name}")
 
             if args.use_rag:  # Use RAG
+                # TODO: RAG Step 0: [Optional] Query preprocessing, e.g., rewriting
+                # keyword_extraction_prompt = preProcessingPrompts.keyword_extraction(cur_query)
+                # contextual_clarification_prompt = preProcessingPrompts.contextual_clarification(cur_query)
+                # relevance_filtering_prompt = preProcessingPrompts.relevance_filtering(cur_query)
+                # query_expansion_prompt = preProcessingPrompts.query_expansion(cur_query)
+                # information_structuring_prompt = preProcessingPrompts.information_structuring(cur_query)
+                # intent_clarification_prompt = preProcessingPrompts.intent_clarification(cur_query)
+                # preproc_responses = preProcessingAgent.apply_agent(prompt=keyword_extraction_prompt)
+
                 # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
                 if len(cur_keywords) == 0:
                     cur_keywords = get_keywords(cur_query)
@@ -714,7 +716,6 @@ def evaluate(
                     case _:
                         raise ValueError(f"ValueError: args.rag_source = {args.rag_source}")
 
-                # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
                 rag_docs = {
                     "atomic": atomic_rag,
                     "llm_gemini": llm_gemini_rag,
@@ -726,12 +727,19 @@ def evaluate(
                     "googleSearch": googleSearch_rag,
                 }
                 rag_all = atomic_rag + llm_gemini_rag + llm_openai_rag + llm_anthropic_rag + \
-                    wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
-                # gpt_instruction = (
-                #     "Given the following documents retrieved by a retrieval-augmented generation system, "
-                #     "summarize the key points and refine the information for clarity and relevance:\n\n" +
-                #     "\n\n".join(rag_documents)
-                # )
+                          wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
+
+                # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+                # ranking_documents_prompt = postProcessingPrompts.ranking_documents(cur_query, docs=rag_all)
+                # summarizing_documents_prompt = postProcessingPrompts.summarizing_documents(cur_query, docs=rag_all)
+                # extracting_key_info_prompt = postProcessingPrompts.extracting_key_info(cur_query, docs=rag_all)
+                # refining_documents_prompt = postProcessingPrompts.refining_documents(cur_query, docs=rag_all)
+                # evaluating_documents_prompt = postProcessingPrompts.evaluating_documents(cur_query, docs=rag_all)
+                # identifying_conflict_prompt = postProcessingPrompts.identifying_conflict(cur_query, docs=rag_all)
+                # filter_duplication_prompt = postProcessingPrompts.filter_duplication(cur_query, docs=rag_all)
+                # structured_format_prompt = postProcessingPrompts.structured_format(cur_query, docs=rag_all)
+                # preproc_responses = preProcessingAgent.apply_agent(prompt=ranking_documents_prompt)
+                # preproc_responses = preProcessingAgent.apply_agent(prompt=summarizing_documents_prompt)
 
                 # TODO: RAG Step 3: Augmentation: Combine the docs to the original query (different prompting methods)
                 if len(rag_all) > 0:
