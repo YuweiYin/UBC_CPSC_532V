@@ -226,8 +226,25 @@ def parse_eval_args() -> argparse.Namespace:
         "--rag_source",
         type=str,
         default="ALL",
-        help="(Options: \"atomic\", \"llm_gemini\", \"llm_openai\", \"llm_anthropic\", "
-             "\"wiki\", \"conceptNet\", \"arxiv\", \"googleSearch\". Default: ALL)"
+        help="Options: \"wiki\", \"conceptNet\", \"arxiv\", \"googleSearch\", \"llm\", \"atomic\". Default: \"ALL\""
+    )
+    parser.add_argument(
+        "--rag_limit",
+        type=int,
+        default=10,
+        help="The limit of the number of retrieved documents per knowledge source"
+    )
+    parser.add_argument(
+        "--llm_retriever_type",
+        type=str,
+        default="google",
+        help="The LLM retriever type. Default: \"google\" (free). Other options: \"openai\", \"anthropic\""
+    )
+    parser.add_argument(
+        "--llm_agent_type",
+        type=str,
+        default="google",
+        help="The LLM agent type. Default: \"google\" (free). Other options: \"openai\", \"anthropic\""
     )
 
     return parser.parse_args()

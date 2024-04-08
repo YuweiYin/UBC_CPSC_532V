@@ -14,7 +14,6 @@ from openai import OpenAI
 
 from .api_setup import OPENAI_API_KEY
 from .conceptnet_setup import PREFIX_URL, REL_TO_TEMPLATE
-from .prompt import PROMPT
 
 
 class Retriever:
@@ -65,7 +64,7 @@ class GPTRetriever(Retriever):
                 model=self.model,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": PROMPT.format(query=query)}
+                    {"role": "user", "content": query}
                 ],
             )
             retrieved.append(chat_completion.choices[0].message.content)

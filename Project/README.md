@@ -257,11 +257,22 @@ We choose the following datasets to perform evaluation.
 
 * Before running `eval.sh` or `eval_rag.sh`, please modify the `CACHE_DIR` variable (`""` for default Hugging Face directory: `"~/.cache/huggingface/"`).
 
+**Without RAG**:
+
 ```bash
 bash eval_all.sh "0" "openai-community/gpt2" "float16" "auto:8"
 
 #mkdir -p log
 #nohup bash eval_all.sh "0" "openai-community/gpt2" "float16" "auto:8" > log/eval---gpt2---all.log 2>&1 &
+```
+
+**With RAG**:
+
+```bash
+bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki"
+
+#mkdir -p log
+#nohup bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki" > log/eval---gpt2---all---rag-wiki.log 2>&1 &
 ```
 
 ---

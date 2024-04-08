@@ -404,13 +404,14 @@ def evaluate(
 
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
+    args.rag_limit = max(1, int(args.rag_limit))
+    args.llm_retriever_type = str(args.llm_retriever_type) if hasattr(args, "llm_retriever_type") else "google"
+    args.llm_agent_type = str(args.llm_agent_type) if hasattr(args, "llm_agent_type") else "google"
     if args.use_rag:
         # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
         textParser = TextParser()  # Keyword extractor
-        # atomicRetriever = AtomicRetriever()
-        LLM_Gemini_Retriever = LLMAgent(model="google")  # LLM - Gemini
-        LLM_OpenAI_Retriever = LLMAgent(model="openai")  # LLM - OpenAI GPT
-        LLM_Anthropic_Retriever = LLMAgent(model="anthropic")  # LLM - Anthropic
+        # atomicRetriever = AtomicRetriever()  # Too slow, and of questionable quality
+        LLMRetriever = LLMAgent(model=args.llm_retriever_type)  # LLM (Default: Google Gemini. Free)
         wikiRetriever = WikiRetriever(full_text=False)
         conceptNetRetriever = ConceptNetRetriever(verbose=False)
         arxivRetriever = ArxivRetriever()
@@ -422,9 +423,9 @@ def evaluate(
     postProcessingPrompts = PostProcessingPrompts()
     augmentationPrompts = AugmentationPrompts()
     backupPrompts = BackupPrompts()
-    preProcessingAgent = LLMAgent(model="google")  # To preprocess the query
-    postProcessingAgent = LLMAgent(model="google")  # To postprocess the query and documents
-    qaAgent = LLMAgent(model="google")  # To answer the query. TODO: not fit the current eval method
+    preProcessingAgent = LLMAgent(model=args.llm_agent_type)  # To preprocess the query
+    postProcessingAgent = LLMAgent(model=args.llm_agent_type)  # To postprocess the query and documents
+    qaAgent = LLMAgent(model=args.llm_agent_type)  # To answer the query. TODO: fit the current eval method
 
     save_dir = str(args.output_path)
     if not os.path.isdir(save_dir):
@@ -446,6 +447,7 @@ def evaluate(
         reqs_to_save = []
         for req in reqs:
             timer_start = time.perf_counter()
+
             # Evaluator workflow
             #     The evaluator feeds the model with req.arguments[0] (called "context") as input and
             #     compares the model output with req.arguments[0] (called "continuation"), which calculate two values:
@@ -649,85 +651,72 @@ def evaluate(
                 # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
                 if len(cur_keywords) == 0:
                     cur_keywords = get_keywords(cur_query)
+                    cur_keywords.sort()
+                    cur_keywords = cur_keywords[: args.rag_limit]
 
                 # TODO: RAG Step 2: Search for relevant documents from multiple knowledge bases/sources (online API)
-                atomic_rag, llm_gemini_rag, llm_openai_rag, llm_anthropic_rag = [], [], [], []
-                wiki_rag, conceptNet_rag, arxiv_rag, googleSearch_rag = [], [], [], []
+                atomic_rag, llm_rag, wiki_rag, conceptNet_rag, arxiv_rag, googleSearch_rag = [], [], [], [], [], []
                 match args.rag_source:
                     # case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
                     #     atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                    case "llm_gemini":
-                        llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
-                    case "llm_openai":
-                        llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
-                    case "llm_anthropic":
-                        llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                    case "llm":
+                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
+                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
+                        llm_rag = llm_rag[: args.rag_limit]
                     case "wiki":
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
                         for kw in cur_keywords:  # searching using keywords
                             wiki_rag += wikiRetriever.retrieve(kw)
+                        wiki_rag = [_doc.replace("\n", " ").strip() for _doc in wiki_rag]
+                        wiki_rag = wiki_rag[: args.rag_limit]
                     case "conceptNet":
                         conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
                         for kw in cur_keywords:  # searching using keywords
                             conceptNet_rag += conceptNetRetriever.retrieve(kw)
+                        conceptNet_rag = [_doc.replace("\n", " ").strip() for _doc in conceptNet_rag]
+                        conceptNet_rag = conceptNet_rag[: args.rag_limit]
                     case "arxiv":
                         arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
+                        arxiv_rag = [_doc.replace("\n", " ").strip() for _doc in arxiv_rag]
+                        arxiv_rag = arxiv_rag[: args.rag_limit]
                     case "googleSearch":
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+                        googleSearch_rag = [_doc.replace("\n", " ").strip() for _doc in googleSearch_rag]
+                        googleSearch_rag = googleSearch_rag[: args.rag_limit]
                     case "ALL":
                         # atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                        llm_gemini_rag = LLM_Gemini_Retriever.apply_agent(cur_query)  # LLM - Gemini
-                        llm_openai_rag = LLM_OpenAI_Retriever.apply_agent(cur_query)  # LLM - OpenAI GPT
-                        llm_anthropic_rag = LLM_Anthropic_Retriever.apply_agent(cur_query)  # LLM - Anthropic
+                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
                         conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
                         arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
 
-                        # multiprocessing
-                        # p_atomic_rag = mp.Process(target=atomicRetriever.retrieve, args=(cur_query,))
-                        # # p_llm_gemini_rag = mp.Process(target=LLM_Gemini_Retriever.apply_agent, args=(cur_query,))
-                        # # p_llm_openai_rag = mp.Process(target=LLM_OpenAI_Retriever.apply_agent, args=(cur_query,))
-                        # # p_llm_anthropic_rag = mp.Process(target=LLM_Anthropic_Retriever.apply_agent, args=(cur_query,))
-                        # p_wiki_rag = mp.Process(target=wikiRetriever.retrieve, args=(cur_query,))
-                        # p_conceptNet_rag = mp.Process(target=conceptNetRetriever.retrieve, args=(cur_query,))
-                        # p_arxiv_rag = mp.Process(target=arxivRetriever.retrieve, args=(cur_query,))
-                        # p_googleSearch_rag = mp.Process(target=googleSearchRetriever.retrieve, args=(cur_query,))
-                        # p_atomic_rag.start()
-                        # # p_llm_gemini_rag.start()
-                        # # p_llm_openai_rag.start()
-                        # # p_llm_anthropic_rag.start()
-                        # p_wiki_rag.start()
-                        # p_conceptNet_rag.start()
-                        # p_arxiv_rag.start()
-                        # p_googleSearch_rag.start()
-                        # p_atomic_rag.join()
-                        # # p_llm_gemini_rag.join()
-                        # # p_llm_openai_rag.join()
-                        # # p_llm_anthropic_rag.join()
-                        # p_wiki_rag.join()
-                        # p_conceptNet_rag.join()
-                        # p_arxiv_rag.join()
-                        # p_googleSearch_rag.join()
-
                         for kw in cur_keywords:  # searching using keywords
                             wiki_rag += wikiRetriever.retrieve(kw)
                             conceptNet_rag += conceptNetRetriever.retrieve(kw)
+
+                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
+                        llm_rag = llm_rag[: args.rag_limit]
+                        wiki_rag = [_doc.replace("\n", " ").strip() for _doc in wiki_rag]
+                        wiki_rag = wiki_rag[: args.rag_limit]
+                        conceptNet_rag = [_doc.replace("\n", " ").strip() for _doc in conceptNet_rag]
+                        conceptNet_rag = conceptNet_rag[: args.rag_limit]
+                        arxiv_rag = [_doc.replace("\n", " ").strip() for _doc in arxiv_rag]
+                        arxiv_rag = arxiv_rag[: args.rag_limit]
+                        googleSearch_rag = [_doc.replace("\n", " ").strip() for _doc in googleSearch_rag]
+                        googleSearch_rag = googleSearch_rag[: args.rag_limit]
                     case _:
                         raise ValueError(f"ValueError: args.rag_source = {args.rag_source}")
 
                 rag_docs = {
                     "atomic": atomic_rag,
-                    "llm_gemini": llm_gemini_rag,
-                    "llm_openai": llm_openai_rag,
-                    "llm_anthropic": llm_anthropic_rag,
+                    "llm": llm_rag,
                     "wiki_rag": wiki_rag,
                     "conceptNet": conceptNet_rag,
                     "arxiv": arxiv_rag,
                     "googleSearch": googleSearch_rag,
                 }
-                rag_all = atomic_rag + llm_gemini_rag + llm_openai_rag + llm_anthropic_rag + \
-                          wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
+                rag_all = atomic_rag + llm_rag + wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
 
                 # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
                 # ranking_documents_prompt = postProcessingPrompts.ranking_documents(cur_query, docs=rag_all)
@@ -743,30 +732,30 @@ def evaluate(
 
                 # TODO: RAG Step 3: Augmentation: Combine the docs to the original query (different prompting methods)
                 if len(rag_all) > 0:
+                    rag_context = "Context:\n"
+                    for _idx, _doc in enumerate(rag_all, start=1):
+                        rag_context += f"{_idx}. {_doc}\n"
+                    # if len(atomic_rag) > 0:
+                    #     rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
+                    # if len(llm_rag) > 0:
+                    #     rag_context += "Large Language Model Knowledge:\n" + "\n".join(llm_rag) + "\n"
+                    # if len(wiki_rag) > 0:
+                    #     rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
+                    # if len(conceptNet_rag) > 0:
+                    #     rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
+                    # if len(arxiv_rag) > 0:
+                    #     rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
+                    # if len(googleSearch_rag) > 0:
+                    #     rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
+                    rag_context += "\nAnswer the following query with the help of the above context:\n"
+                    rag_prompt = rag_context + req.arguments[0]
+
                     # augmentation_short_prompt = augmentationPrompts.augmentation_short(cur_query, docs=rag_docs)
                     # augmentation_medium_prompt = augmentationPrompts.augmentation_medium(cur_query, docs=rag_docs)
                     # augmentation_long_prompt = augmentationPrompts.augmentation_long(cur_query, docs=rag_docs)
-                    # req.arguments = (augmentation_short_prompt, req.arguments[1])  # Augmentation
+                    # rag_prompt = augmentation_short_prompt
 
-                    rag_context = "Context:\n"
-                    if len(atomic_rag) > 0:
-                        rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
-                    if len(llm_gemini_rag) > 0:
-                        rag_context += "Gemini Knowledge:\n" + "\n".join(llm_gemini_rag) + "\n"
-                    if len(llm_openai_rag) > 0:
-                        rag_context += "OpenAI GPT Knowledge:\n" + "\n".join(llm_openai_rag) + "\n"
-                    if len(llm_anthropic_rag) > 0:
-                        rag_context += "Anthropic Knowledge:\n" + "\n".join(llm_anthropic_rag) + "\n"
-                    if len(wiki_rag) > 0:
-                        rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
-                    if len(conceptNet_rag) > 0:
-                        rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
-                    if len(arxiv_rag) > 0:
-                        rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
-                    if len(googleSearch_rag) > 0:
-                        rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
-                    rag_context += "\n\nAnswer the following question based on the above context:\n"
-                    req.arguments = (rag_context + req.arguments[0], req.arguments[1])  # Augmentation
+                    req.arguments = (rag_prompt, req.arguments[1])  # Augmentation
             else:
                 rag_docs = {}
 
@@ -789,9 +778,8 @@ def evaluate(
             timer_list.append(timer_gap)
 
         timer_all, timer_avg = sum(timer_list), float(np.mean(timer_list))
-        eval_logger.info(">>> RAG Running Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
-        eval_logger.info(">>> RAG Running Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
-        # wnli [AVG] wiki: 1.6s
+        eval_logger.info(">>> Requests Dealing Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
+        eval_logger.info(">>> Requests Dealing Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
 
         if (lm.world_size > 1) and (padding_requests[req_type] > 0):
             req = reqs[-1]

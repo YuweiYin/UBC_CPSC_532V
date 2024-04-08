@@ -48,7 +48,7 @@ run_eval "mrpc"
 run_eval "qqp"
 run_eval "wnli"
 run_eval "sst2"
-run_eval "cola"
+#run_eval "cola"
 
 #run_eval "super-glue-lm-eval-v1"
 run_eval "cb"
