@@ -44,19 +44,19 @@ run_eval "anli_r3"
 run_eval "arc_easy"
 run_eval "arc_challenge"
 run_eval "piqa"
-run_eval "swag"  # Note: Too large for slow RAG: 20k
-run_eval "hellaswag"  # Note: Too large for slow RAG: 10k
+#run_eval "swag"  # TODO: Too large for RAG (skip for now) 20k
+#run_eval "hellaswag"  # TODO: Too large for RAG (skip for now) 10k
 
 #run_eval "glue"
 run_eval "rte"
-run_eval "qnli"  # Note: Too large for slow RAG: 5.46k
-run_eval "mnli"  # Note: Too large for slow RAG: 9.8k
-run_eval "mnli_mismatch"  # Note: Too large for slow RAG: 9.85k
+#run_eval "qnli"  # TODO: Too large for RAG (skip for now) 5.46k
+#run_eval "mnli"  # TODO: Too large for RAG (skip for now) 9.8k
+#run_eval "mnli_mismatch"  # TODO: Too large for RAG (skip for now) 9.85k
 run_eval "mrpc"
-run_eval "qqp"  # Note: Too large for slow RAG: 391k
+#run_eval "qqp"  # TODO: Too large for RAG (skip for now) 391k
 run_eval "wnli"
 run_eval "sst2"
-#run_eval "cola"  # Note: Using MCC Metric
+#run_eval "cola"  # TODO: Using MCC Metric (skip for now)
 
 #run_eval "super-glue-lm-eval-v1"
 run_eval "cb"
@@ -64,8 +64,8 @@ run_eval "wic"
 run_eval "sglue_rte"
 run_eval "boolq"
 run_eval "copa"
-run_eval "multirc"  # Note: Too large for slow RAG: 9.69k
-run_eval "record"  # Note: Too large for slow RAG: 10k
+#run_eval "multirc"  # TODO: Too large for RAG (skip for now) 9.69k
+#run_eval "record"  # TODO: Too large for RAG (skip for now) 10k
 run_eval "wsc"
 
 echo -e "\n\n>>> DONE EVAL --- RAG <<<\n\n"
