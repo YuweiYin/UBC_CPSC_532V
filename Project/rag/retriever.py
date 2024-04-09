@@ -130,7 +130,10 @@ class ConceptNetRetriever(Retriever):
     def retrieve(self, query: str, verbose: bool = False, **kwargs) -> List[str]:
         retrieved = []
 
-        edges = self.get_concept(query)["edges"]
+        concept_res = self.get_concept(query)
+        if "edges" not in concept_res:
+            return []
+        edges = concept_res["edges"]
         for edge in edges:
             try:
                 if "language" in edge["start"] and edge["start"]["language"] == "en" and \
@@ -154,7 +157,7 @@ class ArxivRetriever(Retriever):
         super().__init__()
         self.client = arxiv.Client()
 
-    def retrieve(self, query: str, max_results: int = 10, verbose: bool = False, **kwargs) -> List[str]:
+    def retrieve(self, query: str, max_results: int = 5, verbose: bool = False, **kwargs) -> List[str]:
         retrieved = []
 
         try:
