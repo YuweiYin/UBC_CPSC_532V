@@ -157,11 +157,17 @@ class ArxivRetriever(Retriever):
         super().__init__()
         self.client = arxiv.Client()
 
-    def retrieve(self, query: str, max_results: int = 10, verbose: bool = False, **kwargs) -> List[str]:
+    def retrieve(
+            self,
+            query: str,
+            max_results: int = 10,
+            max_retry: int = 10,
+            verbose: bool = False,
+            **kwargs
+    ) -> List[str]:
         retrieved = []
 
-        run_flag = True
-        while run_flag:
+        for _ in range(max_retry):
             try:
                 search = arxiv.Search(
                     query=query,
@@ -171,7 +177,7 @@ class ArxivRetriever(Retriever):
                 for r in self.client.results(search):
                     retrieved.append(r.summary)
                 if len(retrieved) > 0:
-                    run_flag = False
+                    break
             except Exception as e:
                 if verbose:
                     print(e)
@@ -184,11 +190,17 @@ class GoogleSearchRetriever(Retriever):
     def __init__(self):
         super().__init__()
 
-    def retrieve(self, query: str, num_results: int = 10, verbose: bool = False, **kwargs) -> List[str]:
+    def retrieve(
+            self,
+            query: str,
+            num_results: int = 10,
+            max_retry: int = 10,
+            verbose: bool = False,
+            **kwargs
+    ) -> List[str]:
         retrieved = []
 
-        run_flag = True
-        while run_flag:
+        for _ in range(max_retry):
             try:
                 results = g_search(query, num_results=num_results, advanced=True)
                 for idx, result in enumerate(results, start=1):
@@ -196,7 +208,7 @@ class GoogleSearchRetriever(Retriever):
                     # retrieved.append(f"{result.title}: {result.description}")
                     retrieved.append(result.description)
                 if len(retrieved) > 0:
-                    run_flag = False
+                    break
             except Exception as e:
                 if verbose:
                     print(e)
