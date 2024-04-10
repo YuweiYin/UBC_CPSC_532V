@@ -157,20 +157,24 @@ class ArxivRetriever(Retriever):
         super().__init__()
         self.client = arxiv.Client()
 
-    def retrieve(self, query: str, max_results: int = 5, verbose: bool = False, **kwargs) -> List[str]:
+    def retrieve(self, query: str, max_results: int = 10, verbose: bool = False, **kwargs) -> List[str]:
         retrieved = []
 
-        try:
-            search = arxiv.Search(
-                query=query,
-                max_results=max_results,
-                sort_by=arxiv.SortCriterion.Relevance
-            )
-            for r in self.client.results(search):
-                retrieved.append(r.summary)
-        except Exception as e:
-            if verbose:
-                print(e)
+        run_flag = True
+        while run_flag:
+            try:
+                search = arxiv.Search(
+                    query=query,
+                    max_results=max_results,
+                    sort_by=arxiv.SortCriterion.Relevance
+                )
+                for r in self.client.results(search):
+                    retrieved.append(r.summary)
+                if len(retrieved) > 0:
+                    run_flag = False
+            except Exception as e:
+                if verbose:
+                    print(e)
 
         return retrieved
 
@@ -183,14 +187,18 @@ class GoogleSearchRetriever(Retriever):
     def retrieve(self, query: str, num_results: int = 10, verbose: bool = False, **kwargs) -> List[str]:
         retrieved = []
 
-        try:
-            results = g_search(query, num_results=num_results, advanced=True)
-            for idx, result in enumerate(results, start=1):
-                # retrieved.append(f"{idx}. {result.description}")
-                # retrieved.append(f"{result.title}: {result.description}")
-                retrieved.append(result.description)
-        except Exception as e:
-            if verbose:
-                print(e)
+        run_flag = True
+        while run_flag:
+            try:
+                results = g_search(query, num_results=num_results, advanced=True)
+                for idx, result in enumerate(results, start=1):
+                    # retrieved.append(f"{idx}. {result.description}")
+                    # retrieved.append(f"{result.title}: {result.description}")
+                    retrieved.append(result.description)
+                if len(retrieved) > 0:
+                    run_flag = False
+            except Exception as e:
+                if verbose:
+                    print(e)
 
         return retrieved
