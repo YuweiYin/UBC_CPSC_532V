@@ -275,4 +275,14 @@ bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki"
 #nohup bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki" > log/eval---gpt2---all---rag-wiki.log 2>&1 &
 ```
 
+* **Use RAG Pre-processing**: Pass `--use_rag_preprocess` and `--rag_preprocess_type "contextual_clarification"` to `eval.py`
+* **Use RAG Post-processing**: Pass `--use_rag_postprocess` and `--rag_postprocess_type "summarizing_documents"` to `eval.py`
+* **Use Advanced Augmentation**:
+  * **Use In-context Learning (ICL)** (by providing examples): Pass `--use_icl` and `--icl_n_example 3` to `eval.py`
+  * **Use Chain-of-Thought Learning (CoT)** (by providing reasoning path in ICL examples): Pass `--use_icl`, `--icl_n_example 3`, and `--use_cot` to `eval.py`
+  * **Use Supervised fine-tuning (SFT)** (via Instruction Tuning):
+    * Step 1: Use train.py / train_dp.py / train_ddp.py to fine-tune models; Load the trained model by;
+    * Step 2: Pass `--model_args "pretrained=/path/to/huggingface_checkpoint,dtype=float"` and `--use_sft` to `eval.py`
+* **Case Study**: Run `case_study.py`, which is suitable to observe the quality of RAG retrievals.
+
 ---

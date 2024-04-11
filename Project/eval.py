@@ -229,9 +229,38 @@ def parse_eval_args() -> argparse.Namespace:
         help="Options: \"wiki\", \"conceptNet\", \"arxiv\", \"googleSearch\", \"llm\", \"atomic\". Default: \"ALL\""
     )
     parser.add_argument(
+        "--use_rag_preprocess",
+        action="store_true",
+        default=False,
+        help="Pre-process the original query or not"
+    )
+    parser.add_argument(
+        "--rag_preprocess_type",
+        type=str,
+        default="contextual_clarification",
+        help="Options: \"keyword_extraction\", \"contextual_clarification\", \"relevance_filtering\", "
+             "\"query_expansion\", \"information_structuring\", \"intent_clarification\". "
+             "Default: \"contextual_clarification\""
+    )
+    parser.add_argument(
+        "--use_rag_postprocess",
+        action="store_true",
+        default=False,
+        help="Post-process the retrievals or not"
+    )
+    parser.add_argument(
+        "--rag_postprocess_type",
+        type=str,
+        default="summarizing_documents",
+        help="Options: \"ranking_documents\", \"summarizing_documents\", \"extracting_key_info\", "
+             "\"refining_documents\", \"evaluating_documents\", \"identifying_conflict\", "
+             "\"filter_duplication\", \"structured_format\". "
+             "Default: \"summarizing_documents\""
+    )
+    parser.add_argument(
         "--rag_limit",
         type=int,
-        default=10,
+        default=-1,
         help="The limit of the number of retrieved documents per knowledge source"
     )
     parser.add_argument(
@@ -245,6 +274,30 @@ def parse_eval_args() -> argparse.Namespace:
         type=str,
         default="google",
         help="The LLM agent type. Default: \"google\" (free). Other options: \"openai\", \"anthropic\""
+    )
+    parser.add_argument(
+        "--use_sft",
+        action="store_true",
+        default=False,
+        help="Use supervised fine-tuning (via Instruction Tuning) or not"
+    )
+    parser.add_argument(
+        "--use_icl",
+        action="store_true",
+        default=False,
+        help="Use in-context learning (providing examples in the prompt) or not"
+    )
+    parser.add_argument(
+        "--icl_n_example",
+        type=int,
+        default=3,
+        help="The number of example to provide when using the ICL method."
+    )
+    parser.add_argument(
+        "--use_cot",
+        action="store_true",
+        default=False,
+        help="Use chain-of-thought prompting (providing reasoning path in the ICL examples) or not"
     )
 
     return parser.parse_args()

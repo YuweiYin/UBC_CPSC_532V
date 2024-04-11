@@ -402,35 +402,63 @@ def evaluate(
             numpad = max(gathered_item) - gathered_item[lm.rank]
             padding_requests[task.OUTPUT_TYPE] += numpad
 
-    # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
+    # ########## RAG ##########
+    # Retrieval-Augmented Generation (RAG) workflow
+    #     Step 1: Get cur_query of the current task
+    #     Step 1.5: [Optional] Query preprocessing, e.g., rewriting
+    #     Step 2: Keywords extraction (using KeyBERT or a GPT agent)
+    #     Step 3: Search for relevant documents from multiple knowledge bases/sources (using online API)
+    #     Step 3.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+    #     Step 4: Augmentation: Combine the documents to the original query (different prompting methods)
+    #     Step 4.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
+    #     Step 5: Run models and get evaluation results
+
+    # RAG settings
     args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
-    args.rag_limit = max(1, int(args.rag_limit))
+    args.use_rag_preprocess = hasattr(args, "use_rag_preprocess") and \
+        isinstance(args.use_rag_preprocess, bool) and args.use_rag_preprocess
+    args.use_rag_postprocess = hasattr(args, "use_rag_postprocess") and \
+        isinstance(args.use_rag_postprocess, bool) and args.use_rag_postprocess
+    args.use_sft = hasattr(args, "use_sft") and isinstance(args.use_sft, bool) and args.use_sft
+    args.use_icl = hasattr(args, "use_icl") and isinstance(args.use_icl, bool) and args.use_icl
+    args.use_cot = hasattr(args, "use_cot") and isinstance(args.use_cot, bool) and args.use_cot
+    N_EXAMPLE = int(args.icl_n_example)
+    RAG_LIMIT = int(args.rag_limit)
+    args.rag_source = str(args.rag_source) if hasattr(args, "rag_source") else "ALL"
+    args.rag_preprocess_type = str(args.rag_preprocess_type) \
+        if hasattr(args, "rag_preprocess_type") else "contextual_clarification"
+    args.rag_postprocess_type = str(args.rag_postprocess_type) \
+        if hasattr(args, "rag_postprocess_type") else "summarizing_documents"
     args.llm_retriever_type = str(args.llm_retriever_type) if hasattr(args, "llm_retriever_type") else "google"
     args.llm_agent_type = str(args.llm_agent_type) if hasattr(args, "llm_agent_type") else "google"
+
+    # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     if args.use_rag:
-        # gpt_retriever_prompt = "Please provide relevant context information about the following test:\n{}"
         textParser = TextParser()  # Keyword extractor
-        # atomicRetriever = AtomicRetriever()  # Too slow, and of questionable quality
-        LLMRetriever = LLMAgent(model=args.llm_retriever_type)  # LLM (Default: Google Gemini. Free)
         wikiRetriever = WikiRetriever(full_text=False)
+        googleSearchRetriever = GoogleSearchRetriever()
+        LLMRetriever = LLMAgent(model=args.llm_retriever_type)  # LLM (Default: Google Gemini. Free)
         conceptNetRetriever = ConceptNetRetriever(verbose=False)
         arxivRetriever = ArxivRetriever()
-        googleSearchRetriever = GoogleSearchRetriever()
+        # atomicRetriever = AtomicRetriever()  # Too slow, and of questionable quality
 
     # Prompts (templates) and agents for LLMs
-    directQAPrompts = DirectQAPrompts()
-    preProcessingPrompts = PreProcessingPrompts()
-    postProcessingPrompts = PostProcessingPrompts()
-    augmentationPrompts = AugmentationPrompts()
-    backupPrompts = BackupPrompts()
-    preProcessingAgent = LLMAgent(model=args.llm_agent_type)  # To preprocess the query
-    postProcessingAgent = LLMAgent(model=args.llm_agent_type)  # To postprocess the query and documents
-    qaAgent = LLMAgent(model=args.llm_agent_type)  # To answer the query. TODO: fit the current eval method
+    # directQAPrompts = DirectQAPrompts()
+    prePrompts = PreProcessingPrompts()
+    postPrompts = PostProcessingPrompts()
+    # augmentationPrompts = AugmentationPrompts()
+    # backupPrompts = BackupPrompts()
+    # directQAAgent = LLMAgent(model=args.llm_agent_type)  # To answer the query directly. TODO: fit the lm_eval method
+    preAgent = LLMAgent(model=args.llm_agent_type)  # To preprocess the query
+    postAgent = LLMAgent(model=args.llm_agent_type)  # To postprocess the query and documents
 
     save_dir = str(args.output_path)
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
-    timer_list = []
+    req_timer_list = []
+    rag_timer_list = []
+    pre_timer_list = []
+    post_timer_list = []
 
     def get_keywords(_query: str) -> List[str]:
         _keywords_1 = textParser.get_keywords_keybert(_query, n_bag=1)
@@ -438,15 +466,14 @@ def evaluate(
         _keywords = sorted(list(set(_keywords_1 + _keywords_2)))
         return _keywords
 
-    # ### Run LM on inputs, get all outputs ###
-    # execute each type of request
+    # Execute each type of request
     for req_type, reqs in requests.items():
         eval_logger.info(f"Running {req_type} requests")
         # create `K` copies of each request `req` based off `K = req.repeats`
         cloned_reqs = []
         reqs_to_save = []
         for req in reqs:
-            timer_start = time.perf_counter()
+            req_timer_start = time.perf_counter()
 
             # Evaluator workflow
             #     The evaluator feeds the model with req.arguments[0] (called "context") as input and
@@ -456,22 +483,10 @@ def evaluate(
             #     See lm_eval/api/model.py `rem_res = getattr(self.lm, attr)(remaining_reqs)` and `loglikelihood(...)`
             #     See lm_eval/models/huggingface.py `_loglikelihood_tokens(...)` and `multi_logits = F.log_softmax(...)`
             #     Therefore, we need to prepend external knowledge (RAG retrievals) to the front of req.arguments[0]
-            # Retrieval-Augmented Generation (RAG) workflow
-            #     Step 0: [Optional] Query preprocessing, e.g., rewriting
-            #     Step 1: Keywords extraction (using KeyBERT)
-            #     Step 2: Search for relevant documents from multiple knowledge bases/sources (using online API)
-            #     Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
-            #     Step 3: Augmentation: Combine the documents to the original query (different prompting methods)
-            #     Step 3.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
-            #     Step 4: Run models and get evaluation results
             req.arguments_original = copy.deepcopy(req.arguments)  # Tuple(str): constructed input-output prompt
             # req_docs = req.doc  # dict: task-specific dictionary -> raw attributes to construct our RAG prompt
 
-            # TODO: Solving most of the following tasks relies more on commonsense or inter-sentence reasoning
-            #     instead of external knowledge based on semantic matching (either sentence-level or word-level).
-            #     Therefore, the effectiveness of RAG for such tasks is questionable.
-            #     At least, the "missing info" to solve the task is more of reasoning path/clues.
-            #     It is also unknown if the provided extra knowledge will even degrade the performance.
+            # ### RAG Step 1: Get cur_query of the current task
             # Different knowledge source API needs different query/keyword input
             task_name = req.task_name
             cur_keywords = []
@@ -638,99 +653,154 @@ def evaluate(
                 case _:
                     raise ValueError(f"ValueError: task_name = {task_name}")
 
-            if args.use_rag:  # Use RAG
-                # TODO: RAG Step 0: [Optional] Query preprocessing, e.g., rewriting
-                # keyword_extraction_prompt = preProcessingPrompts.keyword_extraction(cur_query)
-                # contextual_clarification_prompt = preProcessingPrompts.contextual_clarification(cur_query)
-                # relevance_filtering_prompt = preProcessingPrompts.relevance_filtering(cur_query)
-                # query_expansion_prompt = preProcessingPrompts.query_expansion(cur_query)
-                # information_structuring_prompt = preProcessingPrompts.information_structuring(cur_query)
-                # intent_clarification_prompt = preProcessingPrompts.intent_clarification(cur_query)
-                # preproc_responses = preProcessingAgent.apply_agent(prompt=keyword_extraction_prompt)
+            # Idae: Solving most of the above tasks relies more on commonsense or inter-sentence reasoning instead of
+            #     external factual knowledge based on semantic matching (either sentence-level or word-level).
+            #     Therefore, the effectiveness of RAG for such tasks is unknown.
+            #     At least, the "missing info" to solve the task is more of reasoning path/clues.
+            #     It is also unknown if the provided extra knowledge will even degrade the performance.
 
-                # TODO: RAG Step 1: Keywords extraction (using KeyBERT)
+            if args.use_rag:  # Use RAG
+                rag_timer_start = time.perf_counter()
+
+                # ### RAG Step 1.5: [Optional] Query preprocessing, e.g., rewriting
+                if args.use_rag_preprocess:
+                    pre_timer_start = time.perf_counter()
+
+                    match args.rag_preprocess_type:
+                        case "keyword_extraction":  # need formatting
+                            preprocess_prompt = prePrompts.keyword_extraction(cur_query)
+                        case "contextual_clarification":  # concise rewriting
+                            preprocess_prompt = prePrompts.contextual_clarification(cur_query)
+                        case "relevance_filtering":  # a bit more informative
+                            preprocess_prompt = prePrompts.relevance_filtering(cur_query)
+                        case "query_expansion":  # more informative
+                            preprocess_prompt = prePrompts.query_expansion(cur_query)
+                        case "information_structuring":  # structured output
+                            preprocess_prompt = prePrompts.information_structuring(cur_query)
+                        case "intent_clarification":  # concise rewriting
+                            preprocess_prompt = prePrompts.intent_clarification(cur_query)
+                        case _:
+                            raise ValueError(f"ValueError: rag_preprocess_type = {args.rag_preprocess_type}")
+
+                    pre_responses = preAgent.apply_agent(prompt=preprocess_prompt)
+                    cur_query = pre_responses[0] if len(pre_responses) > 0 else ""
+
+                    pre_timer_end = time.perf_counter()
+                    pre_time = pre_timer_end - pre_timer_start
+                else:
+                    pre_time = 0.0
+                pre_timer_list.append(pre_time)
+
+                # ### RAG Step 2: Keywords extraction (using KeyBERT or a GPT agent)
                 if len(cur_keywords) == 0:
                     cur_keywords = get_keywords(cur_query)
                     cur_keywords.sort()
-                    cur_keywords = cur_keywords[: args.rag_limit]
+                    cur_keywords = cur_keywords[: RAG_LIMIT] if RAG_LIMIT > 0 else cur_keywords
+                    # cur_keywords_gpt = preAgent.apply_agent(prompt=keyword_extraction_prompt)
 
-                # TODO: RAG Step 2: Search for relevant documents from multiple knowledge bases/sources (online API)
-                atomic_rag, llm_rag, wiki_rag, conceptNet_rag, arxiv_rag, googleSearch_rag = [], [], [], [], [], []
+                # ### RAG Step 3: Search for relevant documents from multiple knowledge bases/sources (using online API)
+                wiki_rag, googleSearch_rag, llm_rag, conceptNet_rag, arxiv_rag, atomic_rag = [], [], [], [], [], []
                 match args.rag_source:
-                    # case "atomic":  # TODO: atomicRetriever is the slowest (and it costs the most in memory)
-                    #     atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                    case "llm":
-                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
-                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
-                        llm_rag = llm_rag[: args.rag_limit]
                     case "wiki":
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
                         for kw in cur_keywords:  # searching using keywords
                             wiki_rag += wikiRetriever.retrieve(kw)
                         wiki_rag = [_doc.replace("\n", " ").strip() for _doc in wiki_rag]
-                        wiki_rag = wiki_rag[: args.rag_limit]
+                        wiki_rag = wiki_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else wiki_rag
+                    case "googleSearch":
+                        googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+                        googleSearch_rag = [_doc.replace("\n", " ").strip() for _doc in googleSearch_rag]
+                        googleSearch_rag = googleSearch_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else googleSearch_rag
+                    case "llm":
+                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
+                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
+                        llm_rag = llm_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else llm_rag
                     case "conceptNet":
                         conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
                         for kw in cur_keywords:  # searching using keywords
                             conceptNet_rag += conceptNetRetriever.retrieve(kw)
                         conceptNet_rag = [_doc.replace("\n", " ").strip() for _doc in conceptNet_rag]
-                        conceptNet_rag = conceptNet_rag[: args.rag_limit]
+                        conceptNet_rag = conceptNet_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else conceptNet_rag
                     case "arxiv":
                         arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
                         arxiv_rag = [_doc.replace("\n", " ").strip() for _doc in arxiv_rag]
-                        arxiv_rag = arxiv_rag[: args.rag_limit]
-                    case "googleSearch":
-                        googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
-                        googleSearch_rag = [_doc.replace("\n", " ").strip() for _doc in googleSearch_rag]
-                        googleSearch_rag = googleSearch_rag[: args.rag_limit]
-                    case "ALL":
-                        # atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
-                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
+                        arxiv_rag = arxiv_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else arxiv_rag
+                    # case "atomic":  # atomicRetriever is the slowest (and it costs the most in memory)
+                    #     atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
+                    #     atomic_rag = [_doc.replace("\n", " ").strip() for _doc in atomic_rag]
+                    #     atomic_rag = atomic_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else atomic_rag
+                    case "ALL":  # Skip atomic, conceptNet, and arxiv because they are too slow
                         wiki_rag = wikiRetriever.retrieve(cur_query)  # wiki pages of the concept
-                        conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
-                        arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
                         googleSearch_rag = googleSearchRetriever.retrieve(cur_query)  # Google Search top-N results
+                        llm_rag = LLMRetriever.apply_agent(cur_query)  # LLM
+                        # conceptNet_rag = conceptNetRetriever.retrieve(cur_query)  # all the edges of the concept
+                        # arxiv_rag = arxivRetriever.retrieve(cur_query)  # the Abstract of most relevant N papers
+                        # atomic_rag = atomicRetriever.retrieve(cur_query)  # text completion by the Atomic-Comet model
 
                         for kw in cur_keywords:  # searching using keywords
                             wiki_rag += wikiRetriever.retrieve(kw)
-                            conceptNet_rag += conceptNetRetriever.retrieve(kw)
+                            # conceptNet_rag += conceptNetRetriever.retrieve(kw)
 
-                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
-                        llm_rag = llm_rag[: args.rag_limit]
                         wiki_rag = [_doc.replace("\n", " ").strip() for _doc in wiki_rag]
-                        wiki_rag = wiki_rag[: args.rag_limit]
-                        conceptNet_rag = [_doc.replace("\n", " ").strip() for _doc in conceptNet_rag]
-                        conceptNet_rag = conceptNet_rag[: args.rag_limit]
-                        arxiv_rag = [_doc.replace("\n", " ").strip() for _doc in arxiv_rag]
-                        arxiv_rag = arxiv_rag[: args.rag_limit]
+                        wiki_rag = wiki_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else wiki_rag
                         googleSearch_rag = [_doc.replace("\n", " ").strip() for _doc in googleSearch_rag]
-                        googleSearch_rag = googleSearch_rag[: args.rag_limit]
+                        googleSearch_rag = googleSearch_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else googleSearch_rag
+                        llm_rag = [_doc.replace("\n", " ").strip() for _doc in llm_rag]
+                        llm_rag = llm_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else llm_rag
+                        # conceptNet_rag = [_doc.replace("\n", " ").strip() for _doc in conceptNet_rag]
+                        # conceptNet_rag = conceptNet_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else conceptNet_rag
+                        # arxiv_rag = [_doc.replace("\n", " ").strip() for _doc in arxiv_rag]
+                        # arxiv_rag = arxiv_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else arxiv_rag
+                        # atomic_rag = [_doc.replace("\n", " ").strip() for _doc in atomic_rag]
+                        # atomic_rag = atomic_rag[: RAG_LIMIT] if RAG_LIMIT > 0 else atomic_rag
                     case _:
                         raise ValueError(f"ValueError: args.rag_source = {args.rag_source}")
 
                 rag_docs = {
-                    "atomic": atomic_rag,
-                    "llm": llm_rag,
                     "wiki_rag": wiki_rag,
+                    "googleSearch": googleSearch_rag,
+                    "llm": llm_rag,
                     "conceptNet": conceptNet_rag,
                     "arxiv": arxiv_rag,
-                    "googleSearch": googleSearch_rag,
+                    "atomic": atomic_rag,
                 }
-                rag_all = atomic_rag + llm_rag + wiki_rag + conceptNet_rag + arxiv_rag + googleSearch_rag
+                rag_all = wiki_rag + googleSearch_rag + llm_rag + conceptNet_rag + arxiv_rag + atomic_rag
 
-                # TODO: RAG Step 2.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
-                # ranking_documents_prompt = postProcessingPrompts.ranking_documents(cur_query, docs=rag_all)
-                # summarizing_documents_prompt = postProcessingPrompts.summarizing_documents(cur_query, docs=rag_all)
-                # extracting_key_info_prompt = postProcessingPrompts.extracting_key_info(cur_query, docs=rag_all)
-                # refining_documents_prompt = postProcessingPrompts.refining_documents(cur_query, docs=rag_all)
-                # evaluating_documents_prompt = postProcessingPrompts.evaluating_documents(cur_query, docs=rag_all)
-                # identifying_conflict_prompt = postProcessingPrompts.identifying_conflict(cur_query, docs=rag_all)
-                # filter_duplication_prompt = postProcessingPrompts.filter_duplication(cur_query, docs=rag_all)
-                # structured_format_prompt = postProcessingPrompts.structured_format(cur_query, docs=rag_all)
-                # preproc_responses = preProcessingAgent.apply_agent(prompt=ranking_documents_prompt)
-                # preproc_responses = preProcessingAgent.apply_agent(prompt=summarizing_documents_prompt)
+                # ### RAG Step 3.5: [Optional] Document postprocessing, e.g., ranking, refinement, summarization, etc.
+                if args.use_rag_postprocess:
+                    post_timer_start = time.perf_counter()
 
-                # TODO: RAG Step 3: Augmentation: Combine the docs to the original query (different prompting methods)
+                    match args.rag_postprocess_type:
+                        case "ranking_documents":  # Top 5 relevant docs
+                            postprocess_prompt = postPrompts.ranking_documents(cur_query, docs=rag_all)
+                        case "summarizing_documents":  # Summary of each doc
+                            postprocess_prompt = postPrompts.summarizing_documents(cur_query, docs=rag_all)
+                        case "extracting_key_info":  # Summary of all docs
+                            postprocess_prompt = postPrompts.extracting_key_info(cur_query, docs=rag_all)
+                        case "refining_documents":  # Summary of most docs
+                            postprocess_prompt = postPrompts.refining_documents(cur_query, docs=rag_all)
+                        case "evaluating_documents":  # Evaluation of each doc
+                            postprocess_prompt = postPrompts.evaluating_documents(cur_query, docs=rag_all)
+                        case "identifying_conflict":  # Agreements and Contradictions
+                            postprocess_prompt = postPrompts.identifying_conflict(cur_query, docs=rag_all)
+                        case "filter_duplication":  # Filtered docs
+                            postprocess_prompt = postPrompts.filter_duplication(cur_query, docs=rag_all)
+                        case "structured_format":  # Relevant info of each doc
+                            postprocess_prompt = postPrompts.structured_format(cur_query, docs=rag_all)
+                        case _:
+                            raise ValueError(f"ValueError: rag_postprocess_type = {args.rag_postprocess_type}")
+
+                    post_responses = postAgent.apply_agent(prompt=postprocess_prompt)
+                    rag_all = post_responses[0].split("\n") if len(post_responses) > 0 else []
+                    rag_all = [_doc.strip() for _doc in rag_all if len(_doc) > 0]
+
+                    post_timer_end = time.perf_counter()
+                    post_time = post_timer_end - post_timer_start
+                else:
+                    post_time = 0.0
+                post_timer_list.append(post_time)
+
+                # ### RAG Step 4: Augmentation: Combine the docs to the original query (different prompting methods)
                 if len(rag_all) > 0:
                     rag_context = "Context:\n"
                     for _idx, _doc in enumerate(rag_all, start=1):
@@ -756,8 +826,13 @@ def evaluate(
                     # rag_prompt = augmentation_short_prompt
 
                     req.arguments = (rag_prompt, req.arguments[1])  # Augmentation
+
+                rag_timer_end = time.perf_counter()
+                rag_time = rag_timer_end - rag_timer_start
             else:
                 rag_docs = {}
+                rag_time = 0.0
+            rag_timer_list.append(rag_time)
 
             cloned_reqs.extend([req] * req.repeats)
             req_to_save = {
@@ -773,24 +848,52 @@ def evaluate(
             # reqs_to_save.append(req_to_save)
             reqs_to_save.extend([req_to_save] * req.repeats)
 
-            timer_end = time.perf_counter()
-            timer_gap = timer_end - timer_start
-            timer_list.append(timer_gap)
+            req_timer_end = time.perf_counter()
+            req_time = req_timer_end - req_timer_start
+            req_timer_list.append(req_time)
 
-        timer_all, timer_avg = sum(timer_list), float(np.mean(timer_list))
-        eval_logger.info(">>> Requests Dealing Time (ALL): %.1f sec (%.1f min)" % (timer_all, timer_all / 60))
-        eval_logger.info(">>> Requests Dealing Time (AVG): %.1f sec (%.1f min)" % (timer_avg, timer_avg / 60))
+        req_timer_all, req_timer_avg = sum(req_timer_list), float(np.mean(req_timer_list))
+        eval_logger.info(">>> Requests Time (ALL): %.1f sec (%.1f min)" % (req_timer_all, req_timer_all / 60))
+        eval_logger.info(">>> Requests Time (AVG): %.1f sec (%.1f min)" % (req_timer_avg, req_timer_avg / 60))
+
+        if args.use_rag:
+            eval_logger.info(f">>> Use RAG. Knowledge sources: {args.rag_source}")
+            rag_timer_all, rag_timer_avg = sum(rag_timer_list), float(np.mean(rag_timer_list))
+            eval_logger.info(">>> >>> RAG Time (ALL): %.1f sec (%.1f min)" % (rag_timer_all, rag_timer_all / 60))
+            eval_logger.info(">>> >>> RAG Time (AVG): %.1f sec (%.1f min)" % (rag_timer_avg, rag_timer_avg / 60))
+
+            if args.use_rag_preprocess:
+                eval_logger.info(f">>> Use RAG Pre-processing: {args.rag_preprocess_type}")
+                pre_timer_all, pre_timer_avg = sum(pre_timer_list), float(np.mean(pre_timer_list))
+                eval_logger.info(">>> >>> RAG Pre-processing Time (ALL): %.1f sec (%.1f min)" % (
+                    pre_timer_all, pre_timer_all / 60))
+                eval_logger.info(">>> >>> RAG Pre-processing Time (AVG): %.1f sec (%.1f min)" % (
+                    pre_timer_avg, pre_timer_avg / 60))
+            else:
+                eval_logger.info(">>> Did NOT use RAG Pre-processing")
+
+            if args.use_rag_postprocess:
+                eval_logger.info(f">>> Use RAG Post-processing: {args.rag_postprocess_type}")
+                post_timer_all, post_timer_avg = sum(post_timer_list), float(np.mean(post_timer_list))
+                eval_logger.info(">>> >>> RAG Post-processing Time (ALL): %.1f sec (%.1f min)" % (
+                    post_timer_all, post_timer_all / 60))
+                eval_logger.info(">>> >>> RAG Post-processing Time (AVG): %.1f sec (%.1f min)" % (
+                    post_timer_avg, post_timer_avg / 60))
+            else:
+                eval_logger.info(">>> Did NOT use RAG Post-processing")
+        else:
+            eval_logger.info(">>> Did NOT use RAG")
 
         if (lm.world_size > 1) and (padding_requests[req_type] > 0):
             req = reqs[-1]
             for _ in range(padding_requests[req_type]):
                 cloned_reqs.extend([req] * req.repeats)
 
-        # TODO: RAG Step 3.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
+        # ### RAG Step 4.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
         # Use train.py / train_dp.py / train_ddp.py to fine-tune models; Load the trained model by
-        # setting `--model_args "pretrained=/path/to/huggingface_checkpoint,dtype=float" for eval.py
+        # setting `--model_args "pretrained=/path/to/huggingface_checkpoint,dtype=float"` for eval.py
 
-        # TODO: RAG Step 4: Run models and get evaluation results
+        # ### RAG Step 5: Run models and get evaluation results
         # run requests through model
         resps = getattr(lm, req_type)(cloned_reqs)
 
@@ -820,15 +923,13 @@ def evaluate(
 
     RANK = lm.rank
     WORLD_SIZE = lm.world_size
-    # ### Postprocess outputs ###
-    # TODO: del model here, maybe (idea: allow user to specify device of e.g. reward model separately)
+    # Outputs Post-processing
     for task_output in eval_tasks:
         task = task_output.task
         task.apply_filters()
 
-        # ### Collect values of metrics on all datapoints ###
-        # # unpack results and sort back in order and return control to Task
-        # TODO: make it possible to use a different metric per filter
+        # Collect values of metrics on all datapoints
+        # Unpack results and sort back in order and return control to Task
         # Pre-process task.instances to group by doc_id
         instances_by_doc_id = collections.defaultdict(list)
         for instance in task.instances:
@@ -895,22 +996,19 @@ def evaluate(
                     )
 
     if RANK == 0:
-        # ### Aggregate results over all datapoints ###
-        # aggregate results ; run bootstrap CIs
+        # Aggregate results over all datapoints: aggregate results; run bootstrap CIs
         for task_output in eval_tasks:
             task_output.calculate_aggregate_metric(bootstrap_iters=bootstrap_iters)
         results, samples, configs, versions, num_fewshot = consolidate_results(
             eval_tasks
         )
 
-        # ### Calculate group metrics ###
+        # Calculate group metrics
         if bool(results):
             for group, task_list in reversed(task_hierarchy.items()):
                 if len(task_list) == 0:
-                    # task_hierarchy entries are either
-                    # `group_name: [subtask1, subtask2, ...]`
-                    # or `task_name: []`.
-                    # we only want to operate on groups here.
+                    # task_hierarchy entries are either `group_name: [subtask1, subtask2, ...]` or `task_name: []`.
+                    # We only want to operate on groups here.
                     continue
                 metric_list = list(
                     {
@@ -923,13 +1021,13 @@ def evaluate(
                 for metric in metric_list:
                     stderr = "_stderr,".join(metric.split(","))
 
-                    # gather metrics, sizes, and stderrs from subtasks
+                    # Gather metrics, sizes, and std_errs from subtasks
                     metrics = [
                         results[task][metric]
                         for task in task_list
                         if metric in results[task]
-                    ]  # TODO: copy?
-                    stderrs = [
+                    ]
+                    std_errs = [
                         results[task][stderr]
                         for task in task_list
                         if stderr in results[task]
@@ -940,22 +1038,16 @@ def evaluate(
                         if metric in results[task]
                     ]
 
-                    # compute group's pooled metric and stderr
+                    # Compute group's pooled metric and stderr
                     results[group][
                         metric
                     ] = lm_eval.api.metrics.aggregate_subtask_metrics(metrics, sizes)
-                    # TODO: calculate grouped metric using aggregation fn
-                    if "N/A" in stderrs:
+                    if "N/A" in std_errs:
                         results[group][stderr] = "N/A"
                     else:
                         results[group][
                             stderr
-                        ] = lm_eval.api.metrics.pooled_sample_stderr(stderrs, sizes)
-                        # TODO: allow GroupConfigs to choose which variance formula is used, for back-compatibility
-                        # To use the old (likely incorrect) variance formula,
-                        #     comment out the above and uncomment this line:
-                        # results[group][stderr] = lm_eval.api.metrics.combined_sample_stderr(
-                        #     stderrs, sizes, metrics=metrics)
+                        ] = lm_eval.api.metrics.pooled_sample_stderr(std_errs, sizes)
 
                     results[group]["samples"] = sum(sizes)
 

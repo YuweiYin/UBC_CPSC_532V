@@ -101,10 +101,13 @@ class PostProcessingPrompts:
         # Ranking Documents Based on Relevance
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
-Rank these documents in order of their relevance to the original query. Provide the ranked list.
+Give a list of retrieved documents as follows:\n{docs}\n\
+Rank these documents in order of their relevance to the original query. Provide the top 5 documents.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -112,11 +115,14 @@ Rank these documents in order of their relevance to the original query. Provide 
         # Summarizing Individual Documents
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Summarize the above documents by extracting its core message or information. \
 Ensure the summary is concise and captures the essence of the document related to the original query.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
 #     @staticmethod
@@ -124,11 +130,14 @@ Ensure the summary is concise and captures the essence of the document related t
 #         # Generating a Consolidated Summary from Multiple Documents
 #         prompt_template = """
 # Given the original query: "{query}"\n\
-# Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+# Give a list of retrieved documents as follows:\n{docs}\n\
 # From the above documents, generate a comprehensive summary that integrates the most relevant information \
 # from each document related to the original query. The summary should be coherent and concise.
 #         """.strip()
-#         prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+#         docs_str = ""
+#         for idx, doc in enumerate(docs, start=1):
+#             docs_str += f"{idx}. {doc}\n"
+#         prompt = prompt_template.format(query=query, docs=docs_str)
 #         return prompt
 
     @staticmethod
@@ -136,11 +145,14 @@ Ensure the summary is concise and captures the essence of the document related t
         # Extracting Key Information from Documents
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 From the above documents, extract the most critical pieces of information related to the original query. \
 Organize the information by relevance and clarity.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -148,11 +160,14 @@ Organize the information by relevance and clarity.
         # Refining and Clarifying Documents
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Refine and clarify the content of the above documents to make it more directly related to the original query. \
 Remove any irrelevant details and enhance the clarity of the document's main points.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -160,11 +175,14 @@ Remove any irrelevant details and enhance the clarity of the document's main poi
         # Evaluating Document Quality and Relevance
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Evaluate the relevance and quality of the above documents in relation to the original query. \
 Provide a brief assessment highlighting its relevance, accuracy, and any biases or inaccuracies detected.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -172,11 +190,14 @@ Provide a brief assessment highlighting its relevance, accuracy, and any biases 
         # Identifying and Highlighting Contradictions or Agreements
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Identify and highlight any agreements or contradictions among the above documents with respect to the original query. \
 Summarize the points of agreement or conflict.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -184,11 +205,14 @@ Summarize the points of agreement or conflict.
         # Filtering Out Duplicate Information
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Identify and remove duplicate information found across the above documents. \
 Provide a cleaned-up version of the content that retains unique information relevant to the original query.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
@@ -196,11 +220,14 @@ Provide a cleaned-up version of the content that retains unique information rele
         # Transforming Document Content into a Structured Format
         prompt_template = """
 Given the original query: "{query}"\n\
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Transform the key information found in the above documents into a structured format (e.g., bullet points, tables) \
 to make the information more accessible and understandable in relation to the original query.
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
 
@@ -214,29 +241,35 @@ class AugmentationPrompts:
     def augmentation_short(query: str, docs: List[str]) -> str:
         # Transforming Document Content into a Structured Format
         prompt_template = """
-Give a list of retrieved documents, where each document separated by "\\n":\n\n{docs}\n\
+Give a list of retrieved documents as follows:\n{docs}\n\
 Based on the above documents, generate an accurate, concise, and reasonable answer to the following query:\n\n{query}
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
     def augmentation_medium(query: str, docs: List[str]) -> str:
         # Transforming Document Content into a Structured Format
         prompt_template = """
-Give the relevant information extracted from external documents:\n\n{docs}\n\
+Give the relevant information extracted from external documents as follows:\n{docs}\n\
 Using the key information from the above documents to create an accurate, concise, and reasonable response. \
 Aim for coherence and insight, addressing the query with depth and clarity. \
 Highlight any significant agreements or contradictions from the external information, ensuring a balanced view. \
 Answer the following query:\n\n{query}
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
     @staticmethod
     def augmentation_long(query: str, docs: List[str]) -> str:
         prompt_template = """
-Give the relevant information extracted from external documents:\n\n{docs}\n\
+Give the relevant information extracted from external documents as follows:\n{docs}\n\
 Generate a comprehensive response that incorporates this information to provide \
 an accurate, concise, and reasonable answer.\n\
 The response should reflect an understanding of the query's intent and the knowledge contained \
@@ -246,7 +279,10 @@ If the processed information supports or contradicts the query, \
 highlight these aspects appropriately, providing a balanced and informed perspective. \
 Answer the following query:\n\n{query}
         """.strip()
-        prompt = prompt_template.format(query=query, docs="\n\n".join(docs))
+        docs_str = ""
+        for idx, doc in enumerate(docs, start=1):
+            docs_str += f"{idx}. {doc}\n"
+        prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
 
