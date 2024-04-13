@@ -246,7 +246,8 @@ Based on the above documents, generate an accurate, concise, and reasonable answ
         """.strip()
         docs_str = ""
         for idx, doc in enumerate(docs, start=1):
-            docs_str += f"{idx}. {doc}\n"
+            if isinstance(doc, str) and len(doc.strip()) > 0:
+                docs_str += f"{idx}. {doc.strip()}\n"
         prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
@@ -262,7 +263,8 @@ Answer the following query:\n\n{query}
         """.strip()
         docs_str = ""
         for idx, doc in enumerate(docs, start=1):
-            docs_str += f"{idx}. {doc}\n"
+            if isinstance(doc, str) and len(doc.strip()) > 0:
+                docs_str += f"{idx}. {doc.strip()}\n"
         prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 
@@ -281,7 +283,8 @@ Answer the following query:\n\n{query}
         """.strip()
         docs_str = ""
         for idx, doc in enumerate(docs, start=1):
-            docs_str += f"{idx}. {doc}\n"
+            if isinstance(doc, str) and len(doc.strip()) > 0:
+                docs_str += f"{idx}. {doc.strip()}\n"
         prompt = prompt_template.format(query=query, docs=docs_str)
         return prompt
 

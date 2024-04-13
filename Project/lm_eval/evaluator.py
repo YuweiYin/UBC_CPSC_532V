@@ -355,6 +355,28 @@ def evaluate(
         Dictionary of results
     """
 
+    # RAG settings
+    args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
+    args.use_rag_preprocess = hasattr(args, "use_rag_preprocess") and \
+                              isinstance(args.use_rag_preprocess, bool) and args.use_rag_preprocess
+    args.use_rag_postprocess = hasattr(args, "use_rag_postprocess") and \
+                               isinstance(args.use_rag_postprocess, bool) and args.use_rag_postprocess
+    args.use_sft = hasattr(args, "use_sft") and isinstance(args.use_sft, bool) and args.use_sft
+    args.use_icl = hasattr(args, "use_icl") and isinstance(args.use_icl, bool) and args.use_icl
+    args.icl_n_example = hasattr(args, "icl_n_example") and isinstance(args.icl_n_example, int) and args.icl_n_example
+    args.use_cot = hasattr(args, "use_cot") and isinstance(args.use_cot, bool) and args.use_cot
+    N_EXAMPLE = int(args.icl_n_example)
+    RAG_LIMIT = int(args.rag_limit)
+    args.rag_source = str(args.rag_source) if hasattr(args, "rag_source") else "ALL"
+    args.rag_preprocess_type = str(args.rag_preprocess_type) \
+        if hasattr(args, "rag_preprocess_type") else "contextual_clarification"
+    args.rag_postprocess_type = str(args.rag_postprocess_type) \
+        if hasattr(args, "rag_postprocess_type") else "summarizing_documents"
+    args.rag_augmentation_type = str(args.rag_augmentation_type) \
+        if hasattr(args, "rag_augmentation_type") else "basic"
+    args.llm_retriever_type = str(args.llm_retriever_type) if hasattr(args, "llm_retriever_type") else "google"
+    args.llm_agent_type = str(args.llm_agent_type) if hasattr(args, "llm_agent_type") else "google"
+
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
     # decontaminate = decontamination_ngrams_path is not None
 
@@ -363,6 +385,10 @@ def evaluate(
     # stores the amount to pad out reqs per req. type so that
     # number of fwd passes per distributed rank is equal
     padding_requests = collections.defaultdict(int)
+
+    # Few-shot for In-context learning and Chain-of-Thought prompting
+    for k, v in task_dict.items():
+        v.config.num_fewshot = max(0, args.icl_n_example) if args.use_icl else None
 
     # get lists of group hierarchy and each type of request
     task_hierarchy, eval_tasks = get_task_list(task_dict)
@@ -413,25 +439,6 @@ def evaluate(
     #     Step 4.5: [Optional] Supervised fine-tuning (SFT) / Instruction Tuning / Alignment via RLHF or DPO
     #     Step 5: Run models and get evaluation results
 
-    # RAG settings
-    args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
-    args.use_rag_preprocess = hasattr(args, "use_rag_preprocess") and \
-        isinstance(args.use_rag_preprocess, bool) and args.use_rag_preprocess
-    args.use_rag_postprocess = hasattr(args, "use_rag_postprocess") and \
-        isinstance(args.use_rag_postprocess, bool) and args.use_rag_postprocess
-    args.use_sft = hasattr(args, "use_sft") and isinstance(args.use_sft, bool) and args.use_sft
-    args.use_icl = hasattr(args, "use_icl") and isinstance(args.use_icl, bool) and args.use_icl
-    args.use_cot = hasattr(args, "use_cot") and isinstance(args.use_cot, bool) and args.use_cot
-    N_EXAMPLE = int(args.icl_n_example)
-    RAG_LIMIT = int(args.rag_limit)
-    args.rag_source = str(args.rag_source) if hasattr(args, "rag_source") else "ALL"
-    args.rag_preprocess_type = str(args.rag_preprocess_type) \
-        if hasattr(args, "rag_preprocess_type") else "contextual_clarification"
-    args.rag_postprocess_type = str(args.rag_postprocess_type) \
-        if hasattr(args, "rag_postprocess_type") else "summarizing_documents"
-    args.llm_retriever_type = str(args.llm_retriever_type) if hasattr(args, "llm_retriever_type") else "google"
-    args.llm_agent_type = str(args.llm_agent_type) if hasattr(args, "llm_agent_type") else "google"
-
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     if args.use_rag:
         textParser = TextParser()  # Keyword extractor
@@ -446,7 +453,7 @@ def evaluate(
     # directQAPrompts = DirectQAPrompts()
     prePrompts = PreProcessingPrompts()
     postPrompts = PostProcessingPrompts()
-    # augmentationPrompts = AugmentationPrompts()
+    augmentationPrompts = AugmentationPrompts()
     # backupPrompts = BackupPrompts()
     # directQAAgent = LLMAgent(model=args.llm_agent_type)  # To answer the query directly. TODO: fit the lm_eval method
     preAgent = LLMAgent(model=args.llm_agent_type)  # To preprocess the query
@@ -469,6 +476,7 @@ def evaluate(
     # Execute each type of request
     for req_type, reqs in requests.items():
         eval_logger.info(f"Running {req_type} requests")
+
         # create `K` copies of each request `req` based off `K = req.repeats`
         cloned_reqs = []
         reqs_to_save = []
@@ -802,30 +810,35 @@ def evaluate(
 
                 # ### RAG Step 4: Augmentation: Combine the docs to the original query (different prompting methods)
                 if len(rag_all) > 0:
-                    rag_context = "Context:\n"
-                    for _idx, _doc in enumerate(rag_all, start=1):
-                        rag_context += f"{_idx}. {_doc}\n"
-                    # if len(atomic_rag) > 0:
-                    #     rag_context += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
-                    # if len(llm_rag) > 0:
-                    #     rag_context += "Large Language Model Knowledge:\n" + "\n".join(llm_rag) + "\n"
-                    # if len(wiki_rag) > 0:
-                    #     rag_context += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
-                    # if len(conceptNet_rag) > 0:
-                    #     rag_context += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
-                    # if len(arxiv_rag) > 0:
-                    #     rag_context += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
-                    # if len(googleSearch_rag) > 0:
-                    #     rag_context += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
-                    rag_context += "\nAnswer the following query with the help of the above context:\n"
-                    rag_prompt = rag_context + req.arguments[0]
+                    match args.rag_augmentation_type:
+                        case "basic":
+                            aug_prompt = "Context:\n"
+                            for _idx, _doc in enumerate(rag_all, start=1):
+                                aug_prompt += f"{_idx}. {_doc}\n"
+                                # if len(atomic_rag) > 0:
+                                #     aug_prompt += "Atomic Knowledge:\n" + "\n".join(atomic_rag) + "\n"
+                                # if len(llm_rag) > 0:
+                                #     aug_prompt += "Large Language Model Knowledge:\n" + "\n".join(llm_rag) + "\n"
+                                # if len(wiki_rag) > 0:
+                                #     aug_prompt += "Wikipedia Knowledge:\n" + "\n".join(wiki_rag) + "\n"
+                                # if len(conceptNet_rag) > 0:
+                                #     aug_prompt += "ConceptNet Knowledge:\n" + "\n".join(conceptNet_rag) + "\n"
+                                # if len(arxiv_rag) > 0:
+                                #     aug_prompt += "arXiv Knowledge:\n" + "\n".join(arxiv_rag) + "\n"
+                                # if len(googleSearch_rag) > 0:
+                                #     aug_prompt += "Google Search Knowledge:\n" + "\n".join(googleSearch_rag) + "\n"
+                            aug_prompt += "\nAnswer the following query with the help of the above context:\n"
+                            aug_prompt += req.arguments[0]
+                        case "short":
+                            aug_prompt = augmentationPrompts.augmentation_short(cur_query, docs=rag_all)
+                        case "medium":
+                            aug_prompt = augmentationPrompts.augmentation_medium(cur_query, docs=rag_all)
+                        case "long":
+                            aug_prompt = augmentationPrompts.augmentation_long(cur_query, docs=rag_all)
+                        case _:
+                            raise ValueError(f"ValueError: rag_augmentation_type = {args.rag_augmentation_type}")
 
-                    # augmentation_short_prompt = augmentationPrompts.augmentation_short(cur_query, docs=rag_docs)
-                    # augmentation_medium_prompt = augmentationPrompts.augmentation_medium(cur_query, docs=rag_docs)
-                    # augmentation_long_prompt = augmentationPrompts.augmentation_long(cur_query, docs=rag_docs)
-                    # rag_prompt = augmentation_short_prompt
-
-                    req.arguments = (rag_prompt, req.arguments[1])  # Augmentation
+                    req.arguments = (aug_prompt, req.arguments[1])  # Augmentation
 
                 rag_timer_end = time.perf_counter()
                 rag_time = rag_timer_end - rag_timer_start

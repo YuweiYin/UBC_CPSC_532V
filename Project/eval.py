@@ -258,6 +258,12 @@ def parse_eval_args() -> argparse.Namespace:
              "Default: \"summarizing_documents\""
     )
     parser.add_argument(
+        "--rag_augmentation_type",
+        type=str,
+        default="basic",
+        help="Options: \"basic\", \"short\", \"medium\", \"long\". Default: \"basic\""
+    )
+    parser.add_argument(
         "--rag_limit",
         type=int,
         default=-1,
