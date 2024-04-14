@@ -34,6 +34,7 @@ from rag.llm_agent import LLMAgent
 from rag.prompt import (
     DirectQAPrompts, PreProcessingPrompts, PostProcessingPrompts, AugmentationPrompts, BackupPrompts,
 )
+from rag.deduplicator import Deduplicator
 
 if TYPE_CHECKING:
     from lm_eval.api.model import LM
@@ -358,9 +359,9 @@ def evaluate(
     # RAG settings
     args.use_rag = hasattr(args, "use_rag") and isinstance(args.use_rag, bool) and args.use_rag
     args.use_rag_preprocess = hasattr(args, "use_rag_preprocess") and \
-                              isinstance(args.use_rag_preprocess, bool) and args.use_rag_preprocess
+        isinstance(args.use_rag_preprocess, bool) and args.use_rag_preprocess
     args.use_rag_postprocess = hasattr(args, "use_rag_postprocess") and \
-                               isinstance(args.use_rag_postprocess, bool) and args.use_rag_postprocess
+        isinstance(args.use_rag_postprocess, bool) and args.use_rag_postprocess
     args.use_sft = hasattr(args, "use_sft") and isinstance(args.use_sft, bool) and args.use_sft
     args.use_icl = hasattr(args, "use_icl") and isinstance(args.use_icl, bool) and args.use_icl
     args.icl_n_example = hasattr(args, "icl_n_example") and isinstance(args.icl_n_example, int) and args.icl_n_example
@@ -388,7 +389,7 @@ def evaluate(
 
     # Few-shot for In-context learning and Chain-of-Thought prompting
     for k, v in task_dict.items():
-        v.config.num_fewshot = max(0, args.icl_n_example) if args.use_icl else None
+        v.config.num_fewshot = max(0, N_EXAMPLE) if args.use_icl else None
 
     # get lists of group hierarchy and each type of request
     task_hierarchy, eval_tasks = get_task_list(task_dict)
@@ -442,6 +443,15 @@ def evaluate(
     # TextParser and Retrievers for Retrieval-Augmented Generation (RAG)
     if args.use_rag:
         textParser = TextParser()  # Keyword extractor
+        deduplicator = Deduplicator(
+            model_name="sentence-transformers/sentence-t5-large",
+            device=args.device,
+            cache_folder=args.cache_dir,
+            trust_remote_code=True,
+            revision=None,
+            threshold=0.8,
+        )
+
         wikiRetriever = WikiRetriever(full_text=False)
         googleSearchRetriever = GoogleSearchRetriever()
         LLMRetriever = LLMAgent(model=args.llm_retriever_type)  # LLM (Default: Google Gemini. Free)
