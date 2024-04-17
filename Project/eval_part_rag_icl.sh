@@ -8,7 +8,7 @@ MODEL=$2
 DTYPE=$3  # "float32", "float16", "auto"
 BSZ=$4  # "64", "32", "auto:8"
 RAG=$5  # "wiki" "conceptNet" "arxiv" "googleSearch" "llm" "atomic"
-ICL=$5  # 1, 3, 5, 8
+ICL=$6  # 1, 3, 5, 8
 
 CACHE_DIR="/ubc/cs/research/nlp/yuweiyin/.cache/huggingface/"
 mkdir -p "${CACHE_DIR}"
