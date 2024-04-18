@@ -18,7 +18,7 @@ run_train(){
   task=$1
   echo -e "\n>>> Start TRAINING <<< Task: ${task}; Model: ${MODEL}\n"
   CUDA_VISIBLE_DEVICES=${CUDA} python3 train.py \
-  --cuda "0" --verbose --seed 42 \
+  --cuda "0" --verbose --use_wandb --seed 42 \
   --ds_name "${task}" \
   --model_name "${MODEL}" \
   --eval_gap 1000 --logging_gap 100 \

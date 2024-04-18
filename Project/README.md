@@ -139,7 +139,8 @@ python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1"
 * Or use the bash script:
 
 ```bash
-bash train.sh "0" "commonsense_qa" "olmo-1b" "32" "5" "5" "5" > "log/train---OLMo-1B---commonsense_qa---32_5_5_5.log"
+bash train.sh "0" "commonsense_qa" "gpt2" "32" "5" "5" "5" > "log/train---gpt2---commonsense_qa---32_5_5_5.log"
+bash train.sh "0" "commonsense_qa" "gpt2-xl" "32" "5" "5" "5" > "log/train---gpt2-xl---commonsense_qa---32_5_5_5.log"
 ```
 
 ## Experiments
