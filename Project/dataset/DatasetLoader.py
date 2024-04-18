@@ -88,17 +88,21 @@ class DatasetLoader:
         :return: the in-context-learning prompts.
         """
 
-        icl_indices = random.sample(range(len(source_dataset)), max(3, n_icl))
-        icl_dataset = source_dataset.select(icl_indices)
+        icl_indices = random.sample(range(len(source_dataset)), max(0, n_icl))
         icl_prompt = ""
-        for icl_item in icl_dataset:
-            icl_item = self.map_prompt(icl_item)  # get the prompt (without answer)
-            # cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set answers for ICL examples
-            cur_prompt = icl_item["prompt"] + f"Answer:{icl_item['answer']}\n\n"  # set answers for ICL examples
-            icl_prompt += cur_prompt
-        # icl_prompt_len = len(icl_prompt)
-        if verbose:
-            self.logger.info(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
+        if len(icl_indices) > 0:
+            icl_dataset = source_dataset.select(icl_indices)
+            for icl_item in icl_dataset:
+                icl_item = self.map_prompt(icl_item)  # get the prompt (without answer)
+                # cur_prompt = icl_item["prompt"] + f"Answer: {icl_item['answer']}\n\n"  # set answers for ICL examples
+                cur_prompt = icl_item["prompt"] + f"Answer:{icl_item['answer']}\n\n"  # set answers for ICL examples
+                icl_prompt += cur_prompt
+            # icl_prompt_len = len(icl_prompt)
+            if verbose:
+                self.logger.info(f"[Prompt] In-context Learning ({n_icl} examples):\n{icl_prompt}")
+        else:
+            if verbose:
+                self.logger.info(f"[Prompt] NOT use In-context Learning")
 
         return icl_prompt
 

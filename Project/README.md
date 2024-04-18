@@ -136,6 +136,12 @@ python3 train_ddp.py --ds_name "commonsense_qa" --model_name "gpt2" --cuda "0,1"
 **Model Parallel** ([PyTorch](https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html), 
 [Transformers](https://huggingface.co/transformers/v4.9.2/parallelism.html)) is also recommended.
 
+* Or use the bash script:
+
+```bash
+bash train.sh "0" "commonsense_qa" "olmo-1b" "32" "5" "5" "5" > "log/train---OLMo-1B---commonsense_qa---32_5_5_5.log"
+```
+
 ## Experiments
 
 ### Training Results
