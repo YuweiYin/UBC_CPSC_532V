@@ -1,5 +1,7 @@
 # UBC CPSC 532V (2023W2) Project
 
+* [Project Report](./docs/UBC_CPSC_532V-Project_Report.pdf)
+
 ## Environment (Linux; macOS)
 
 ### Miniconda3
@@ -288,9 +290,5 @@ bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki"
     * Step 1: Use train.py / train_dp.py / train_ddp.py to fine-tune models; Load the trained model by;
     * Step 2: Pass `--model_args "pretrained=/path/to/huggingface_checkpoint,dtype=float"` and `--use_sft` to `eval.py`
 * **Case Study**: Run `case_study.py`, which is suitable to observe the quality of RAG retrievals.
-
----
-
-* [Project Report](./docs/UBC_CPSC_532V-Project_Report.pdf)
 
 ---
