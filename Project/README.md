@@ -290,3 +290,7 @@ bash eval_all_rag.sh "0" "openai-community/gpt2" "float16" "auto:8" "wiki"
 * **Case Study**: Run `case_study.py`, which is suitable to observe the quality of RAG retrievals.
 
 ---
+
+* [Project Report](./docs/UBC_CPSC_532V-Project_Report.pdf)
+
+---
